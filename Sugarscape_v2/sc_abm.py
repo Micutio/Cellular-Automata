@@ -30,7 +30,7 @@ STARTING_SUGAR = (40, 80)
 
 
 class Agent:
-    def __init__(self, g_id, x, y, su, sp, m, v, g, f, d):
+    def __init__(self, g_id, x, y, su, sp, m_su, m_sp, v, g, f, d):
         """
         Initializes an agent
         """
@@ -43,7 +43,8 @@ class Agent:
         self.init_spice = sp
         self.sugar = su
         self.spice = sp
-        self.metabolism = m
+        self.metab_sugar = m_su
+        self.metab_spice = m_sp
         self.vision = v
         self.gender = g
         self.fertility = f
@@ -159,8 +160,8 @@ class Agent:
         self.spice += cell.spice
         cell.sugar = 0
         cell.spice = 0
-        self.sugar -= self.metabolism
-        self.spice -= self.metabolism
+        self.sugar -= self.metab_sugar
+        self.spice -= self.metab_spice
         if self.sugar <= 0 or self.spice <= 0:
             self.dead = True
 
@@ -188,7 +189,8 @@ class Agent:
                     self.spice -= int(self.init_spice / 2)
                     m.sugar -= int(m.init_sugar / 2)
                     m.spice -= int(m.init_spice / 2)
-                    n_m = int((self.metabolism + m.metabolism) / 2)
+                    n_m_su = int((self.metab_sugar + m.metab_spice) / 2)
+                    n_m_sp = int((self.metab_sugar + m.metab_spice) / 2)
                     n_v = random.choice([self.vision, m.vision])
                     n_g = random.choice([self.gender, m.gender])
                     if n_g == self.gender:
@@ -198,7 +200,7 @@ class Agent:
                     d1 = self.dying_age
                     d2 = m.dying_age
                     n_d = random.randint(min(d1, d2), max(d1, d2))
-                    agent_positions[n_x, n_y] = Agent(n_id, n_x, n_y, n_su, n_sp, n_m, n_v, n_g, n_f, n_d)
+                    agent_positions[n_x, n_y] = Agent(n_id, n_x, n_y, n_su, n_sp, n_m_su, n_m_sp, n_v, n_g, n_f, n_d)
 
 
 class ABM:
@@ -213,7 +215,8 @@ class ABM:
         positions = random.sample(positions, num_agents)
         random.shuffle(positions)
         for p in positions:
-            metabolism = random.randint(MIN_METABOLISM, MAX_METABOLISM)
+            metab_sugar = random.randint(MIN_METABOLISM, MAX_METABOLISM)
+            metab_spice = random.randint(MIN_METABOLISM, MAX_METABOLISM)
             vision = random.randint(1, VISION)
             g = random.choice(["f", "m"])
             if g == "f":
@@ -223,7 +226,7 @@ class ABM:
             su = random.randint(STARTING_SUGAR[0], STARTING_SUGAR[1])
             sp = random.randint(STARTING_SUGAR[0], STARTING_SUGAR[1])
             d = random.randint(f[1], MAX_AGENT_LIFE)
-            self.agent_dict[p[0], p[1]] = Agent(str(a_id), p[0], p[1], su, sp, metabolism, vision, g, f, d)
+            self.agent_dict[p[0], p[1]] = Agent(str(a_id), p[0], p[1], su, sp, metab_sugar, metab_spice, vision, g, f, d)
             a_id += 1
 
     def cycle_system(self, ca):
