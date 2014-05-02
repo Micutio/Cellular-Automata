@@ -1,0 +1,38 @@
+def determine_next_step(self, ca, c):
+        cell_x = (c.x * 10) + 5
+        if cell_x < self.x:
+            if self.x - cell_x <= self.vision * 10:
+                self.next_x = (self.x - 10)
+            else:
+                self.next_x = (self.x + 10)
+        elif cell_x > self.x:
+            if cell_x - self.x <= self.vision * 10:
+                self.next_x = (self.x + 10)
+            else:
+                self.next_x = (self.x - 10)
+        elif cell_x == self.x:
+            self.next_x = self.x
+
+        cell_y = (c.y * 10) + 5
+        if cell_y < self.y:
+            if self.y - cell_y <= self.vision * 10:
+                self.next_y = (self.y - 10)
+            else:
+                self.next_y = (self.y + 10)
+        elif cell_y > self.y:
+            if cell_y - self.y <= self.vision * 10:
+                self.next_y = (self.y + 10)
+            else:
+                self.next_y = (self.y - 10)
+        elif cell_y == self.y:
+            self.next_y = self.y
+
+        if self.next_x > ca.grid_width:
+            self.next_x -= ca.grid_width
+        if self.next_x < 0:
+            self.next_x += ca.grid_width
+
+        if self.next_y > ca.grid_height:
+            self.next_y -= ca.grid_height
+        if self.next_y < 0:
+            self.next_y += ca.grid_height
