@@ -75,7 +75,12 @@ class ClassCell:
     def draw(self, surf):
         #print("new color: (%i,%i,%i)" % (red, green, blue))
         col = self.calculate_color()
+        col2 = (col[0] * 0.9, col[1] * 0.9, col[2] * 0.9)
         pygame.draw.rect(surf, col, (self.x * self.w, self.y * self.h, self.w, self.h), 0)
+        lx = self.x * self.w
+        ly = self.y * self.h
+        pygame.draw.line(surf, col2, [lx + 1, ly + 9], [lx + 9, ly + 9], 2)
+        pygame.draw.line(surf, col2, [lx + 9, ly + 1], [lx + 9, ly + 9], 2)
 
     def calculate_color(self):
         if self.max_sugar == 0:
