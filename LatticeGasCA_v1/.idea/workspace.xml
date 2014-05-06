@@ -489,7 +489,11 @@
       <created>1399390968523</created>
       <updated>1399390968523</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary=" - excluded more unnecessary files">
+      <created>1399391295711</created>
+      <updated>1399391295711</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="ToolWindowManager">
