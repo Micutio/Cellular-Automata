@@ -6,6 +6,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Sugarscape_v2" />
     <orderEntry type="module" module-name="ThermalCreep" />
+    <orderEntry type="module" module-name="LatticeGasCA" />
   </component>
 </module>
 
