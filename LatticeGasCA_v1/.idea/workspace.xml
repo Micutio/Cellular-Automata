@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="8b5b55ae-56f1-4222-b12f-b35c92aaff3f" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/LatticeGasCA_v1.iml" afterPath="$PROJECT_DIR$/.idea/LatticeGasCA_v1.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Sugarscape_v2/.idea/Sugarscape_v2.iml" afterPath="$PROJECT_DIR$/../Sugarscape_v2/.idea/Sugarscape_v2.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../ThermalCreep/.idea/ThermalCreep.iml" afterPath="$PROJECT_DIR$/../ThermalCreep/.idea/ThermalCreep.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="ThermalCreep.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -24,7 +27,35 @@
     <favorites_list name="ThermalCreep" />
   </component>
   <component name="FileEditorManager">
-    <leaf />
+    <leaf>
+      <file leaf-file-name="sc_main.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../Sugarscape_v2/sc_main.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="3111">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sc_ca.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/../Sugarscape_v2/sc_ca.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="72" column="29" selection-start="2024" selection-end="2029" vertical-scroll-proportion="0.0" vertical-offset="1005" max-vertical-offset="5814">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sc_abm.py" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../Sugarscape_v2/sc_abm.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="45" column="31" selection-start="1246" selection-end="1246" vertical-scroll-proportion="0.7338129" vertical-offset="459" max-vertical-offset="4641">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
   </component>
   <component name="FindManager">
     <FindUsagesManager>
@@ -122,19 +153,20 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="options.lastSelected" value="preferences.sourceCode.Python" />
+    <property name="options.lastSelected" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../LatticeGasCA_v2" />
     <property name="recentsLimit" value="5" />
+    <property name="FullScreen" value="false" />
   </component>
   <component name="PyConsoleOptionsProvider">
     <option name="myPythonConsoleState">
       <console-settings />
     </option>
   </component>
-  <component name="RunManager" selected="Python.main (1)">
+  <component name="RunManager" selected="Python.sc_main">
     <configuration default="false" name="main" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -172,6 +204,24 @@
       <RunnerSettings RunnerId="PyDebugRunner" />
       <RunnerSettings RunnerId="PythonRunner" />
       <ConfigurationWrapper RunnerId="PyDebugRunner" />
+      <ConfigurationWrapper RunnerId="PythonRunner" />
+      <method />
+    </configuration>
+    <configuration default="false" name="sc_main" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:/Python33/python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../Sugarscape_v2" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="LatticeGasCA_v1" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/../Sugarscape_v2/sc_main.py" />
+      <option name="PARAMETERS" value="" />
+      <RunnerSettings RunnerId="PythonRunner" />
       <ConfigurationWrapper RunnerId="PythonRunner" />
       <method />
     </configuration>
@@ -296,14 +346,16 @@
       <option name="USE_PATTERN" value="false" />
       <method />
     </configuration>
-    <list size="2">
+    <list size="3">
       <item index="0" class="java.lang.String" itemvalue="Python.main" />
       <item index="1" class="java.lang.String" itemvalue="Python.main (1)" />
+      <item index="2" class="java.lang.String" itemvalue="Python.sc_main" />
     </list>
     <recent_temporary>
-      <list size="2">
-        <item index="0" class="java.lang.String" itemvalue="Python.main (1)" />
-        <item index="1" class="java.lang.String" itemvalue="Python.main" />
+      <list size="3">
+        <item index="0" class="java.lang.String" itemvalue="Python.sc_main" />
+        <item index="1" class="java.lang.String" itemvalue="Python.main (1)" />
+        <item index="2" class="java.lang.String" itemvalue="Python.main" />
       </list>
     </recent_temporary>
   </component>
@@ -357,7 +409,7 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.12708499" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33333334" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Event Log" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32876712" sideWeight="0.50045496" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.50045496" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.325723" sideWeight="0.49954504" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32876712" sideWeight="0.49954504" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -437,16 +489,6 @@
         <state line="67" column="33" selection-start="2006" selection-end="2006" vertical-scroll-proportion="0.0" vertical-offset="784" max-vertical-offset="3417" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/../Sugarscape_v2/sc_ca.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="72" column="29" selection-start="2024" selection-end="2029" vertical-scroll-proportion="0.33333334" vertical-offset="950" max-vertical-offset="5729" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/../Sugarscape_v2/sc_abm.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="7" selection-start="166" selection-end="166" vertical-scroll-proportion="83.88" vertical-offset="2250" max-vertical-offset="4641" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="58" column="83" selection-start="1834" selection-end="1834" vertical-scroll-proportion="0.0" vertical-offset="146" max-vertical-offset="1870" />
@@ -467,6 +509,27 @@
     <entry file="file://$PROJECT_DIR$/../LatticeGasCA_v2/main.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="119" column="0" selection-start="4949" selection-end="4949" vertical-scroll-proportion="2.3975904" vertical-offset="960" max-vertical-offset="2346">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../Sugarscape_v2/sc_ca.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="72" column="29" selection-start="2024" selection-end="2029" vertical-scroll-proportion="0.0" vertical-offset="1005" max-vertical-offset="5814">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../Sugarscape_v2/sc_main.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3111">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/../Sugarscape_v2/sc_abm.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="45" column="31" selection-start="1246" selection-end="1246" vertical-scroll-proportion="0.7338129" vertical-offset="459" max-vertical-offset="4641">
           <folding />
         </state>
       </provider>
