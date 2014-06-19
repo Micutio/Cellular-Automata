@@ -15,6 +15,7 @@ import colorsys
 #import time
 
 import pygame
+import random
 
 #########################################################################
 ###                       Global Variables                            ###
@@ -37,37 +38,31 @@ class ClassCell:
     """
     This class models one cell of the CA, while the grid itself will be a dictionary of ClassCell instances.
     """
-    def __init__(self, x, y, temperature):
+    def __init__(self, x, y, persist):
         self.col = (0, 0, 0)
         self.x = x
         self.y = y
         self.w = 10
         self.h = 10
-        self.temperature = temperature
-        self.temp_balance = 0
-        self.persist = False
-        self.neigh_temp = []
+        self.temperature = 0
+        self.neighbor_count = 0
+        self.persist = persist
 
     def get_temperature(self):
         return self.temperature
 
     def sense_neigh(self, neighbor):
-        self.temp_balance += neighbor.get_temperature()
         if neighbor.get_temperature() > 0:
-            self.neigh_temp.append(neighbor.get_temperature())
+            self.neighbor_count += 1
 
     def regulate(self):
         """
         This method regulates the cell's temperature according to the temperature of its neighbors.
         """
-        i = 0
-        for n in self.neigh_temp:
-            if n > self.temp_balance:
-                i += 1
-        if i >= 2 and self.temperature < MAX_TEMPERATURE:
-            self.temperature += 1
-        elif self.temperature > 0:
-            self.temperature -= 1
+        ratio = (self.neighbor_count / 8)
+        if (self.temperature == 0 and random.random() < ratio / 10) or (self.temperature > 0 and not self.persist):
+            self.temperature = ratio * 100
+        self.neighbor_count = 0
 
     @property
     def calculate_color_hsv(self):
@@ -143,7 +138,7 @@ def init_ca():
     width = int(GRID_WIDTH / 10)
     for y in range(0, height):
         for x in range(0, width):
-            ca_grid[x, y] = ClassCell(x, y, 0)
+            ca_grid[x, y] = ClassCell(x, y, False)
 
     return ca_grid
 

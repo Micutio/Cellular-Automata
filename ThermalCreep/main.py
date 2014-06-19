@@ -72,13 +72,13 @@ def main():
                 if event.button == 1:
                     print("Cell %i, %i = 1, T = %i" % (mx, my, ca[int(mx), int(my)].temperature))
                     ca[int(mx), int(my)].temperature = MAX_TEMPERATURE
-                    ca[int(mx), int(my)].persist = not ca[int(mx), int(my)].persist
+                    ca[int(mx), int(my)].persist = True
 
                 # Click on right mouse button
                 elif event.button == 3:
                     print("Cell %i, %i = 1, T = %i" % (mx, my, ca[int(mx), int(my)].temperature))
                     ca[int(mx), int(my)].temperature = 0
-                    ca[int(mx), int(my)].persist = not ca[int(mx), int(my)].persist
+                    ca[int(mx), int(my)].persist = False
 
             # Keyboard key is pressed
             elif event.type == pygame.KEYUP:
@@ -100,7 +100,7 @@ def main():
         draw_cells(ca, screen)
 
         pygame.display.flip()
-        #time.sleep(tick_delay)
+        time.sleep(tick_delay)
 
 
 if __name__ == '__main__':
