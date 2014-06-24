@@ -39,7 +39,6 @@ class ClassCell:
     This class models one cell of the CA, while the grid itself will be a dictionary of ClassCell instances.
     """
     def __init__(self, x, y, persist):
-        self.col = (0, 0, 0)
         self.x = x
         self.y = y
         self.w = 10
@@ -62,7 +61,6 @@ class ClassCell:
         ratio = (self.neighbor_count / 8)
         if (self.temperature == 0 and random.random() < ratio / 10) or (self.temperature > 0 and not self.persist):
             self.temperature = ratio * 100
-        self.neighbor_count = 0
 
     @property
     def calculate_color_hsv(self):
@@ -111,8 +109,17 @@ class ClassCell:
 
     def draw(self, surf):
         #print("new color: (%i,%i,%i)" % (red, green, blue))
-        self.col = self.calculate_color()
-        pygame.draw.rect(surf, self.col, (self.x * self.w, self.y * self.h, self.w, self.h), 0)
+        col = self.calculate_color()
+        pygame.draw.rect(surf, col, (self.x * self.w, self.y * self.h, self.w, self.h), 0)
+
+        col = self.calculate_color()
+        col2 = (col[0] * 0.6, col[1] * 0.6, col[2] * 0.6)
+        lx = self.x * self.w
+        ly = self.y * self.h
+        thick = self.neighbor_count
+        pygame.draw.line(surf, col2, [lx + 1, ly + 9], [lx + 9, ly + 9], thick)
+        pygame.draw.line(surf, col2, [lx + 9, ly + 1], [lx + 9, ly + 9], thick)
+        self.neighbor_count = 0
 
 
 #########################################################################
