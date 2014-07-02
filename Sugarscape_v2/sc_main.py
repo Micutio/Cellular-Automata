@@ -30,8 +30,10 @@ class GlobalConstants:
         self.num_agents = 250
         self.random_landscape = False
         self.run_simulation = False
-        self.grid_width = 500
-        self.grid_height = 500
+        self.cell_size = 15
+        self.grid_width = int(500 / 10) * self.cell_size
+        self.grid_height = int(500 / 10) * self.cell_size
+
         #self.abm_bounds = (0, 10, 40, 50)
         self.abm_bounds = (0, 50, 0, 50)
         self.ticks = 0
@@ -50,8 +52,8 @@ class EventHandler:
 
     def mouse_motion(self):
         self.mx, self.my = pygame.mouse.get_pos()
-        self.mx = (self.mx / 10)
-        self.my = (self.my / 10)
+        self.mx = (self.mx / GC.cell_size)
+        self.my = (self.my / GC.cell_size)
 
     def mouse_action(self, button, ca):
         # Click on left mouse button, set temperature of cell to max
@@ -77,8 +79,8 @@ class EventHandler:
         if active_key == pygame.K_e:
             px = math.floor(self.mx)
             py = math.floor(self.my)
-            ax = (10 * px) + 5
-            ay = (10 * py) + 5
+            ax = (GC.cell_size * px) + int(GC.cell_size / 2)
+            ay = (GC.cell_size * py) + int(GC.cell_size / 2)
             a = abm.get_agent_at_position(ax, ay)
             if a:
                 print("+----- CELL INFO ------------------------------------------------------")
@@ -111,7 +113,7 @@ class EventHandler:
             print("+----------------------------------------------------------------------")
         # r key is pressed, reset the simulation
         if active_key == pygame.K_r:
-            ca.__init__(GC.random_landscape, GC.grid_width, GC.grid_height)
+            ca.__init__(GC.random_landscape, GC.grid_width, GC.grid_height, GC.cell_size)
             abm.__init__(GC.num_agents, GC.abm_bounds[0], GC.abm_bounds[1], GC.abm_bounds[2], GC.abm_bounds[3])
             GC.ticks = 0
             render_simulation(ca, abm, screen)
@@ -154,11 +156,12 @@ def main():
     pygame.display.set_caption('Sugarscape')
 
     # Initialize the ca grid.
-    ca = CA(GC.random_landscape, GC.grid_width, GC.grid_height)
+    ca = CA(GC.random_landscape, GC.grid_width, GC.grid_height, GC.cell_size)
     #abm = ABM(GLOBAL_CONSTANTS.num_agents, GLOBAL_CONSTANTS.grid_width, GLOBAL_CONSTANTS.grid_height)
-    abm = ABM(GC.num_agents, GC.abm_bounds[0], GC.abm_bounds[1], GC.abm_bounds[2], GC.abm_bounds[3])
+    abm = ABM(GC.num_agents, GC.cell_size, GC.abm_bounds[0], GC.abm_bounds[1], GC.abm_bounds[2], GC.abm_bounds[3])
     handler = EventHandler()
 
+    # TODO: fix simulation loop
     # Initialize other simulation related objects
     clock = pygame.time.Clock()
     while 1:

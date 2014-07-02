@@ -37,11 +37,11 @@ class ClassCell:
     This class models one cell of the CA, while the grid itself will be a dictionary of ClassCell instances.
     """
 
-    def __init__(self, x, y, sugar, spice, growth, period):
+    def __init__(self, x, y, c_size, sugar, spice, growth, period):
         self.x = x
         self.y = y
-        self.w = 10
-        self.h = 10
+        self.w = c_size
+        self.h = c_size
         self.sugar = sugar
         self.spice = spice
         self.max_sugar = sugar
@@ -79,8 +79,8 @@ class ClassCell:
         pygame.draw.rect(surf, col, (self.x * self.w, self.y * self.h, self.w, self.h), 0)
         lx = self.x * self.w
         ly = self.y * self.h
-        pygame.draw.line(surf, col2, [lx + 1, ly + 9], [lx + 9, ly + 9], 2)
-        pygame.draw.line(surf, col2, [lx + 9, ly + 1], [lx + 9, ly + 9], 2)
+        pygame.draw.line(surf, col2, [lx + 1, ly + self.w - 1], [lx + self.h - 1, ly + self.w - 1], int(self.w * 0.2))
+        pygame.draw.line(surf, col2, [lx + self.h - 1, ly + 1], [lx + self.h - 1, ly + self.w - 1], int(self.w * 0.2))
 
     def calculate_color(self):
         if self.max_sugar == 0:
@@ -103,7 +103,7 @@ class ClassCell:
 
 
 class CA:
-    def __init__(self, random_init, grid_height, grid_width):
+    def __init__(self, random_init, grid_height, grid_width, cell_size):
         """
         Initializes and returns the cellular automaton.
         The CA is a dictionary and not a list of lists
@@ -112,18 +112,19 @@ class CA:
         self.ca_grid = {}
         self.grid_height = grid_height
         self.grid_width = grid_width
-        self.height = int(self.grid_height / 10)
-        self.width = int(self.grid_width / 10)
+        self.height = int(self.grid_height / cell_size)
+        self.width = int(self.grid_width / cell_size)
+        self.cell_size = cell_size
         if random_init:
             for y in range(0, self.height):
                 for x in range(0, self.width):
-                    self.ca_grid[x, y] = ClassCell(x, y, random.randint(0, MAX_SUGAR), GROWTH_PER_TICK, GROWTH_PERIOD)
+                    self.ca_grid[x, y] = ClassCell(x, y, cell_size, random.randint(0, MAX_SUGAR), GROWTH_PER_TICK, GROWTH_PERIOD)
         else:
             sugar_dist = get_two_hill_landscape()
             spice_dist = get_inverted_two_hill_landscape()
             for y in range(0, self.height):
                 for x in range(0, self.width):
-                    self.ca_grid[x, y] = ClassCell(x, y, sugar_dist[x][y], spice_dist[y][x], GROWTH_PER_TICK, GROWTH_PERIOD)
+                    self.ca_grid[x, y] = ClassCell(x, y, cell_size, sugar_dist[x][y], spice_dist[y][x], GROWTH_PER_TICK, GROWTH_PERIOD)
 
     def draw_cells(self, screen):
         """
@@ -150,15 +151,16 @@ class CA:
 
     def get_visible_cells(self, a_pos, agent_x, agent_y, v):
         """
-        Delivers all cells that are in sight of cell(x,y) with sight range of v
+        Delivers all cells that are in sight of cell(x,y) with sight range of v.
+        Here we use the von-Neuman neighborhood
         """
-        x = int(agent_x / 10)
-        y = int(agent_y / 10)
+        x = int(agent_x / self.cell_size)
+        y = int(agent_y / self.cell_size)
         visible_cells = []
         for i in range(-v, v + 1):
             # 1. go through horizontal line of sight
             grid_x = x + i
-            agnt_x = ((grid_x * 10) + 5)
+            agnt_x = ((grid_x * self.cell_size) + int(self.cell_size / 2))
             if (grid_x, y) in self.ca_grid:
                 a = self.ca_grid[grid_x, y]
                 if (agnt_x, agent_y) not in a_pos:
@@ -168,7 +170,7 @@ class CA:
                 visible_cells.append((a, b))
             # 2. go through vertical line of sight
             grid_y = y + i
-            agnt_y = ((grid_y * 10) + 5)
+            agnt_y = ((grid_y * self.cell_size) + int(self.cell_size / 2))
             if (x, grid_y) in self.ca_grid:
                 a = self.ca_grid[x, grid_y]
                 if (agent_x, agnt_y) not in a_pos:
@@ -179,15 +181,15 @@ class CA:
         return visible_cells
 
     def get_neighborhood(self, a_pos, agent_x, agent_y):
-        x = int(agent_x / 10)
-        y = int(agent_y / 10)
+        x = int(agent_x / self.cell_size)
+        y = int(agent_y / self.cell_size)
         neighborhood = []
         for i in range(-1, 2):
             for j in range(-1, 2):
                 grid_x = x + i
-                agnt_x = ((grid_x * 10) + 5)
+                agnt_x = ((grid_x * self.cell_size) + int(self.cell_size / 2))
                 grid_y = y + j
-                agnt_y = ((grid_y * 10) + 5)
+                agnt_y = ((grid_y * self.cell_size) + int(self.cell_size / 2))
                 if (grid_x, grid_y) in self.ca_grid and not (grid_x == 0 and grid_y == 0):
                     a = self.ca_grid[grid_x, grid_y]
                     if (agnt_x, agnt_y) not in a_pos:
@@ -198,8 +200,8 @@ class CA:
         return neighborhood
 
     def highlight_cell(self, screen, x, y):
-        cx = int(x / 10)
-        cy = int(y / 10)
+        cx = int(x / self.cell_size)
+        cy = int(y / self.cell_size)
         self.ca_grid[cx, cy].highlight(screen)
 
     def update_from_neighs(self):

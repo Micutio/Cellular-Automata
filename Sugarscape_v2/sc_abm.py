@@ -30,13 +30,14 @@ STARTING_SUGAR = (40, 80)
 
 
 class Agent:
-    def __init__(self, g_id, x, y, su, sp, m_su, m_sp, v, g, f, d):
+    def __init__(self, g_id, x, y, c_size, su, sp, m_su, m_sp, v, g, f, d, c):
         """
         Initializes an agent
         """
         self.gene_id = g_id
         self.x = x
         self.y = y
+        self.size = c_size
         self.prev_x = x
         self.prev_y = y
         self.init_sugar = su
@@ -51,7 +52,7 @@ class Agent:
         self.age = 1
         self.dying_age = d
         self.dead = False
-        self.radius = 5
+        self.culture = c
 
     def visible_cells(self, ca):
         return ca.get_all_cells_in_vision(self.x, self.y, self.vision)
@@ -60,27 +61,33 @@ class Agent:
         """
         Method for visualizing the agent
         """
+        radius = int(self.size / 2)
         if not self.dead:
             col = self.get_color()
-            pygame.draw.circle(surf, col, [self.x, self.y], self.radius, 0)
-            #pygame.draw.circle(surf, (0, 0, 0), [self.x, self.y], self.radius - 2, 0)
+            pygame.draw.circle(surf, col[0], [self.x, self.y], radius, 0)
+            pygame.draw.circle(surf, col[1], [self.x, self.y], radius - 2, 0)
         else:
-            pygame.draw.circle(surf, (0, 0, 0), [self.x, self.y], self.radius, 0)
+            pygame.draw.circle(surf, (0, 0, 0), [self.x, self.y], radius, 0)
 
     def get_color(self):
-        r = g = b = 0
+        # First color: the ring
+        r0 = g0 = b0 = 0
         if self.is_fertile():
             ratio = 1 - (self.age / MAX_AGENT_LIFE)
             if self.gender == "m":
-                b = 255 * ratio
+                b0 = 255 * ratio
             else:
-                r = 255 * ratio
+                r0 = 255 * ratio
         elif self.age > self.fertility[1]:
-            r = g = b = 80
+            r0 = g0 = b0 = 80
         elif self.age < self.fertility[0]:
-            r = g = 150
-            b = 0
-        return r, g, b
+            r0 = g0 = 150
+            b0 = 0
+        if self.culture.count(0) > self.culture.count(1):
+            r1 = g1 = b1 = 0
+        else:
+            r1 = g1 = b1 = 255
+        return [(r0, g0, b0), (r1, g1, b1)]
 
     def is_fertile(self):
         return self.fertility[0] <= self.age <= self.fertility[1]
@@ -103,10 +110,11 @@ class Agent:
             #nb = ca.get_neighborhood(agent_positions, self.x, self.y)
             vc = ca.get_visible_cells(agent_positions, self.x, self.y, self.vision)
             self.r2_reproduce(vc, agent_positions)
+            self.r3_culture(vc)
 
     def r1_select_best_cell(self, cells):
-        grid_x = int(self.x / 10)
-        grid_y = int(self.y / 10)
+        grid_x = int(self.x / self.size)
+        grid_y = int(self.y / self.size)
 
         if cells:
             search_starting_point = True
@@ -150,8 +158,8 @@ class Agent:
             c = random.choice(result)
             self.prev_x = self.x
             self.prev_y = self.y
-            self.x = (c.x * 10) + 5
-            self.y = (c.y * 10) + 5
+            self.x = (c.x * self.size) + int(self.size / 2)
+            self.y = (c.y * self.size) + int(self.size / 2)
             # Additionally, try to eat from it
             self.eat_from_cell(c)
 
@@ -181,8 +189,9 @@ class Agent:
                 if free_cells and m.is_fertile() and m.gender != self.gender and both_wealthy1 and both_wealthy2:
                     c = free_cells.pop()
                     n_id = self.gene_id + "|"
-                    n_x = (c.x * 10) + 5
-                    n_y = (c.y * 10) + 5
+                    n_x = (c.x * self.size) + int(self.size / 2)
+                    n_y = (c.y * self.size) + int(self.size / 2)
+                    n_s = self.size
                     n_su = int(self.init_sugar / 2) + int(m.init_sugar / 2)
                     n_sp = int(self.init_spice / 2) + int(m.init_spice / 2)
                     self.sugar -= int(self.init_sugar / 2)
@@ -200,18 +209,33 @@ class Agent:
                     d1 = self.dying_age
                     d2 = m.dying_age
                     n_d = random.randint(min(d1, d2), max(d1, d2))
-                    agent_positions[n_x, n_y] = Agent(n_id, n_x, n_y, n_su, n_sp, n_m_su, n_m_sp, n_v, n_g, n_f, n_d)
+                    n_c = []
+                    for bit in range(len(self.culture)):
+                        if self.culture[bit] == m.culture[bit]:
+                            n_c.append(self.culture[bit])
+                        else:
+                            n_c.append(random.choice([self.culture[bit], m.culture[bit]]))
+                    agent_positions[n_x, n_y] = Agent(n_id, n_x, n_y, n_s, n_su, n_sp, n_m_su, n_m_sp, n_v, n_g, n_f, n_d, n_c)
+
+    def r3_culture(self, neighbors):
+        for n in neighbors:
+            if n[1]:
+                index = random.choice(range(len(self.culture)))
+                if n[1].culture[index] != self.culture[index]:
+                    n[1].culture[index] = self.culture[index]
 
 
 class ABM:
-    def __init__(self, num_agents, min_x, max_x, min_y, max_y):
+    def __init__(self, num_agents, c_size, min_x, max_x, min_y, max_y):
         """
         Initializes an abm with the given number of agents and returns it
         :return: An initialized ABM.
         """
         self.agent_dict = {}
         a_id = 0
-        positions = [((x * 10) + 5, (y * 10) + 5) for x in range(min_x, max_x) for y in range(min_y, max_y)]
+        c = c_size
+        r = int(c_size / 2)
+        positions = [((x * c) + r, (y * c) + r) for x in range(min_x, max_x) for y in range(min_y, max_y)]
         positions = random.sample(positions, num_agents)
         random.shuffle(positions)
         for p in positions:
@@ -226,7 +250,8 @@ class ABM:
             su = random.randint(STARTING_SUGAR[0], STARTING_SUGAR[1])
             sp = random.randint(STARTING_SUGAR[0], STARTING_SUGAR[1])
             d = random.randint(f[1], MAX_AGENT_LIFE)
-            self.agent_dict[p[0], p[1]] = Agent(str(a_id), p[0], p[1], su, sp, metab_sugar, metab_spice, vision, g, f, d)
+            c = [random.getrandbits(1) for _ in range(11)]
+            self.agent_dict[p[0], p[1]] = Agent(str(a_id), p[0], p[1], c_size, su, sp, metab_sugar, metab_spice, vision, g, f, d, c)
             a_id += 1
 
     def cycle_system(self, ca):
