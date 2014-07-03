@@ -8,6 +8,7 @@ __version__ = '2.0'
 import random
 import pygame
 import copy
+import math
 
 #########################################################################
 ###                       Global Variables                            ###
@@ -97,6 +98,24 @@ class Agent:
         if self.age >= self.dying_age:
             self.dead = True
 
+    def welfare(self, su, sp):
+        """
+        Relates the time the agent will die of lack of sugar with
+        the time the agent will die of lack of spice.
+        :param su:
+        :param sp:
+        :return:
+        """
+        metab_total = self.metab_sugar + self.metab_spice
+        w1 = math.pow((self.sugar + su), (self.metab_sugar / metab_total))
+        w2 = math.pow((self.spice + sp), (self.metab_spice / metab_total))
+        return w1 * w2
+
+    def mrs(self, su, sp):
+        rate_sugar = (self.sugar + su) / self.metab_sugar
+        rate_spice = (self.spice + sp) / self.metab_spice
+        return rate_spice / rate_sugar
+
     def perceive_and_act(self, ca, agent_positions):
         """
         Perceiving the environment and act according to the rules
@@ -115,36 +134,29 @@ class Agent:
     def r1_select_best_cell(self, cells):
         grid_x = int(self.x / self.size)
         grid_y = int(self.y / self.size)
-
         if cells:
             search_starting_point = True
             result = []
             debug = []
             for c in cells:
+                # First look for an unoccupied (or the own) cell to start with.
                 if not c[1] or (c[1] and c[1].x == self.x and c[1].y == self.y):
-                    # First look for an unoccupied (or the own) cell to start with.
                     if search_starting_point:
                         result.append(c[0])
-                        max_c = c[0]
+                        max_w = self.welfare(c[0].sugar, c[0].spice)
+                        max_dist = (abs(c[0].x - grid_x) + abs(c[0].y - grid_y))
                         search_starting_point = False
                     else:
                         # Then look whether we got higher sugar (clear list, take as new best)
                         # or it is closer and of same sugar as the best (clear list, take as new best)
                         # or identical to best (add to existing list)
-                        dist1 = (abs(c[0].x - grid_x) + abs(c[0].y - grid_y))
-                        dist2 = (abs(max_c.x - grid_x) + abs(max_c.y - grid_y))
-                        if self.sugar < self.spice:
-                            if c[0].sugar > max_c.sugar or (c[0].sugar == max_c.sugar and dist1 < dist2):
-                                result = [c[0]]
-                                max_c = c[0]
-                            elif c[0].sugar == max_c.sugar and dist1 == dist2:
-                                result.append(c[0])
-                        else:
-                            if c[0].spice > max_c.spice or (c[0].spice == max_c.spice and dist1 < dist2):
-                                result = [c[0]]
-                                max_c = c[0]
-                            elif c[0].spice == max_c.spice and dist1 == dist2:
-                                result.append(c[0])
+                        dist = (abs(c[0].x - grid_x) + abs(c[0].y - grid_y))
+                        welfare = self.welfare(c[0].sugar, c[0].spice)
+                        if welfare >= max_w and dist < max_dist:
+                            result = [c[0]]
+                            max_w = welfare
+                        elif welfare == max_w and dist == max_dist:
+                            result.append(c[0])
 
             # In this case we didn't find any good cell
             if search_starting_point or not result:
@@ -223,6 +235,38 @@ class Agent:
                 index = random.choice(range(len(self.culture)))
                 if n[1].culture[index] != self.culture[index]:
                     n[1].culture[index] = self.culture[index]
+
+    def r4_trading(self, neighbors):
+        for n in neighbors:
+            if n[1]:
+                w1 = self.mrs(0, 0)
+                w2 = n[1].mrs(0, 0)
+                if w1 < w2:
+                    p = math.sqrt(w1 * w2)
+                    # trade 1 unit of sugar for p units of spice, obey the constraints
+                    if 1 <= p < n[1].spice and self.sugar > 1 and n[1].spice > p and self.mrs(-1, p) < n[1].mrs(1, -p):
+                        self.sugar -= 1
+                        self.spice += p
+                        n[1].sugar += 1
+                        n[1].spice -= p
+                    elif p < 1 and self.sugar > int(1 / p) and n[1].spice > 1 and self.mrs(- int(1 / p), 1) < n[1].mrs(int(1 / p), -1):
+                        self.sugar -= int(1 / p)
+                        self.spice += 1
+                        n[1].sugar += int(1 / p)
+                        n[1].spice -= 1
+                if w1 > w2:
+                    p = math.sqrt(w1 * w2)
+                    # trade 1 unit of sugar for p units of spice, obey the constraints
+                    if 1 <= p < self.spice and n[1].sugar > 1 and self.spice > p and self.mrs(-1, p) < n[1].mrs(1, -p):
+                        n[1].sugar -= 1
+                        n[1].spice += p
+                        self.sugar += 1
+                        self.spice -= p
+                    elif p < 1 and n[1].sugar > int(1 / p) and self.spice > 1 and n[1].mrs(- int(1 / p), 1) < self.mrs(int(1 / p), -1):
+                        n[1].sugar -= int(1 / p)
+                        n[1].spice += 1
+                        self.sugar += int(1 / p)
+                        self.spice -= 1
 
 
 class ABM:

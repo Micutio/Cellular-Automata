@@ -33,7 +33,6 @@ class GlobalConstants:
         self.cell_size = 15
         self.grid_width = int(500 / 10) * self.cell_size
         self.grid_height = int(500 / 10) * self.cell_size
-
         #self.abm_bounds = (0, 10, 40, 50)
         self.abm_bounds = (0, 50, 0, 50)
         self.ticks = 0
@@ -114,7 +113,7 @@ class EventHandler:
         # r key is pressed, reset the simulation
         if active_key == pygame.K_r:
             ca.__init__(GC.random_landscape, GC.grid_width, GC.grid_height, GC.cell_size)
-            abm.__init__(GC.num_agents, GC.abm_bounds[0], GC.abm_bounds[1], GC.abm_bounds[2], GC.abm_bounds[3])
+            abm.__init__(GC.num_agents, GC.cell_size, GC.abm_bounds[0], GC.abm_bounds[1], GC.abm_bounds[2], GC.abm_bounds[3])
             GC.ticks = 0
             render_simulation(ca, abm, screen)
             print("> reset simulation")
