@@ -151,7 +151,7 @@ def main():
     """
     # Initialize GUI
     pygame.init()
-    screen = pygame.display.set_mode((GC.grid_width, GC.grid_height))
+    screen = pygame.display.set_mode((GC.grid_width, GC.grid_height), pygame.RESIZABLE, 32)
     pygame.display.set_caption('Sugarscape')
 
     # Initialize the ca grid.
