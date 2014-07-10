@@ -36,6 +36,7 @@ class GlobalConstants:
         #self.abm_bounds = (0, 10, 40, 50)
         self.abm_bounds = (0, 50, 0, 50)
         self.ticks = 0
+        self.ms_per_tick = 60
 
 GC = GlobalConstants()
 
@@ -163,14 +164,23 @@ def main():
     # TODO: fix simulation loop
     # Initialize other simulation related objects
     clock = pygame.time.Clock()
+    counter = 0
+    lag = 0.0
     while 1:
         # This block performs a simulation step.
-        #clock.tick(10)
-        if GC.run_simulation:
-            step_simulation(ca, abm)
-            GC.ticks += 1
+        elapsed = clock.tick()
+        lag += elapsed
+        while lag >= GC.ms_per_tick:
+            if GC.run_simulation:
+                step_simulation(ca, abm)
+                GC.ticks += 1
+            lag -= GC.ms_per_tick
+
         render_simulation(ca, abm, screen)
         handler.process_input(ca, abm, screen)
+
+        print(counter)
+        counter += 1
 
 
 def step_simulation(ca, abm):
