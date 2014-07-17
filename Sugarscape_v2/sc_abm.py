@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 __author__ = 'Michael Wagner'
 __version__ = '2.0'
 

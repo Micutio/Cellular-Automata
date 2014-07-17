@@ -1,4 +1,4 @@
-#!/usr/bin/python
+from sc_stat import Statistics
 
 __author__ = 'Michael Wagner'
 __version__ = '2.0'
@@ -30,7 +30,7 @@ class GlobalConstants:
         self.num_agents = 250
         self.random_landscape = False
         self.run_simulation = False
-        self.cell_size = 15
+        self.cell_size = 10
         self.grid_width = int(500 / 10) * self.cell_size
         self.grid_height = int(500 / 10) * self.cell_size
         #self.abm_bounds = (0, 10, 40, 50)
@@ -67,7 +67,7 @@ class EventHandler:
             print("> cell %i, %i = 1, T = %i" % (self.mx, self.my, ca.ca_grid[int(self.mx), int(self.my)].sugar))
             #ca[int(mx), int(my)].sugar = 0
 
-    def keyboard_action(self, active_key, ca, abm, screen):
+    def keyboard_action(self, active_key, ca, abm, stats, screen):
         if active_key == pygame.K_SPACE:
             GC.run_simulation = not GC.run_simulation
             if GC.run_simulation:
@@ -87,7 +87,8 @@ class EventHandler:
                 print("+ > cell (" + str(px) + ", " + str(py) + ") : " + str(ca.ca_grid[px, py].sugar))
                 print("+ > agent " + a.gene_id + ", age: " + str(a.age) + ", will die at " + str(a.dying_age) + ":")
                 print("+ >> sugar(initial): " + str(a.init_sugar) + " sugar(now): " + str(a.sugar))
-                print("+ >> metabolism = " + str(a.metabolism) + ", vision: " + str(a.vision))
+                print("+ >> spice(initial): " + str(a.init_spice) + " spice(now): " + str(a.spice))
+                print("+ >> metab_sugar = " + str(a.metab_sugar) + ", metab_spice: " + str(a.metab_spice))
                 print("+ >> gender: " + a.gender + ", fertile between " + str(a.fertility))
                 print("+----------------------------------------------------------------------")
             else:
@@ -111,6 +112,7 @@ class EventHandler:
             print("+ > ticks: " + str(GC.ticks) + " remaining agents: " + str(len(abm.agent_dict)))
             print("+ > fertile agents: " + str(i) + ", richest: " + str(max_wealth) + ", poorest: " + str(min_wealth))
             print("+----------------------------------------------------------------------")
+            stats.plot()
         # r key is pressed, reset the simulation
         if active_key == pygame.K_r:
             ca.__init__(GC.random_landscape, GC.grid_width, GC.grid_height, GC.cell_size)
@@ -124,7 +126,7 @@ class EventHandler:
             step_simulation(ca, abm)
             render_simulation(ca, abm, screen)
 
-    def process_input(self, ca, abm, screen):
+    def process_input(self, ca, abm, stats, screen):
         for event in pygame.event.get():
             # The 'x' on the window is clicked
             if event.type == QUIT:
@@ -138,7 +140,7 @@ class EventHandler:
             # Keyboard key is pressed
             elif event.type == pygame.KEYUP:
                 # space bar is pressed
-                self.keyboard_action(event.key, ca, abm, screen)
+                self.keyboard_action(event.key, ca, abm, stats, screen)
 
 #########################################################################
 ###                          GLOBAL METHODS                           ###
@@ -160,27 +162,18 @@ def main():
     #abm = ABM(GLOBAL_CONSTANTS.num_agents, GLOBAL_CONSTANTS.grid_width, GLOBAL_CONSTANTS.grid_height)
     abm = ABM(GC.num_agents, GC.cell_size, GC.abm_bounds[0], GC.abm_bounds[1], GC.abm_bounds[2], GC.abm_bounds[3])
     handler = EventHandler()
+    stats = Statistics(abm, ca)
 
     # TODO: fix simulation loop
     # Initialize other simulation related objects
-    clock = pygame.time.Clock()
-    counter = 0
-    lag = 0.0
     while 1:
         # This block performs a simulation step.
-        elapsed = clock.tick()
-        lag += elapsed
-        while lag >= GC.ms_per_tick:
-            if GC.run_simulation:
-                step_simulation(ca, abm)
-                GC.ticks += 1
-            lag -= GC.ms_per_tick
-
+        if GC.run_simulation:
+            step_simulation(ca, abm)
+            stats.update_records()
+            GC.ticks += 1
         render_simulation(ca, abm, screen)
-        handler.process_input(ca, abm, screen)
-
-        print(counter)
-        counter += 1
+        handler.process_input(ca, abm, stats, screen)
 
 
 def step_simulation(ca, abm):
