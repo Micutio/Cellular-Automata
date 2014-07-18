@@ -57,9 +57,9 @@ class ClassCell:
 
     def update(self):
         """
-        This method regulates the cell's temperature according to the temperature of its neighbors.
+        This method updates the sugar/spice amount per cell.
         """
-        if self.period_counter == self.period:
+        if self.period_counter >= self.period:
             self.period_counter = 0
             self.sugar += self.growth
             self.spice += self.growth
@@ -101,7 +101,7 @@ class ClassCell:
 
 
 class CA:
-    def __init__(self, random_init, grid_height, grid_width, cell_size):
+    def __init__(self, init_mode, grid_height, grid_width, cell_size):
         """
         Initializes and returns the cellular automaton.
         The CA is a dictionary and not a list of lists
@@ -113,16 +113,24 @@ class CA:
         self.height = int(self.grid_height / cell_size)
         self.width = int(self.grid_width / cell_size)
         self.cell_size = cell_size
-        if random_init:
-            for y in range(0, self.height):
-                for x in range(0, self.width):
-                    self.ca_grid[x, y] = ClassCell(x, y, cell_size, random.randint(0, MAX_SUGAR), GROWTH_PER_TICK, GROWTH_PERIOD)
-        else:
+        self.season_count = 0
+        self.season = 1
+
+        if init_mode == 1:
+            for i in range(0, self.height):
+                for j in range(0, self.width):
+                    self.ca_grid[i, j] = ClassCell(i, j, cell_size, random.randint(0, MAX_SUGAR), random.randint(0, MAX_SUGAR), GROWTH_PER_TICK, self.season)
+        elif init_mode == 2:
+            landscape = get_procedural_landscape()
+            for i in range(0, self.height):
+                for j in range(0, self.width):
+                    self.ca_grid[i, j] = ClassCell(i, j, cell_size, landscape[i][j], landscape[j][i], GROWTH_PER_TICK, self.season)
+        elif init_mode == 3:
             sugar_dist = get_two_hill_landscape()
             spice_dist = get_inverted_two_hill_landscape()
-            for y in range(0, self.height):
-                for x in range(0, self.width):
-                    self.ca_grid[x, y] = ClassCell(x, y, cell_size, sugar_dist[x][y], spice_dist[y][x], GROWTH_PER_TICK, GROWTH_PERIOD)
+            for i in range(0, self.height):
+                for j in range(0, self.width):
+                    self.ca_grid[i, j] = ClassCell(i, j, cell_size, sugar_dist[i][j], spice_dist[j][i], GROWTH_PER_TICK, self.season)
 
     def draw_cells(self, screen):
         """
@@ -138,6 +146,21 @@ class CA:
         """
         # self.ca_grid = update_from_neighs(ca_grid)
         self.update_states()
+        if self.season_count == 5:
+            self.switch_season()
+        self.season_count += 1
+
+    def switch_season(self):
+        if self.season == 1:
+            self.season = 2
+        else:
+            self.season = 1
+
+        for y in range(0, self.height):
+            for x in range(0, self.width):
+                self.ca_grid[x, y].period = self.season
+
+        self.season_count = 0
 
     def update_states(self):
         """
@@ -275,6 +298,27 @@ def calculate_color_simple(sugar, max_sugar):
         pass
 
     return red * 255, green * 255, blue * 255
+
+
+def get_procedural_landscape():
+    landscape = [[0 for _ in range(50)] for _ in range(50)]
+    # First step: plant some 'seeds' for hills
+    num_hills = random.randint(0, 20)
+    for _ in range(num_hills):
+        rand_x = random.randint(0, 49)
+        rand_y = random.randint(0, 49)
+        landscape[rand_x][rand_y] = MAX_SUGAR
+    for _ in range(50):
+        for i in range(1, 49):
+            for j in range(1, 49):
+                c1 = landscape[i - 1][j]
+                c2 = landscape[i + 1][j]
+                c3 = landscape[i][j - 1]
+                c4 = landscape[i][j + 1]
+                val = random.choice([c1, c2, c3, c4])
+                if 0 < val and landscape[i][j] < MAX_SUGAR:
+                    landscape[i][j] = random.choice(range(1, val + 1))
+    return landscape
 
 
 def get_inverted_two_hill_landscape():

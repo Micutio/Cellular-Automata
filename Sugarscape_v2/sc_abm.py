@@ -52,6 +52,10 @@ class Agent:
         self.dying_age = d
         self.dead = False
         self.culture = c
+        self.sugar_gathered = 0
+        self.spice_gathered = 0
+        self.sugar_traded = 0
+        self.spice_traded = 0
 
     def visible_cells(self, ca):
         return ca.get_all_cells_in_vision(self.x, self.y, self.vision)
@@ -112,7 +116,10 @@ class Agent:
     def mrs(self, su, sp):
         rate_sugar = (self.sugar + su) / self.metab_sugar
         rate_spice = (self.spice + sp) / self.metab_spice
-        return rate_spice / rate_sugar
+        if rate_sugar > 0:
+            return rate_spice / rate_sugar
+        else:
+            return 0
 
     def perceive_and_act(self, ca, agent_positions):
         """
@@ -121,6 +128,10 @@ class Agent:
         self.grow_older()
         self.prev_x = self.x
         self.prev_y = self.y
+        self.sugar_gathered = 0
+        self.spice_gathered = 0
+        self.sugar_traded = 0
+        self.spice_traded = 0
         if not self.dead:
             vc = ca.get_visible_cells(agent_positions, self.x, self.y, self.vision)
             self.r1_select_best_cell(vc)
@@ -128,6 +139,7 @@ class Agent:
             vc = ca.get_visible_cells(agent_positions, self.x, self.y, self.vision)
             self.r2_reproduce(vc, agent_positions)
             self.r3_culture(vc)
+            self.r4_trading(vc)
 
     def r1_select_best_cell(self, cells):
         grid_x = int(self.x / self.size)
@@ -176,6 +188,8 @@ class Agent:
     def eat_from_cell(self, cell):
         self.sugar += cell.sugar
         self.spice += cell.spice
+        self.sugar_gathered += cell.sugar
+        self.spice_gathered += cell.spice
         cell.sugar = 0
         cell.spice = 0
         self.sugar -= self.metab_sugar
@@ -236,7 +250,7 @@ class Agent:
 
     def r4_trading(self, neighbors):
         for n in neighbors:
-            if n[1]:
+            if n[1] and not self.dead and not n[1].dead:
                 w1 = self.mrs(0, 0)
                 w2 = n[1].mrs(0, 0)
                 if w1 < w2:
@@ -247,11 +261,15 @@ class Agent:
                         self.spice += p
                         n[1].sugar += 1
                         n[1].spice -= p
-                    elif p < 1 and self.sugar > int(1 / p) and n[1].spice > 1 and self.mrs(- int(1 / p), 1) < n[1].mrs(int(1 / p), -1):
+                        self.sugar_traded += 1
+                        self.spice_traded += p
+                    elif 0 < p < 1 and self.sugar > int(1 / p) and n[1].spice > 1 and self.mrs(- int(1 / p), 1) < n[1].mrs(int(1 / p), -1):
                         self.sugar -= int(1 / p)
                         self.spice += 1
                         n[1].sugar += int(1 / p)
                         n[1].spice -= 1
+                        self.sugar_traded += int(1 / p)
+                        self.spice_traded += 1
                 if w1 > w2:
                     p = math.sqrt(w1 * w2)
                     # trade 1 unit of sugar for p units of spice, obey the constraints
@@ -260,11 +278,15 @@ class Agent:
                         n[1].spice += p
                         self.sugar += 1
                         self.spice -= p
+                        self.sugar_traded += 1
+                        self.spice_traded += p
                     elif p < 1 and n[1].sugar > int(1 / p) and self.spice > 1 and n[1].mrs(- int(1 / p), 1) < self.mrs(int(1 / p), -1):
                         n[1].sugar -= int(1 / p)
                         n[1].spice += 1
                         self.sugar += int(1 / p)
                         self.spice -= 1
+                        self.sugar_traded += int(1 / p)
+                        self.spice_traded += 1
 
 
 class ABM:

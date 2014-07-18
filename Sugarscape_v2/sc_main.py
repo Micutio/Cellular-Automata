@@ -28,7 +28,7 @@ import sys
 class GlobalConstants:
     def __init__(self):
         self.num_agents = 250
-        self.random_landscape = False
+        self.landscape_mode = 3  # 3 = twohill, 2 = procedural, 1 = randomized
         self.run_simulation = False
         self.cell_size = 10
         self.grid_width = int(500 / 10) * self.cell_size
@@ -158,7 +158,7 @@ def main():
     pygame.display.set_caption('Sugarscape')
 
     # Initialize the ca grid.
-    ca = CA(GC.random_landscape, GC.grid_width, GC.grid_height, GC.cell_size)
+    ca = CA(GC.landscape_mode, GC.grid_width, GC.grid_height, GC.cell_size)
     #abm = ABM(GLOBAL_CONSTANTS.num_agents, GLOBAL_CONSTANTS.grid_width, GLOBAL_CONSTANTS.grid_height)
     abm = ABM(GC.num_agents, GC.cell_size, GC.abm_bounds[0], GC.abm_bounds[1], GC.abm_bounds[2], GC.abm_bounds[3])
     handler = EventHandler()
