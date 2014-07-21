@@ -21,13 +21,7 @@ import random
 ###                       Global Variables                            ###
 #########################################################################
 
-# The Grid of the CA
-#Cells = {}
-# Dimensions of the grid
-GRID_WIDTH = 800
-GRID_HEIGHT = 800
 MAX_TEMPERATURE = 100
-HEAT_FLUX = 0.5
 
 #########################################################################
 ###                            CLASSES                                ###
@@ -47,11 +41,12 @@ class ClassCell:
         self.neighbor_count = 0
         self.persist = persist
 
-    def get_temperature(self):
-        return self.temperature
+    def inc_temperature(self):
+        if self.temperature < MAX_TEMPERATURE:
+            self.temperature += 1
 
     def sense_neigh(self, neighbor):
-        if neighbor.get_temperature() > 0:
+        if neighbor.temperature > 0:
             self.neighbor_count += 1
 
     def regulate(self):
@@ -122,77 +117,64 @@ class ClassCell:
         self.neighbor_count = 0
 
 
-#########################################################################
-###                          GLOBAL METHODS                           ###
-#########################################################################
-# The following methods are used to manipulate the CA grid
-
-
-def draw_cells(ca_grid, screen):
-    for y in range(0, int(GRID_HEIGHT / 10)):
-        for x in range(0, int(GRID_WIDTH / 10)):
-            ca_grid[x, y].draw(screen)
-
-
-def init_ca():
+class CellularAutomaton:
     """
-    Initializes and returns the cellular automaton.
-    The CA is a dictionary and not a list of lists
-    :return: The initialized CA.
+    Encapsulates all functions for a cellular automaton.
     """
-    ca_grid = {}
-    height = int(GRID_HEIGHT / 10)
-    width = int(GRID_WIDTH / 10)
-    for y in range(0, height):
-        for x in range(0, width):
-            ca_grid[x, y] = ClassCell(x, y, False)
 
-    return ca_grid
+    def __init__(self, g_width, g_height, c_size):
+        """
+        Initializes and returns the cellular automaton.
+        The CA is a dictionary and not a list of lists
+        :return: The initialized CA.
+        """
+        self.ca_grid = {}
+        self.width = int(g_width / c_size)
+        self.height = int(g_height / c_size)
+        for y in range(0, self.height):
+            for x in range(0, self.width):
+                self.ca_grid[x, y] = ClassCell(x, y, False)
 
+    def cycle_ca(self):
+        """
+        Performs one simulation step
+        """
+        self.update_from_neighs()
+        self.update_states()
 
-def cycle_ca(ca_grid):
-    ca_grid = update_from_neighs(ca_grid)
-    ca_grid = update_states(ca_grid)
-    return ca_grid
+    def update_from_neighs(self):
+        """
+        Looping over all cells to gather all the neighbor information they need to update
+        """
+        for y in range(0, self.height):
+            for x in range(0, self.width):
+                if y - 1 > -1 and x - 1 > -1 and x + 1 < self.width and y + 1 < self.height:
+                    self.ca_grid[x, y].sense_neigh(self.ca_grid[(x - 1), (y - 1)])  #Top Left
+                    self.ca_grid[x, y].sense_neigh(self.ca_grid[x, (y - 1)])  #Top
+                    self.ca_grid[x, y].sense_neigh(self.ca_grid[(x + 1), (y - 1)])  #Top Right
+                    self.ca_grid[x, y].sense_neigh(self.ca_grid[(x - 1), (y + 1)])  #Bottom Left
+                    self.ca_grid[x, y].sense_neigh(self.ca_grid[x, (y + 1)])  #Bottom
+                    self.ca_grid[x, y].sense_neigh(self.ca_grid[(x + 1), (y + 1)])  #Bottom Right
+                    self.ca_grid[x, y].sense_neigh(self.ca_grid[(x - 1), y])  #Left
+                    self.ca_grid[x, y].sense_neigh(self.ca_grid[(x + 1), y])  #Right
 
+    def update_states(self):
+        """
+        After executing update_neighs this is the actual update of the cell itself
+        """
+        for y in range(0, self.height):
+            for x in range(0, self.width):
+                self.ca_grid[x, y].regulate()
 
-#########################################################################
-###                    UPDATE FROM NEIGHBOR METHODS                   ###
-#########################################################################
+    def draw_cells(self, screen):
+        for y in range(0, self.height):
+            for x in range(0, int(self.width)):
+                self.ca_grid[x, y].draw(screen)
 
-
-def update_from_neighs(ca_grid):
-    """
-    Looping over all cells to gather all the neighbor information they need to update
-    """
-    height = int(GRID_HEIGHT / 10)
-    width = int(GRID_WIDTH / 10)
-    for y in range(0, height):
-        for x in range(0, width):
-            if y - 1 > -1 and x - 1 > -1 and x + 1 < width and y + 1 < height:
-                ca_grid[x, y].sense_neigh(ca_grid[(x - 1), (y - 1)])  #Top Left
-                ca_grid[x, y].sense_neigh(ca_grid[x, (y - 1)])  #Top
-                ca_grid[x, y].sense_neigh(ca_grid[(x + 1), (y - 1)])  #Top Right
-                ca_grid[x, y].sense_neigh(ca_grid[(x - 1), (y + 1)])  #Bottom Left
-                ca_grid[x, y].sense_neigh(ca_grid[x, (y + 1)])  #Bottom
-                ca_grid[x, y].sense_neigh(ca_grid[(x + 1), (y + 1)])  #Bottom Right
-                ca_grid[x, y].sense_neigh(ca_grid[(x - 1), y])  #Left
-                ca_grid[x, y].sense_neigh(ca_grid[(x + 1), y])  #Right
-    return ca_grid
-
-
-#########################################################################
-###                       UPDATE STATES METHODS                       ###
-#########################################################################
-
-
-def update_states(ca_grid):
-    """
-    After executing update_neighs this is the actual update of the cell itself
-    """
-    height = int(GRID_HEIGHT / 10)
-    width = int(GRID_WIDTH / 10)
-    for y in range(0, height):
-        for x in range(0, width):
-            ca_grid[x, y].regulate()
-    return ca_grid
+    def get_cells_around(self, x, y):
+        result = []
+        moves = [(-1, 0), (1, 0), (0, 0), (0, -1), (0, 1)]
+        for m in moves:
+            if (x + m[0], y + m[1]) in self.ca_grid:
+                result.append(self.ca_grid[x + m[0], y + m[1]])
+        return result
