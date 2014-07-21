@@ -143,6 +143,14 @@ class CellularAutomaton:
             for x in range(0, int(self.width)):
                 self.ca_grid[x, y].draw(screen)
 
+    def get_team_cells_around(self, x, y, team):
+        result = []
+        moves = [(-1, 0), (1, 0), (0, 0), (0, -1), (0, 1)]
+        for m in moves:
+            if (x + m[0], y + m[1]) in self.ca_grid and self.ca_grid[x + m[0], y + m[1]].temperatures[team] > 0:
+                result.append(self.ca_grid[x + m[0], y + m[1]])
+        return result
+
     def get_cells_around(self, x, y):
         result = []
         moves = [(-1, 0), (1, 0), (0, 0), (0, -1), (0, 1)]
