@@ -115,7 +115,7 @@ class EventHandler:
             stats.plot()
         # r key is pressed, reset the simulation
         if active_key == pygame.K_r:
-            ca.__init__(GC.random_landscape, GC.grid_width, GC.grid_height, GC.cell_size)
+            ca.__init__(GC.landscape_mode, GC.grid_width, GC.grid_height, GC.cell_size)
             abm.__init__(GC.num_agents, GC.cell_size, GC.abm_bounds[0], GC.abm_bounds[1], GC.abm_bounds[2], GC.abm_bounds[3])
             GC.ticks = 0
             render_simulation(ca, abm, screen)
