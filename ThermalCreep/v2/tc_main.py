@@ -1,6 +1,4 @@
 #!/usr/bin/python
-from tc_abm import AgentBasedSystem
-
 __author__ = 'Michael Wagner'
 __version__ = '2.0'
 
@@ -11,12 +9,12 @@ __version__ = '2.0'
 # Original CA code taken from
 # "http://pygame.org/project-Cellular+Automata-1286-.html"
 
-#import time
-import sys
 
-from tc_ca import *
+import sys
 import math
-import pygame
+
+from v2.tc_ca import *
+from v2.tc_abm import AgentBasedSystem
 from pygame.locals import *
 
 #########################################################################
@@ -114,7 +112,9 @@ def main():
     pygame.display.set_caption('Complex Automaton')
     input_handler = InputHandler()
     ca = CellularAutomaton(GC.grid_with, GC.grid_height, GC.cell_size)
-    abm = AgentBasedSystem(GC.cell_size)
+    abm = AgentBasedSystem(GC.grid_with, GC.grid_height, GC.cell_size)
+    # Add some test agents
+    abm.random_scenario(3)
 
     while 1:
         if GC.run_simulation:
