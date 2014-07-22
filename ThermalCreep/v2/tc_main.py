@@ -95,10 +95,10 @@ class InputHandler():
         # space bar is pressed
         if event.key == pygame.K_SPACE:
             GC.run_simulation = not GC.run_simulation
-        if GC.run_simulation:
-            print("> resumed simulation")
-        else:
-            print("> paused simulation")
+            if GC.run_simulation:
+                print("> resumed simulation")
+            else:
+                print("> paused simulation")
 
 
 def main():
@@ -110,11 +110,11 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((GC.grid_with, GC.grid_height))
     pygame.display.set_caption('Complex Automaton')
-    input_handler = InputHandler()
     ca = CellularAutomaton(GC.grid_with, GC.grid_height, GC.cell_size)
     abm = AgentBasedSystem(GC.grid_with, GC.grid_height, GC.cell_size)
+    input_handler = InputHandler()
     # Add some test agents
-    abm.random_scenario(3)
+    abm.random_scenario(1)
 
     while 1:
         if GC.run_simulation:

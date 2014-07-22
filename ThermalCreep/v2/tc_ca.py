@@ -28,12 +28,11 @@ class ClassCell:
     """
     This class models one cell of the CA, while the grid itself will be a dictionary of ClassCell instances.
     """
-    def __init__(self, x, y, persist):
+    def __init__(self, x, y, size, persist):
         self.x = x
         self.y = y
-        self.w = 10
-        self.h = 10
-        self.temperature = 0
+        self.w = size
+        self.h = size
         self.temperatures = [0, 0, 0, 0]
         self.neighbor_count = 0
         self.persist = persist
@@ -42,7 +41,7 @@ class ClassCell:
         if self.temperatures[team] < MAX_TEMPERATURE:
             is_zero = True
             for i in range(len(self.temperatures)):
-                if i != team:
+                if i != team and self.temperatures[i] > 0:
                     self.temperatures[i] -= 1
                     if self.temperatures[i] > 0:
                         is_zero = False
@@ -53,24 +52,15 @@ class ClassCell:
         if neighbor.temperature > 0:
             self.neighbor_count += 1
 
-    def regulate(self):
-        """
-        This method regulates the cell's temperature according to the temperature of its neighbors.
-        """
-        ratio = (self.neighbor_count / 8)
-        if (self.temperature == 0 and random.random() < ratio / 10) or (self.temperature > 0 and not self.persist):
-            self.temperature = ratio * 100
-
     def draw(self, surf):
         #print("new color: (%i,%i,%i)" % (red, green, blue))
         col = self.calculate_color()
         pygame.draw.rect(surf, col, (self.x * self.w, self.y * self.h, self.w, self.h), 0)
 
-        col = self.calculate_color()
         col2 = (col[0] * 0.6, col[1] * 0.6, col[2] * 0.6)
         lx = self.x * self.w
         ly = self.y * self.h
-        thick = 8 * self.neighbor_count
+        thick = int(4 * (self.temperatures[self.temperatures.index(max(self.temperatures))] / MAX_TEMPERATURE))
         pygame.draw.line(surf, col2, [lx + 1, ly + 9], [lx + 9, ly + 9], thick)
         pygame.draw.line(surf, col2, [lx + 9, ly + 1], [lx + 9, ly + 9], thick)
         self.neighbor_count = 0
@@ -105,7 +95,7 @@ class CellularAutomaton:
         self.height = int(g_height / c_size)
         for y in range(0, self.height):
             for x in range(0, self.width):
-                self.ca_grid[x, y] = ClassCell(x, y, False)
+                self.ca_grid[x, y] = ClassCell(x, y, c_size, False)
 
     def cycle_ca(self):
         """
@@ -142,14 +132,6 @@ class CellularAutomaton:
         for y in range(0, self.height):
             for x in range(0, int(self.width)):
                 self.ca_grid[x, y].draw(screen)
-
-    def get_team_cells_around(self, x, y, team):
-        result = []
-        moves = [(-1, 0), (1, 0), (0, 0), (0, -1), (0, 1)]
-        for m in moves:
-            if (x + m[0], y + m[1]) in self.ca_grid and self.ca_grid[x + m[0], y + m[1]].temperatures[team] > 0:
-                result.append(self.ca_grid[x + m[0], y + m[1]])
-        return result
 
     def get_cells_around(self, x, y):
         result = []
