@@ -55,8 +55,8 @@ class Agent(AbstractAgent):
         super().__init__(x, y, size)
         self.team = team
         self.min_density = min_density
-        self.strategy_walk = strategy_walk  # 0 - random, 1 - min-based, 2 - max-based
-        self.strategy_seed = strategy_seed  # 0 - random, 1 - min-based, 2 - max-based
+        self.strategy_walk = strategy_walk  # 0 - random, 1 - min-based
+        self.strategy_seed = strategy_seed  # 0 - random, 1 - min-based
 
     def move(self, cells):
         """
@@ -64,13 +64,14 @@ class Agent(AbstractAgent):
         """
         # Step 1: move to a new cell, if possible
         if cells:
-            possible_cells = [c for c in cells if c.temperatures[self.team] >= self.min_density]
+            possible_cells = [c for c in cells if self.team == c.team and c.temperature >= self.min_density]
             if len(possible_cells) > 0:
                 if self.strategy_walk == 0:
                     random.shuffle(possible_cells)
                     cell = random.choice(possible_cells)
                 else:  # self.strategy_walk == 1:
-                    c_list = self.get_min_cell(possible_cells)
+                    min_val = min(possible_cells, key=attrgetter('temperature'))
+                    c_list = [c for c in possible_cells if c.temperature == min_val.temperature]
                     random.shuffle(c_list)
                     cell = random.choice(c_list)
 
@@ -82,20 +83,14 @@ class Agent(AbstractAgent):
             if self.strategy_walk == 0:
                 random.shuffle(cells)
                 cell = random.choice(cells)
-            else:  # self.strategy_walk == 1:
-                c_list = self.get_min_cell(cells)
+            else:
+                possible_cells = [c for c in cells if self.team == c.team]
+                min_val = min(possible_cells, key=attrgetter('temperature'))
+                c_list = [c for c in possible_cells if c.temperature == min_val.temperature]
+                c_list.extend([c for c in cells if self.team != c.team])
                 random.shuffle(c_list)
                 cell = random.choice(c_list)
             cell.inc_temperature(self.team)
-
-    def get_min_cell(self, cells):
-        result = [cells[0]]
-        for c in cells:
-            if c.temperatures[self.team] < result[0].temperatures[self.team]:
-                result = [c]
-            else:
-                result.append(c)
-        return result
 
     def draw(self, surf):
         """
@@ -144,10 +139,15 @@ class AgentBasedSystem:
         for a in self.agent_list:
             a.draw(screen)
 
-    def random_scenario(self, num_agents):
+    def random_scenario(self, num_agents, ca):
         loc = [(5, 5), (5, self.height - 5), (self.width - 5, 5), (self.width - 5, self.height - 5)]
         team = 0
         for l in loc:
             for _ in range(num_agents):
-                self.add_agent(l[0], l[1], team, 1, random.randint(0, 1), random.randint(0, 1))
+                walk = random.randint(0, 1)
+                seed = random.randint(0, 1)
+                self.add_agent(l[0], l[1], team, 1, walk, seed)
+            ca_x = int(l[0] / self.cell_size)
+            ca_y = int(l[1] / self.cell_size)
+            ca.ca_grid[ca_x, ca_y].team = team
             team += 1

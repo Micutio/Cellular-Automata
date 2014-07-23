@@ -33,20 +33,20 @@ class ClassCell:
         self.y = y
         self.w = size
         self.h = size
-        self.temperatures = [0, 0, 0, 0]
+        self.temperature = 1
+        self.team = -1
         self.neighbor_count = 0
         self.persist = persist
 
     def inc_temperature(self, team):
-        if self.temperatures[team] < MAX_TEMPERATURE:
-            is_zero = True
-            for i in range(len(self.temperatures)):
-                if i != team and self.temperatures[i] > 0:
-                    self.temperatures[i] -= 1
-                    if self.temperatures[i] > 0:
-                        is_zero = False
-            if is_zero:
-                self.temperatures[team] += 1
+        if self.team == team:
+            if self.temperature < MAX_TEMPERATURE:
+                self.temperature += 1
+        else:
+            if self.temperature == 1:
+                self.team = team
+            else:
+                self.temperature -= 1
 
     def sense_neigh(self, neighbor):
         if neighbor.temperature > 0:
@@ -60,19 +60,18 @@ class ClassCell:
         col2 = (col[0] * 0.6, col[1] * 0.6, col[2] * 0.6)
         lx = self.x * self.w
         ly = self.y * self.h
-        thick = int(4 * (self.temperatures[self.temperatures.index(max(self.temperatures))] / MAX_TEMPERATURE))
+        thick = int(4 * (self.temperature / MAX_TEMPERATURE))
         pygame.draw.line(surf, col2, [lx + 1, ly + 9], [lx + 9, ly + 9], thick)
         pygame.draw.line(surf, col2, [lx + 9, ly + 1], [lx + 9, ly + 9], thick)
         self.neighbor_count = 0
 
     def calculate_color(self):
-        team = self.temperatures.index(max(self.temperatures))
-        c = int(255 * (self.temperatures[team] / MAX_TEMPERATURE))
-        if team == 0:
+        c = int(255 * (self.temperature / MAX_TEMPERATURE))
+        if self.team == 0:
             col = (c, 0, 0)
-        elif team == 1:
+        elif self.team == 1:
             col = (c, c, 0)
-        elif team == 2:
+        elif self.team == 2:
             col = (0, c, 0)
         else:
             col = (0, 0, c)

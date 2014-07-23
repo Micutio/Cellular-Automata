@@ -114,7 +114,7 @@ def main():
     abm = AgentBasedSystem(GC.grid_with, GC.grid_height, GC.cell_size)
     input_handler = InputHandler()
     # Add some test agents
-    abm.random_scenario(1)
+    abm.random_scenario(5, ca)
 
     while 1:
         if GC.run_simulation:
