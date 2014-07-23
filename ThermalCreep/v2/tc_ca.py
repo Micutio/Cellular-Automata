@@ -45,12 +45,11 @@ class ClassCell:
                 self.temperature += power
                 result = power
         else:
+            self.temperature -= power
+            result = power
             if self.temperature <= 0:
                 self.team = team
-                self.temperature = power
-                result = power
-            else:
-                self.temperature -= power
+                self.temperature = 0
         return result
 
     def sense_neigh(self, neighbor):
