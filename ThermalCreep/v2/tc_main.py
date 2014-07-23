@@ -16,7 +16,7 @@ import sys
 import math
 
 from v2.tc_ca import *
-from v2.tc_abm import AgentBasedSystem
+from v2.abm.tc_abm import AgentBasedSystem
 from pygame.locals import *
 
 #########################################################################
@@ -26,9 +26,9 @@ from pygame.locals import *
 
 class GlobalConstants():
     def __init__(self):
-        self.grid_with = 500
-        self.grid_height = 500
         self.cell_size = 10
+        self.grid_with = 50 * self.cell_size
+        self.grid_height = 50 * self.cell_size
         self.run_simulation = False
 
 GC = GlobalConstants()
@@ -119,7 +119,7 @@ def main():
     input_handler = InputHandler()
     stats = Statistics(abm, ca)
     # Add some test agents
-    abm.random_scenario(25, 1, 25, ca)
+    abm.hive_scenario(4, 5, 1, ca)
 
     while 1:
         if GC.run_simulation:

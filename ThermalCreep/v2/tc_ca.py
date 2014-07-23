@@ -65,8 +65,8 @@ class ClassCell:
         lx = self.x * self.w
         ly = self.y * self.h
         thick = int(4 * (self.temperature / MAX_TEMPERATURE))
-        pygame.draw.line(surf, col2, [lx + 1, ly + 9], [lx + 9, ly + 9], thick)
-        pygame.draw.line(surf, col2, [lx + 9, ly + 1], [lx + 9, ly + 9], thick)
+        pygame.draw.line(surf, col2, [lx + 1, ly + self.h - 1], [lx + self.w - 1, ly + self.h - 1], thick)
+        pygame.draw.line(surf, col2, [lx + self.w - 1, ly + 1], [lx + self.w - 1, ly + self.h - 1], thick)
         self.neighbor_count = 0
 
     def calculate_color(self):

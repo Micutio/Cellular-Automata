@@ -21,7 +21,7 @@ class AbstractAgent():
     Interface for all agents in the system.
     """
 
-    def __init__(self, x, y, size):
+    def __init__(self, x, y, size, team):
         """
         Initializer
         """
@@ -29,9 +29,16 @@ class AbstractAgent():
         self.y = y
         self.size = size
         self.dead = False
+        self.team = team
         return
 
     def act(self, cells):
+        """
+        To be overwritten
+        """
+        return
+
+    def move(self, cells):
         """
         To be overwritten
         """
@@ -44,7 +51,7 @@ class AbstractAgent():
         return
 
 
-class Agent(AbstractAgent):
+class Creepling(AbstractAgent):
     """
     Simple Agent class for a thermal creep variant
     """
@@ -53,8 +60,7 @@ class Agent(AbstractAgent):
         """
         Initializer
         """
-        super().__init__(x, y, size)
-        self.team = team
+        super().__init__(x, y, size, team)
         self.min_density = min_density
         self.strategy_walk = strategy_walk  # 0 - random, 1 - min-based
         self.strategy_seed = strategy_seed  # 0 - random, 1 - min-based
@@ -114,48 +120,71 @@ class Agent(AbstractAgent):
             pygame.draw.circle(surf, (0, 0, 255), [self.x, self.y], radius2, 0)
 
 
-class AgentBasedSystem:
+class Hive(AbstractAgent):
     """
-    Encapsulates all methods necessary to execute
+    Class for the creep-agents' headquarters.
     """
-    def __init__(self, width, height, cell_size):
+
+    def __init__(self, x, y, size, team):
         """
         Initializer
         """
-        self.agent_list = []
-        self.width = width
-        self.height = height
-        self.cell_size = cell_size
+        super().__init__(x, y, size, team)
 
-    def add_agent(self, x, y, team, min_density, strategy_walk, strategy_seed, power):
+    def act(self, cells):
         """
-        Adding new agent to the system.
+        To be overwritten
         """
-        self.agent_list.append(Agent(x, y, self.cell_size, team, min_density, strategy_walk, strategy_seed, power))
+        for c in cells:
+            if c.team != self.team:
+                self.dead = True
+                break
+        return
 
-    def cycle_agents(self, ca):
-        for a in self.agent_list:
-            if not a.dead:
-                cells = ca.get_cells_around(int(a.x / self.cell_size), int(a.y / self.cell_size))
-                a.move(cells)
-                cells = ca.get_cells_around(int(a.x / self.cell_size), int(a.y / self.cell_size))
-                a.act(cells)
+    def draw(self, surf):
+        """
+        Method for visualizing the agent
+        """
+        radius1 = int(self.size * 0.4)
+        radius2 = int(self.size * 0.3)
+        radius3 = int(self.size * 0.2)
 
-    def draw_agents(self, screen):
-        for a in self.agent_list:
-            if not a.dead:
-                a.draw(screen)
+        pygame.draw.circle(surf, (255, 255, 255), [self.x + self.size, self.y], radius2, 0)
+        pygame.draw.circle(surf, (255, 255, 255), [self.x, self.y + self.size], radius2, 0)
+        pygame.draw.circle(surf, (255, 255, 255), [self.x - self.size, self.y], radius2, 0)
+        pygame.draw.circle(surf, (255, 255, 255), [self.x, self.y - self.size], radius2, 0)
+        if self.team == 0:
+            pygame.draw.circle(surf, (255, 0, 0), [self.x + self.size, self.y], radius3, 0)
+            pygame.draw.circle(surf, (255, 0, 0), [self.x, self.y + self.size], radius3, 0)
+            pygame.draw.circle(surf, (255, 0, 0), [self.x - self.size, self.y], radius3, 0)
+            pygame.draw.circle(surf, (255, 0, 0), [self.x, self.y - self.size], radius3, 0)
+        elif self.team == 1:
+            pygame.draw.circle(surf, (255, 255, 0), [self.x + self.size, self.y], radius3, 0)
+            pygame.draw.circle(surf, (255, 255, 0), [self.x, self.y + self.size], radius3, 0)
+            pygame.draw.circle(surf, (255, 255, 0), [self.x - self.size, self.y], radius3, 0)
+            pygame.draw.circle(surf, (255, 255, 0), [self.x, self.y - self.size], radius3, 0)
+        elif self.team == 2:
+            pygame.draw.circle(surf, (0, 255, 0), [self.x + self.size, self.y], radius3, 0)
+            pygame.draw.circle(surf, (0, 255, 0), [self.x, self.y + self.size], radius3, 0)
+            pygame.draw.circle(surf, (0, 255, 0), [self.x - self.size, self.y], radius3, 0)
+            pygame.draw.circle(surf, (0, 255, 0), [self.x, self.y - self.size], radius3, 0)
+        else:
+            pygame.draw.circle(surf, (0, 0, 255), [self.x + self.size, self.y], radius3, 2)
+            pygame.draw.circle(surf, (0, 0, 255), [self.x, self.y + self.size], radius3, 2)
+            pygame.draw.circle(surf, (0, 0, 255), [self.x - self.size, self.y], radius3, 2)
+            pygame.draw.circle(surf, (0, 0, 255), [self.x, self.y - self.size], radius3, 2)
 
-    def random_scenario(self, num_agents, min_density, power, ca):
-        loc = [(5, 5), (5, self.height - 5), (self.width - 5, 5), (self.width - 5, self.height - 5)]
-        team = 0
-        for l in loc:
-            for _ in range(num_agents):
-                walk = random.randint(0, 1)
-                seed = random.randint(0, 1)
-                self.add_agent(l[0], l[1], team, min_density, walk, seed, power)
-            ca_x = int(l[0] / self.cell_size)
-            ca_y = int(l[1] / self.cell_size)
-            ca.ca_grid[ca_x, ca_y].team = team
-            ca.ca_grid[ca_x, ca_y].temperature = min_density
-            team += 1
+        pygame.draw.line(surf, (0, 0, 0), [self.x, self.y], [self.x + self.size, self.y], 3)
+        pygame.draw.line(surf, (0, 0, 0), [self.x, self.y], [self.x, self.y + self.size], 3)
+        pygame.draw.line(surf, (0, 0, 0), [self.x, self.y], [self.x - self.size, self.y], 3)
+        pygame.draw.line(surf, (0, 0, 0), [self.x, self.y], [self.x, self.y - self.size], 3)
+
+        pygame.draw.circle(surf, (255, 255, 255), [self.x, self.y], radius1, 0)
+        if self.team == 0:
+            pygame.draw.circle(surf, (255, 0, 0), [self.x, self.y], radius2, 0)
+        elif self.team == 1:
+            pygame.draw.circle(surf, (255, 255, 0), [self.x, self.y], radius2, 0)
+        elif self.team == 2:
+            pygame.draw.circle(surf, (0, 255, 0), [self.x, self.y], radius2, 0)
+        else:
+            pygame.draw.circle(surf, (0, 0, 255), [self.x, self.y], radius2, 0)
