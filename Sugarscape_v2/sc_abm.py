@@ -155,6 +155,8 @@ class Agent:
                         result.append(c[0])
                         max_w = self.welfare(c[0].sugar, c[0].spice)
                         max_dist = (abs(c[0].x - grid_x) + abs(c[0].y - grid_y))
+                        max_x = c[0].x
+                        max_y = c[0].y
                         search_starting_point = False
                     else:
                         # Then look whether we got higher sugar (clear list, take as new best)
@@ -165,7 +167,7 @@ class Agent:
                         if welfare >= max_w and dist < max_dist:
                             result = [c[0]]
                             max_w = welfare
-                        elif welfare == max_w and dist == max_dist:
+                        elif welfare == max_w and dist == max_dist and c[0].x != max_x and c[0].y != max_y:
                             result.append(c[0])
 
             # In this case we didn't find any good cell

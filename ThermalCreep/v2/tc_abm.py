@@ -28,6 +28,7 @@ class AbstractAgent():
         self.x = x
         self.y = y
         self.size = size
+        self.dead = False
         return
 
     def act(self, cells):
@@ -62,35 +63,37 @@ class Agent(AbstractAgent):
         """
         Lets the agent interact with the environment
         """
-        # Step 1: move to a new cell, if possible
-        if cells:
-            possible_cells = [c for c in cells if self.team == c.team and c.temperature >= self.min_density]
-            if len(possible_cells) > 0:
-                if self.strategy_walk == 0:
-                    random.shuffle(possible_cells)
-                    cell = random.choice(possible_cells)
-                else:  # self.strategy_walk == 1:
-                    min_val = min(possible_cells, key=attrgetter('temperature'))
-                    c_list = [c for c in possible_cells if c.temperature == min_val.temperature]
-                    random.shuffle(c_list)
-                    cell = random.choice(c_list)
+        possible_cells = [c for c in cells if self.team == c.team and c.temperature >= self.min_density]
+        if possible_cells:
+            if self.strategy_walk == 0:
+                random.shuffle(possible_cells)
+                cell = random.choice(possible_cells)
+            else:  # self.strategy_walk == 1:
+                min_val = min(possible_cells, key=attrgetter('temperature'))
+                c_list = [c for c in possible_cells if c.temperature == min_val.temperature]
+                random.shuffle(c_list)
+                cell = random.choice(c_list)
 
-                self.x = (cell.x * self.size) + int(self.size / 2)
-                self.y = (cell.y * self.size) + int(self.size / 2)
+            self.x = (cell.x * self.size) + int(self.size / 2)
+            self.y = (cell.y * self.size) + int(self.size / 2)
+        else:
+            self.dead = True
 
     def act(self, cells):
-        if cells:
+        possible_cells = [c for c in cells if self.team == c.team]
+        if possible_cells:
             if self.strategy_walk == 0:
                 random.shuffle(cells)
                 cell = random.choice(cells)
             else:
-                possible_cells = [c for c in cells if self.team == c.team]
                 min_val = min(possible_cells, key=attrgetter('temperature'))
                 c_list = [c for c in possible_cells if c.temperature == min_val.temperature]
                 c_list.extend([c for c in cells if self.team != c.team])
                 random.shuffle(c_list)
                 cell = random.choice(c_list)
             cell.inc_temperature(self.team)
+        else:
+            self.dead = True
 
     def draw(self, surf):
         """
