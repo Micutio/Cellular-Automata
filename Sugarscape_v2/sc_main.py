@@ -30,7 +30,7 @@ class GlobalConstants:
         self.num_agents = 250
         self.landscape_mode = 3  # 3 = twohill, 2 = procedural, 1 = randomized
         self.run_simulation = False
-        self.cell_size = 10
+        self.cell_size = 15
         self.grid_width = int(500 / 10) * self.cell_size
         self.grid_height = int(500 / 10) * self.cell_size
         #self.abm_bounds = (0, 10, 40, 50)

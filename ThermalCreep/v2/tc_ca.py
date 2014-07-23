@@ -33,20 +33,25 @@ class ClassCell:
         self.y = y
         self.w = size
         self.h = size
-        self.temperature = 1
+        self.temperature = 0
         self.team = -1
         self.neighbor_count = 0
         self.persist = persist
 
-    def inc_temperature(self, team):
+    def inc_temperature(self, team, power):
+        result = 0
         if self.team == team:
-            if self.temperature < MAX_TEMPERATURE:
-                self.temperature += 1
+            if (self.temperature + power) < MAX_TEMPERATURE:
+                self.temperature += power
+                result = power
         else:
-            if self.temperature == 1:
+            if self.temperature <= 0:
                 self.team = team
+                self.temperature = power
+                result = power
             else:
-                self.temperature -= 1
+                self.temperature -= power
+        return result
 
     def sense_neigh(self, neighbor):
         if neighbor.temperature > 0:

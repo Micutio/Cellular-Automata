@@ -1,4 +1,6 @@
 #!/usr/bin/python
+from v2.tc_stat import Statistics
+
 __author__ = 'Michael Wagner'
 __version__ = '2.0'
 
@@ -49,7 +51,7 @@ class InputHandler():
         self.mx = 0
         self.my = 0
 
-    def handle(self, ca, abm):
+    def handle(self, ca, abm, stats):
         for event in pygame.event.get():
             # The 'x' on the window is clicked
             if event.type == QUIT:
@@ -67,7 +69,7 @@ class InputHandler():
 
             # Keyboard key is pressed
             elif event.type == pygame.KEYUP:
-                self.handle_keyboard_input(event)
+                self.handle_keyboard_input(event, stats)
 
     def handle_mouse_input(self, event, ca, abm):
         # Click on left mouse button, set temperature of cell to max
@@ -91,7 +93,7 @@ class InputHandler():
             ca.ca_grid[int(self.mx), int(self.my)].temperature = 1
             print("Cell %i, %i = 1, T = %i" % (self.mx, self.my, ca.ca_grid[int(self.mx), int(self.my)].temperature))
 
-    def handle_keyboard_input(self, event):
+    def handle_keyboard_input(self, event, stats):
         # space bar is pressed
         if event.key == pygame.K_SPACE:
             GC.run_simulation = not GC.run_simulation
@@ -99,6 +101,8 @@ class InputHandler():
                 print("> resumed simulation")
             else:
                 print("> paused simulation")
+        elif event.key == pygame.K_i:
+            stats.plot()
 
 
 def main():
@@ -113,15 +117,16 @@ def main():
     ca = CellularAutomaton(GC.grid_with, GC.grid_height, GC.cell_size)
     abm = AgentBasedSystem(GC.grid_with, GC.grid_height, GC.cell_size)
     input_handler = InputHandler()
+    stats = Statistics(abm, ca)
     # Add some test agents
-    abm.random_scenario(5, ca)
+    abm.random_scenario(25, 1, 25, ca)
 
     while 1:
         if GC.run_simulation:
             #ca.cycle_ca()
             abm.cycle_agents(ca)
-
-        input_handler.handle(ca, abm)
+            stats.update_records()
+        input_handler.handle(ca, abm, stats)
         render_simulation(ca, abm, screen)
 
 

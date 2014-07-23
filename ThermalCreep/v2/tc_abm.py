@@ -49,7 +49,7 @@ class Agent(AbstractAgent):
     Simple Agent class for a thermal creep variant
     """
 
-    def __init__(self, x, y, size, team, min_density, strategy_walk, strategy_seed):
+    def __init__(self, x, y, size, team, min_density, strategy_walk, strategy_seed, power):
         """
         Initializer
         """
@@ -58,6 +58,8 @@ class Agent(AbstractAgent):
         self.min_density = min_density
         self.strategy_walk = strategy_walk  # 0 - random, 1 - min-based
         self.strategy_seed = strategy_seed  # 0 - random, 1 - min-based
+        self.score = 0
+        self.power = power
 
     def move(self, cells):
         """
@@ -91,7 +93,7 @@ class Agent(AbstractAgent):
                 c_list.extend([c for c in cells if self.team != c.team])
                 random.shuffle(c_list)
                 cell = random.choice(c_list)
-            cell.inc_temperature(self.team)
+            self.score += cell.inc_temperature(self.team, self.power)
         else:
             self.dead = True
 
@@ -125,32 +127,35 @@ class AgentBasedSystem:
         self.height = height
         self.cell_size = cell_size
 
-    def add_agent(self, x, y, team, min_density, strategy_walk, strategy_seed):
+    def add_agent(self, x, y, team, min_density, strategy_walk, strategy_seed, power):
         """
         Adding new agent to the system.
         """
-        self.agent_list.append(Agent(x, y, self.cell_size, team, min_density, strategy_walk, strategy_seed))
+        self.agent_list.append(Agent(x, y, self.cell_size, team, min_density, strategy_walk, strategy_seed, power))
 
     def cycle_agents(self, ca):
         for a in self.agent_list:
-            cells = ca.get_cells_around(int(a.x / self.cell_size), int(a.y / self.cell_size))
-            a.move(cells)
-            cells = ca.get_cells_around(int(a.x / self.cell_size), int(a.y / self.cell_size))
-            a.act(cells)
+            if not a.dead:
+                cells = ca.get_cells_around(int(a.x / self.cell_size), int(a.y / self.cell_size))
+                a.move(cells)
+                cells = ca.get_cells_around(int(a.x / self.cell_size), int(a.y / self.cell_size))
+                a.act(cells)
 
     def draw_agents(self, screen):
         for a in self.agent_list:
-            a.draw(screen)
+            if not a.dead:
+                a.draw(screen)
 
-    def random_scenario(self, num_agents, ca):
+    def random_scenario(self, num_agents, min_density, power, ca):
         loc = [(5, 5), (5, self.height - 5), (self.width - 5, 5), (self.width - 5, self.height - 5)]
         team = 0
         for l in loc:
             for _ in range(num_agents):
                 walk = random.randint(0, 1)
                 seed = random.randint(0, 1)
-                self.add_agent(l[0], l[1], team, 1, walk, seed)
+                self.add_agent(l[0], l[1], team, min_density, walk, seed, power)
             ca_x = int(l[0] / self.cell_size)
             ca_y = int(l[1] / self.cell_size)
             ca.ca_grid[ca_x, ca_y].team = team
+            ca.ca_grid[ca_x, ca_y].temperature = min_density
             team += 1
