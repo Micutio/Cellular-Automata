@@ -37,6 +37,7 @@ class ClassCell:
         self.team = -1
         self.neighbor_count = 0
         self.persist = persist
+        self.decay = 0
 
     def inc_temperature(self, team, power):
         result = 0
@@ -81,6 +82,16 @@ class ClassCell:
             col = (0, 0, c)
         return col
 
+    def regulate(self):
+        if self.decay == 100:
+            if self.temperature > 0:
+                self.temperature -= 1
+            else:
+                self.team = -1
+            self.decay = 0
+        else:
+            self.decay += 1
+
 
 class CellularAutomaton:
     """
@@ -104,7 +115,7 @@ class CellularAutomaton:
         """
         Performs one simulation step
         """
-        self.update_from_neighs()
+        #self.update_from_neighs()
         self.update_states()
 
     def update_from_neighs(self):

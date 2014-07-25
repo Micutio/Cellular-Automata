@@ -45,8 +45,10 @@ class ClassCell:
         self.max_sugar = sugar
         self.max_spice = spice
         self.growth = growth
-        self.period = period
-        self.period_counter = 0
+        self.sugar_period = period
+        self.spice_period = period
+        self.sugar_period_counter = 0
+        self.spice_period_counter = 0
 
     @property
     def get_sugar(self):
@@ -59,16 +61,17 @@ class ClassCell:
         """
         This method updates the sugar/spice amount per cell.
         """
-        if self.period_counter >= self.period:
-            self.period_counter = 0
+        if self.sugar_period_counter >= self.sugar_period and self.sugar < self.max_sugar:
+            self.sugar_period_counter = 0
             self.sugar += self.growth
-            self.spice += self.growth
-            if self.sugar > self.max_sugar:
-                self.sugar = self.max_sugar
-            if self.spice > self.max_spice:
-                self.spice = self.max_spice
         else:
-            self.period_counter += 1
+            self.sugar_period_counter += 1
+
+        if self.spice_period_counter >= self.spice_period and self.spice < self.max_spice:
+            self.spice_period_counter = 0
+            self.spice += self.growth
+        else:
+            self.spice_period_counter += 1
 
     def draw(self, surf):
         #print("new color: (%i,%i,%i)" % (red, green, blue))
@@ -121,10 +124,11 @@ class CA:
                 for j in range(0, self.width):
                     self.ca_grid[i, j] = ClassCell(i, j, cell_size, random.randint(0, MAX_SUGAR), random.randint(0, MAX_SUGAR), GROWTH_PER_TICK, self.season)
         elif init_mode == 2:
-            landscape = get_procedural_landscape()
+            landscape_sugar = get_procedural_landscape()
+            landscape_spice = get_procedural_landscape()
             for i in range(0, self.height):
                 for j in range(0, self.width):
-                    self.ca_grid[i, j] = ClassCell(i, j, cell_size, landscape[i][j], landscape[j][i], GROWTH_PER_TICK, self.season)
+                    self.ca_grid[i, j] = ClassCell(i, j, cell_size, landscape_sugar[i][j], landscape_spice[i][j], GROWTH_PER_TICK, self.season)
         elif init_mode == 3:
             sugar_dist = get_two_hill_landscape()
             spice_dist = get_inverted_two_hill_landscape()
@@ -146,21 +150,34 @@ class CA:
         """
         # self.ca_grid = update_from_neighs(ca_grid)
         self.update_states()
-        if self.season_count == 5:
-            self.switch_season()
-        self.season_count += 1
+        self.switch_season()
 
     def switch_season(self):
-        if self.season == 1:
-            self.season = 2
+        if self.season_count == 20:
+            if self.season == 1:  # spring
+                sugar_period = 2
+                spice_period = 1
+                self.season = 2
+            elif self.season == 2:  # summer
+                sugar_period = 1
+                spice_period = 1
+                self.season = 3
+            elif self.season == 3:  # fall
+                sugar_period = 1
+                spice_period = 2
+                self.season = 4
+            else:  # winter
+                sugar_period = 3
+                spice_period = 3
+                self.season = 1
+
+            for y in range(0, self.height):
+                for x in range(0, self.width):
+                    self.ca_grid[x, y].sugar_period = sugar_period
+                    self.ca_grid[x, y].spice_period = spice_period
+            self.season_count = 0
         else:
-            self.season = 1
-
-        for y in range(0, self.height):
-            for x in range(0, self.width):
-                self.ca_grid[x, y].period = self.season
-
-        self.season_count = 0
+            self.season_count += 1
 
     def update_states(self):
         """
@@ -199,6 +216,7 @@ class CA:
                 else:
                     b = a_pos[agent_x, agnt_y]
                 visible_cells.append((a, b))
+        random.shuffle(visible_cells)
         return visible_cells
 
     def get_neighborhood(self, a_pos, agent_x, agent_y):
@@ -303,7 +321,7 @@ def calculate_color_simple(sugar, max_sugar):
 def get_procedural_landscape():
     landscape = [[0 for _ in range(50)] for _ in range(50)]
     # First step: plant some 'seeds' for hills
-    num_hills = random.randint(0, 20)
+    num_hills = random.randint(5, 15)
     for _ in range(num_hills):
         rand_x = random.randint(0, 49)
         rand_y = random.randint(0, 49)
@@ -315,9 +333,9 @@ def get_procedural_landscape():
                 c2 = landscape[i + 1][j]
                 c3 = landscape[i][j - 1]
                 c4 = landscape[i][j + 1]
-                val = random.choice([c1, c2, c3, c4])
-                if 0 < val and landscape[i][j] < MAX_SUGAR:
-                    landscape[i][j] = random.choice(range(1, val + 1))
+                choice = random.choice([c1, c2, c3, c4])
+                if 0 < choice and landscape[i][j] < MAX_SUGAR:
+                    landscape[i][j] = random.choice(range(1, choice + 1))
     return landscape
 
 

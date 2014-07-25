@@ -7,6 +7,7 @@ import random
 import pygame
 import copy
 import math
+import sys
 
 #########################################################################
 ###                       Global Variables                            ###
@@ -21,7 +22,7 @@ F_FERTILITY_START = 15
 M_FERTILITY_END = (50, 60)
 F_FERTILITY_END = (40, 50)
 MAX_AGENT_LIFE = 100
-STARTING_SUGAR = (40, 80)
+STARTING_SUGAR = (20, 40)
 
 #########################################################################
 ###                            CLASSES                                ###
@@ -29,7 +30,7 @@ STARTING_SUGAR = (40, 80)
 
 
 class Agent:
-    def __init__(self, g_id, x, y, c_size, su, sp, m_su, m_sp, v, g, f, d, c):
+    def __init__(self, g_id, x, y, c_size, su, sp, m_su, m_sp, v, g, f, d, c, a):
         """
         Initializes an agent
         """
@@ -48,7 +49,7 @@ class Agent:
         self.vision = v
         self.gender = g
         self.fertility = f
-        self.age = 1
+        self.age = a
         self.dying_age = d
         self.dead = False
         self.culture = c
@@ -56,6 +57,8 @@ class Agent:
         self.spice_gathered = 0
         self.sugar_traded = 0
         self.spice_traded = 0
+        self.sugar_price = 0
+        self.spice_price = 0
 
     def visible_cells(self, ca):
         return ca.get_all_cells_in_vision(self.x, self.y, self.vision)
@@ -119,7 +122,7 @@ class Agent:
         if rate_sugar > 0:
             return rate_spice / rate_sugar
         else:
-            return 0
+            return sys.maxsize
 
     def perceive_and_act(self, ca, agent_positions):
         """
@@ -241,7 +244,7 @@ class Agent:
                             n_c.append(self.culture[bit])
                         else:
                             n_c.append(random.choice([self.culture[bit], m.culture[bit]]))
-                    agent_positions[n_x, n_y] = Agent(n_id, n_x, n_y, n_s, n_su, n_sp, n_m_su, n_m_sp, n_v, n_g, n_f, n_d, n_c)
+                    agent_positions[n_x, n_y] = Agent(n_id, n_x, n_y, n_s, n_su, n_sp, n_m_su, n_m_sp, n_v, n_g, n_f, n_d, n_c, 0)
 
     def r3_culture(self, neighbors):
         for n in neighbors:
@@ -251,6 +254,10 @@ class Agent:
                     n[1].culture[index] = self.culture[index]
 
     def r4_trading(self, neighbors):
+        sugar_count = 0
+        spice_count = 0
+        self.sugar_price = 0
+        self.spice_price = 0
         for n in neighbors:
             if n[1] and not self.dead and not n[1].dead:
                 w1 = self.mrs(0, 0)
@@ -272,6 +279,10 @@ class Agent:
                         n[1].spice -= 1
                         self.sugar_traded += int(1 / p)
                         self.spice_traded += 1
+                    #self.sugar_price += 1 / p
+                    self.spice_price += 1
+                    spice_count += 1
+
                 if w1 > w2:
                     p = math.sqrt(w1 * w2)
                     # trade 1 unit of sugar for p units of spice, obey the constraints
@@ -289,6 +300,13 @@ class Agent:
                         self.spice -= 1
                         self.sugar_traded += int(1 / p)
                         self.spice_traded += 1
+                    self.sugar_price += p
+                    sugar_count += 1
+                    #self.spice_price += 1 / p
+        if sugar_count > 0:
+            self.sugar_price /= sugar_count
+        if spice_count > 0:
+            self.spice_price /= spice_count
 
 
 class ABM:
@@ -317,7 +335,14 @@ class ABM:
             sp = random.randint(STARTING_SUGAR[0], STARTING_SUGAR[1])
             d = random.randint(f[1], MAX_AGENT_LIFE)
             c = [random.getrandbits(1) for _ in range(11)]
-            self.agent_dict[p[0], p[1]] = Agent(str(a_id), p[0], p[1], c_size, su, sp, metab_sugar, metab_spice, vision, g, f, d, c)
+            if p[0] > p[1]:
+                while c.count(0) < c.count(1):
+                    c = [random.getrandbits(1) for _ in range(11)]
+            else:
+                while c.count(0) > c.count(1):
+                    c = [random.getrandbits(1) for _ in range(11)]
+            a = random.randint(0, int(MAX_AGENT_LIFE / 2))
+            self.agent_dict[p[0], p[1]] = Agent(str(a_id), p[0], p[1], c_size, su, sp, metab_sugar, metab_spice, vision, g, f, d, c, a)
             a_id += 1
 
     def cycle_system(self, ca):

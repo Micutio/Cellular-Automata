@@ -26,7 +26,7 @@ from pygame.locals import *
 
 class GlobalConstants():
     def __init__(self):
-        self.cell_size = 10
+        self.cell_size = 15
         self.grid_with = 50 * self.cell_size
         self.grid_height = 50 * self.cell_size
         self.run_simulation = False
@@ -119,13 +119,16 @@ def main():
     input_handler = InputHandler()
     stats = Statistics(abm, ca)
     # Add some test agents
-    abm.hive_scenario(4, 5, 1, ca)
+    abm.hive_scenario(20, 1, 1, ca)
+    update = True
 
     while 1:
         if GC.run_simulation:
-            #ca.cycle_ca()
+            ca.cycle_ca()
             abm.cycle_agents(ca)
-            stats.update_records()
+            if update:
+                stats.update_records()
+            update = not update
         input_handler.handle(ca, abm, stats)
         render_simulation(ca, abm, screen)
 

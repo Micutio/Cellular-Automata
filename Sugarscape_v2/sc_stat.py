@@ -18,7 +18,7 @@ class Statistics:
     """
 
     def __init__(self, abm, ca):
-        """
+        """r
         Initializes the Statistics class.
         """
         self.abm = abm
@@ -35,6 +35,8 @@ class Statistics:
         self.production_spice = []
         self.trade_sugar = []
         self.trade_spice = []
+        self.sugar_price = []
+        self.spice_price = []
 
     def update_records(self):
         """
@@ -50,6 +52,9 @@ class Statistics:
         prod_spice = 0
         tr_sugar = 0
         tr_spice = 0
+        sugar_pr = 0
+        spice_pr = 0
+        price_count = 0
 
         for k, v in self.abm.agent_dict.items():
             # count gender
@@ -68,6 +73,14 @@ class Statistics:
             # count trade
             tr_sugar += v.sugar_traded
             tr_spice += v.spice_traded
+            # count market prices
+            sugar_pr += v.sugar_price
+            spice_pr += v.spice_price
+            price_count += 1
+
+        if price_count > 0:
+            sugar_pr /= price_count
+            spice_pr /= price_count
 
         self.male_per_gen.append(males)
         self.female_per_gen.append(females)
@@ -77,6 +90,8 @@ class Statistics:
         self.production_spice.append(prod_spice)
         self.trade_sugar.append(tr_sugar)
         self.trade_spice.append(tr_spice)
+        self.sugar_price.append(sugar_pr)
+        self.spice_price.append(spice_pr)
 
         sugar = 0
         spice = 0
@@ -92,7 +107,7 @@ class Statistics:
         """
         generations = len(self.pop_per_gen)
         gen_line = range(generations)
-        pop_graph = plt.subplot(2, 1, 1)
+        pop_graph = plt.subplot(2, 2, 1)
         pop_graph.plot(gen_line, self.pop_per_gen, color="#505050", linewidth=1)
         pop_graph.plot(gen_line, self.male_per_gen, color="#0000FF", linewidth=1)
         pop_graph.plot(gen_line, self.female_per_gen, color="#FF0090", linewidth=1)
@@ -102,16 +117,26 @@ class Statistics:
         pop_graph.grid()
         #pop_graph.legend(("total pop", "male pop", "female pop", "white culture", "black culture"), loc=7)
 
-        resource_graph = plt.subplot(2, 1, 2)
+        resource_graph = plt.subplot(2, 2, 2)
         resource_graph.plot(gen_line, self.total_sugar, color="#90FF90", linewidth=1)
         resource_graph.plot(gen_line, self.total_spice, color="#FF9090", linewidth=1)
-        resource_graph.plot(gen_line, self.production_sugar, ":", color="#00AA00", linewidth=2)
-        resource_graph.plot(gen_line, self.trade_sugar, "--", color="#00AA00", linewidth=2)
-        resource_graph.plot(gen_line, self.production_spice, ":", color="#AA0000", linewidth=2)
-        resource_graph.plot(gen_line, self.trade_spice, "--", color="#AA0000", linewidth=2)
         plt.ylabel("resources")
         resource_graph.grid()
         #resource_graph.legend(("total sugar", "total spice"), loc=7)
+
+        production_graph = plt.subplot(2, 2, 3)
+        production_graph.plot(gen_line, self.production_sugar, ":", color="#00AA00", linewidth=1)
+        production_graph.plot(gen_line, self.trade_sugar, "--", color="#00AA00", linewidth=1)
+        production_graph.plot(gen_line, self.production_spice, ":", color="#AA0000", linewidth=1)
+        production_graph.plot(gen_line, self.trade_spice, "--", color="#AA0000", linewidth=1)
+        plt.ylabel("production (dotted) and trade (dashed)")
+        production_graph.grid()
+
+        market_graph = plt.subplot(2, 2, 4)
+        market_graph.plot(gen_line, self.sugar_price, color="#00FF00", linewidth=1)
+        market_graph.plot(gen_line, self.spice_price, color="#FF0000", linewidth=1)
+        plt.ylabel("market prices")
+        market_graph.grid()
 
         plt.title("Sugarscape Information")
         plt.show()

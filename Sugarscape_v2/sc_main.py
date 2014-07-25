@@ -10,8 +10,6 @@ __version__ = '2.0'
 # Original CA code taken from
 # "http://pygame.org/project-Cellular+Automata-1286-.html"
 
-import time
-
 from sc_ca import *
 from sc_abm import *
 
@@ -27,14 +25,15 @@ import sys
 
 class GlobalConstants:
     def __init__(self):
-        self.num_agents = 250
-        self.landscape_mode = 3  # 3 = twohill, 2 = procedural, 1 = randomized
+        self.num_agents = 200
+        self.landscape_mode = 2  # 3 = twohill, 2 = procedural, 1 = randomized
         self.run_simulation = False
         self.cell_size = 15
         self.grid_width = int(500 / 10) * self.cell_size
         self.grid_height = int(500 / 10) * self.cell_size
         #self.abm_bounds = (0, 10, 40, 50)
-        self.abm_bounds = (0, 50, 0, 50)
+        #self.abm_bounds = (0, 50, 0, 50)
+        self.abm_bounds = (15, 35, 15, 35)
         self.ticks = 0
         self.ms_per_tick = 60
 
@@ -117,6 +116,7 @@ class EventHandler:
         if active_key == pygame.K_r:
             ca.__init__(GC.landscape_mode, GC.grid_width, GC.grid_height, GC.cell_size)
             abm.__init__(GC.num_agents, GC.cell_size, GC.abm_bounds[0], GC.abm_bounds[1], GC.abm_bounds[2], GC.abm_bounds[3])
+            stats.__init__(abm, ca)
             GC.ticks = 0
             render_simulation(ca, abm, screen)
             print("> reset simulation")
@@ -163,6 +163,7 @@ def main():
     abm = ABM(GC.num_agents, GC.cell_size, GC.abm_bounds[0], GC.abm_bounds[1], GC.abm_bounds[2], GC.abm_bounds[3])
     handler = EventHandler()
     stats = Statistics(abm, ca)
+    update = True
 
     # TODO: fix simulation loop
     # Initialize other simulation related objects
@@ -170,7 +171,9 @@ def main():
         # This block performs a simulation step.
         if GC.run_simulation:
             step_simulation(ca, abm)
-            stats.update_records()
+            if update:
+                stats.update_records()
+            update = not update
             GC.ticks += 1
         render_simulation(ca, abm, screen)
         handler.process_input(ca, abm, stats, screen)

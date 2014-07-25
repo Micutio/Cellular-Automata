@@ -73,7 +73,10 @@ class AgentBasedSystem:
             for _ in range(num_agents):
                 walk = random.randint(0, 1)
                 seed = random.randint(0, 1)
-                self.add_agent(l[0], l[1], team, min_density, walk, seed, power)
+                densty = random.randint(1, 10)
+                powr = random.randint(1, 10)
+                #self.add_agent(l[0], l[1], team, min_density, walk, seed, power)
+                self.add_agent(l[0], l[1], team, densty, walk, seed, powr)
             self.agent_list.append(Hive(l[0], l[1], self.cell_size, team))
             ca_x = int(l[0] / self.cell_size)
             ca_y = int(l[1] / self.cell_size)

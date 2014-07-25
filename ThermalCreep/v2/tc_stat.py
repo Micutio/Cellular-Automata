@@ -63,7 +63,7 @@ class Statistics:
         """
         Plots all available data in figures.
         """
-        self.print_pop()
+        #self.print_pop()
 
         generations = len(self.pops[0])
         gen_line = range(generations)
