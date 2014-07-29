@@ -1,4 +1,4 @@
-from sc_stat import Statistics
+from v1.sc_stat import Statistics
 
 __author__ = 'Michael Wagner'
 __version__ = '2.0'
@@ -10,8 +10,8 @@ __version__ = '2.0'
 # Original CA code taken from
 # "http://pygame.org/project-Cellular+Automata-1286-.html"
 
-from sc_ca import *
-from sc_abm import *
+from v1.sc_ca import *
+from v1.sc_abm import *
 
 import pygame
 from pygame.locals import *

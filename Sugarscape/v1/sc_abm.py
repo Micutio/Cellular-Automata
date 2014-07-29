@@ -59,6 +59,7 @@ class Agent:
         self.spice_traded = 0
         self.sugar_price = 0
         self.spice_price = 0
+        self.children = []
 
     def visible_cells(self, ca):
         return ca.get_all_cells_in_vision(self.x, self.y, self.vision)
@@ -244,7 +245,9 @@ class Agent:
                             n_c.append(self.culture[bit])
                         else:
                             n_c.append(random.choice([self.culture[bit], m.culture[bit]]))
-                    agent_positions[n_x, n_y] = Agent(n_id, n_x, n_y, n_s, n_su, n_sp, n_m_su, n_m_sp, n_v, n_g, n_f, n_d, n_c, 0)
+                    child = Agent(n_id, n_x, n_y, n_s, n_su, n_sp, n_m_su, n_m_sp, n_v, n_g, n_f, n_d, n_c, 0)
+                    self.children.append(child)
+                    agent_positions[n_x, n_y] = child
 
     def r3_culture(self, neighbors):
         for n in neighbors:
@@ -307,6 +310,17 @@ class Agent:
             self.sugar_price /= sugar_count
         if spice_count > 0:
             self.spice_price /= spice_count
+
+    def last_will(self):
+        """
+        As the name suggests, this method is to be executed upon the agent's death.
+        All it does so far, is inheriting its wealth to all its offspring.
+        """
+        if self.children:
+            num_kids = len(self.children)
+            for c in self.children:
+                c.sugar += math.floor(self.sugar / num_kids)
+                c.spice += math.floor(self.spice / num_kids)
 
 
 class ABM:
@@ -371,6 +385,7 @@ class ABM:
 
     def update_position(self, v):
         if v.dead:
+            v.last_will()
             self.agent_dict.pop((v.prev_x, v.prev_y))
         #elif v.x != v.prev_x or v.y != v.prev_y:
         else:
