@@ -29,8 +29,23 @@ STARTING_SUGAR = (20, 40)
 #########################################################################
 
 
+class Tribes:
+    def __init__(self, num_tribes):
+        self.num_tribes = num_tribes
+        self.total_cells = 2500
+        self.tribal_wealth = {}
+        self.total_wealth = 0
+        for i in range(self.num_tribes):
+            self.tribal_wealth[i] = 0
+
+    def max_area_of_tribe(self, tribe_id):
+        tribal_wealth = self.tribal_wealth[tribe_id]
+        result = tribal_wealth * self.total_cells / self.total_wealth
+        return int(result)
+
+
 class Agent:
-    def __init__(self, g_id, x, y, c_size, su, sp, m_su, m_sp, v, g, f, d, c, a):
+    def __init__(self, g_id, x, y, c_size, su, sp, m_su, m_sp, v, g, f, d, c, a, tribe):
         """
         Initializes an agent
         """
@@ -60,6 +75,11 @@ class Agent:
         self.sugar_price = 0
         self.spice_price = 0
         self.children = []
+        if self.culture.count(0) > self.culture.count(1):
+            self.tribe_id = 0
+        else:
+            self.tribe_id = 1
+        self.tribe = tribe
 
     def visible_cells(self, ca):
         return ca.get_all_cells_in_vision(self.x, self.y, self.vision)
@@ -192,6 +212,7 @@ class Agent:
             self.eat_from_cell(c)
 
     def eat_from_cell(self, cell):
+        old_wealth = self.sugar + self.spice
         self.sugar += cell.sugar
         self.spice += cell.spice
         self.sugar_gathered += cell.sugar
@@ -200,6 +221,8 @@ class Agent:
         cell.spice = 0
         self.sugar -= self.metab_sugar
         self.spice -= self.metab_spice
+        new_wealth = self.sugar + self.spice
+        self.tribe.tribal_wealth[self.tribe_id] += (old_wealth - new_wealth)
         if self.sugar <= 0 or self.spice <= 0:
             self.dead = True
 
@@ -330,6 +353,8 @@ class ABM:
         :return: An initialized ABM.
         """
         self.agent_dict = {}
+        self.tribes = Tribes(2)
+        total_wealth = 0
         a_id = 0
         c = c_size
         r = int(c_size / 2)
@@ -356,8 +381,11 @@ class ABM:
                 while c.count(0) > c.count(1):
                     c = [random.getrandbits(1) for _ in range(11)]
             a = random.randint(0, int(MAX_AGENT_LIFE / 2))
-            self.agent_dict[p[0], p[1]] = Agent(str(a_id), p[0], p[1], c_size, su, sp, metab_sugar, metab_spice, vision, g, f, d, c, a)
+            self.agent_dict[p[0], p[1]] = Agent(str(a_id), p[0], p[1], c_size, su, sp, metab_sugar, metab_spice, vision, g, f, d, c, a, self.tribes)
             a_id += 1
+
+            total_wealth += (su + sp)
+        self.tribes.total_wealth = total_wealth
 
     def cycle_system(self, ca):
         """
