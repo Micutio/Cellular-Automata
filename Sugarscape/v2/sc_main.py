@@ -51,6 +51,7 @@ class EventHandler:
             #ca[int(mx), int(my)].sugar = 0
 
     def keyboard_action(self, active_key, ca, abm, stats, screen):
+        # TODO: add switching of visualizing modes
         if active_key == pygame.K_SPACE:
             GC.RUN_SIMULATION = not GC.RUN_SIMULATION
             if GC.RUN_SIMULATION:
