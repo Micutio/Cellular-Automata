@@ -16,7 +16,7 @@ GC = GlobalConstants()
 
 
 class CA:
-    def __init__(self, init_mode, grid_height, grid_width, cell_size):
+    def __init__(self, init_mode, grid_height, grid_width, cell_size, visualizer):
         """
         Initializes and returns the cellular automaton.
         The CA is a dictionary and not a list of lists
@@ -30,31 +30,35 @@ class CA:
         self.cell_size = cell_size
         self.season_count = 0
         self.season = 1
+        self.visualizer = visualizer
 
         if init_mode == 1:
             for i in range(0, self.height):
                 for j in range(0, self.width):
-                    self.ca_grid[i, j] = ClassCell(i, j, cell_size, random.randint(0, GC.MAX_SUGAR), random.randint(0, GC.MAX_SUGAR), GC.GROWTH_PER_TICK, self.season)
+                    self.ca_grid[i, j] = ClassCell(i, j, cell_size, random.randint(0, GC.MAX_SUGAR),
+                                                   random.randint(0, GC.MAX_SUGAR), GC.GROWTH_PER_TICK, self.season)
         elif init_mode == 2:
             landscape_sugar = get_procedural_landscape()
             landscape_spice = get_procedural_landscape()
             for i in range(0, self.height):
                 for j in range(0, self.width):
-                    self.ca_grid[i, j] = ClassCell(i, j, cell_size, landscape_sugar[i][j], landscape_spice[i][j], GC.GROWTH_PER_TICK, self.season)
+                    self.ca_grid[i, j] = ClassCell(i, j, cell_size, landscape_sugar[i][j], landscape_spice[i][j],
+                                                   GC.GROWTH_PER_TICK, self.season)
         elif init_mode == 3:
             sugar_dist = get_two_hill_landscape()
             spice_dist = get_inverted_two_hill_landscape()
             for i in range(0, self.height):
                 for j in range(0, self.width):
-                    self.ca_grid[i, j] = ClassCell(i, j, cell_size, sugar_dist[i][j], spice_dist[j][i], GC.GROWTH_PER_TICK, self.season)
+                    self.ca_grid[i, j] = ClassCell(i, j, cell_size, sugar_dist[i][j], spice_dist[j][i],
+                                                   GC.GROWTH_PER_TICK, self.season)
 
-    def draw_cells(self, screen):
+    def draw_cells(self):
         """
         Simply iterating over all cells and calling their draw() method.
         """
         for y in range(0, self.height):
             for x in range(0, self.width):
-                self.ca_grid[x, y].draw(screen)
+                self.visualizer.draw_cell(self.ca_grid[x, y])
 
     def cycle_automaton(self):
         """
@@ -99,7 +103,7 @@ class CA:
             for x in range(0, self.width):
                 self.ca_grid[x, y].update()
 
-    def get_visible_cells(self, a_pos, agent_x, agent_y, v, tribe_id, wealth):
+    def get_visible_cells(self, a_pos, agent_x, agent_y, v):
         """
         Delivers all cells that are in sight of cell(x,y) with sight range of v.
         Here we use the von-Neumann neighborhood

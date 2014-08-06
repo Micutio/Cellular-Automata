@@ -69,6 +69,8 @@ class Chromosome:
         :return: The child's chromosome.
         """
         # TODO: Finish this!
+        # Concept: divide genome in partions of varying length.
+        # Exchange those parts between mother and father gametes?
         return
 
     # This method makes sense only for Lamarckian Evolution!

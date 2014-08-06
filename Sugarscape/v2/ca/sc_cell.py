@@ -22,6 +22,7 @@ class ClassCell:
         self.sugar_period_counter = 0
         self.spice_period_counter = 0
         self.tribe_id = -1
+        self.visits = 0
 
     @property
     def get_sugar(self):

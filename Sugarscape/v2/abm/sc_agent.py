@@ -59,9 +59,9 @@ class Agent:
         """
         Relates the time the agent will die of lack of sugar with
         the time the agent will die of lack of spice.
-        :param su:
-        :param sp:
-        :return:
+        :param su: amount of sugar that can be gained during this move.
+        :param sp: amount of spice that can be gained during this move.
+        :return: welfare value, important to calculate prices in the trading rule.
         """
         meta_total = self.meta_sugar + self.meta_spice
         w1 = math.pow((self.sugar + su), (self.meta_sugar / meta_total))
@@ -170,6 +170,9 @@ class Agent:
         # ... and move to the new one.
         self.x = (c[0].x * self.size) + int(self.size / 2)
         self.y = (c[0].y * self.size) + int(self.size / 2)
+        # Increase the cell's visit counter. This is only important for
+        # the heat map visualization option.
+        c[0].visits += 1
         # Additionally, try to eat from it and kill possible occupants.
         self.eat_from_cell(c)
 

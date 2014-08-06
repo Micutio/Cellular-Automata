@@ -5,20 +5,22 @@ __version__ = '2.0'
 
 import random
 import copy
+from v2.abm.sc_agent import Agent
 from v2.abm.sc_tribes import Tribes
 from v2.sc_global_constants import GlobalConstants
 
-GC = GlobalConstants
+GC = GlobalConstants()
 
 
 class ABM:
-    def __init__(self, num_agents, c_size, min_x, max_x, min_y, max_y):
+    def __init__(self, num_agents, c_size, min_x, max_x, min_y, max_y, visualizer):
         """
         Initializes an abm with the given number of agents and returns it
         :return: An initialized ABM.
         """
         self.agent_dict = {}
         self.tribes = Tribes(2)
+        self.visualizer = visualizer
         total_wealth = 0
         a_id = 0
         c = c_size
@@ -26,18 +28,19 @@ class ABM:
         positions = [((x * c) + r, (y * c) + r) for x in range(min_x, max_x) for y in range(min_y, max_y)]
         positions = random.sample(positions, num_agents)
         random.shuffle(positions)
+
         for p in positions:
-            metab_sugar = random.randint(MIN_METABOLISM, MAX_METABOLISM)
-            metab_spice = random.randint(MIN_METABOLISM, MAX_METABOLISM)
-            vision = random.randint(1, VISION)
-            g = random.choice(["f", "m"])
-            if g == "f":
-                f = [F_FERTILITY_START, random.randint(F_FERTILITY_END[0], F_FERTILITY_END[1])]
+            meta_sugar = random.randint(GC.MIN_METABOLISM, GC.MAX_METABOLISM)
+            meta_spice = random.randint(GC.MIN_METABOLISM, GC.MAX_METABOLISM)
+            vision = random.randint(1, GC.VISION)
+            g = random.choice([0, 1])
+            if g == 1:
+                f = [GC.F_FERTILITY_START, random.randint(GC.F_FERTILITY_END[0], GC.F_FERTILITY_END[1])]
             else:
-                f = [M_FERTILITY_START, random.randint(M_FERTILITY_END[0], M_FERTILITY_END[1])]
-            su = random.randint(STARTING_SUGAR[0], STARTING_SUGAR[1])
-            sp = random.randint(STARTING_SUGAR[0], STARTING_SUGAR[1])
-            d = random.randint(f[1], MAX_AGENT_LIFE)
+                f = [GC.M_FERTILITY_START, random.randint(GC.M_FERTILITY_END[0], GC.M_FERTILITY_END[1])]
+            su = random.randint(GC.STARTING_SUGAR[0], GC.STARTING_SUGAR[1])
+            sp = random.randint(GC.STARTING_SUGAR[0], GC.STARTING_SUGAR[1])
+            d = random.randint(f[1], GC.MAX_AGENT_LIFE)
             c = [random.getrandbits(1) for _ in range(11)]
             if p[0] > p[1]:
                 self.tribes.tribal_area[1] += 1
@@ -47,8 +50,11 @@ class ABM:
                 self.tribes.tribal_area[0] += 1
                 while c.count(0) > c.count(1):
                     c = [random.getrandbits(1) for _ in range(11)]
-            a = random.randint(0, int(MAX_AGENT_LIFE / 2))
-            self.agent_dict[p[0], p[1]] = Agent(str(a_id), p[0], p[1], c_size, su, sp, metab_sugar, metab_spice, vision, g, f, d, c, a, self.tribes)
+            a = random.randint(0, int(GC.MAX_AGENT_LIFE / 2))
+            gene_string = bin(meta_sugar) + bin(meta_spice) + bin(su) + bin(sp)
+            gene_string += bin(vision) + bin(g) + bin(f[0]) + bin(f[1]) + bin(d)
+            genome = (gene_string, gene_string)
+            self.agent_dict[p[0], p[1]] = Agent(p[0], p[1], c_size, su, sp, genome, a, self.tribes)
             a_id += 1
 
             total_wealth += (su + sp)
@@ -66,12 +72,12 @@ class ABM:
             # In case the agent has updated it's position we change the position list accordingly.
             self.update_position(v)
 
-    def draw_agents(self, surf):
+    def draw_agents(self):
         """
         Iterates over all agents and draws them on the grid
         """
         for (_, _), v in self.agent_dict.items():
-            v.draw(surf)
+            self.visualizer.draw_agent(v)
 
     def get_agent_at_position(self, x, y):
         for (_, _), v in self.agent_dict.items():
@@ -86,4 +92,3 @@ class ABM:
         else:
             self.agent_dict.pop((v.prev_x, v.prev_y))
             self.agent_dict[v.x, v.y] = v
-
