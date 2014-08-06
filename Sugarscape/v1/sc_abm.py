@@ -413,7 +413,7 @@ class ABM:
 
     def update_position(self, v):
         if v.dead:
-            v.last_will()
+            v.inherit_on_death()
             self.agent_dict.pop((v.prev_x, v.prev_y))
         #elif v.x != v.prev_x or v.y != v.prev_y:
         else:
