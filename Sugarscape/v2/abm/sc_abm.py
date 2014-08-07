@@ -19,7 +19,7 @@ class ABM:
         :return: An initialized ABM.
         """
         self.agent_dict = {}
-        self.tribes = Tribes(2)
+        self.tribes = Tribes(GC.NUM_TRIBES)
         self.visualizer = visualizer
         total_wealth = 0
         a_id = 0
@@ -41,19 +41,12 @@ class ABM:
             su = random.randint(GC.STARTING_SUGAR[0], GC.STARTING_SUGAR[1])
             sp = random.randint(GC.STARTING_SUGAR[0], GC.STARTING_SUGAR[1])
             d = random.randint(f[1], GC.MAX_AGENT_LIFE)
-            c = [random.getrandbits(1) for _ in range(11)]
-            if p[0] > p[1]:
-                self.tribes.tribal_area[1] += 1
-                while c.count(0) < c.count(1):
-                    c = [random.getrandbits(1) for _ in range(11)]
-            else:
-                self.tribes.tribal_area[0] += 1
-                while c.count(0) > c.count(1):
-                    c = [random.getrandbits(1) for _ in range(11)]
+            c = [random.randint(0, GC.NUM_TRIBES - 1) for _ in range(11)]
+            imm_sys = [random.getrandbits(1) for _ in range(50)]
             a = random.randint(0, int(GC.MAX_AGENT_LIFE / 2))
             gene_string = bin(meta_sugar) + bin(meta_spice) + bin(su) + bin(sp)
             gene_string += bin(vision) + bin(g) + bin(f[0]) + bin(f[1]) + bin(d)
-            genome = (gene_string, gene_string)
+            genome = (gene_string, gene_string, c, imm_sys)
             self.agent_dict[p[0], p[1]] = Agent(p[0], p[1], c_size, su, sp, genome, a, self.tribes)
             a_id += 1
 
@@ -86,7 +79,7 @@ class ABM:
 
     def update_position(self, v):
         if v.dead:
-            v.inherit_on_death()
+            v.on_death()
             self.agent_dict.pop((v.prev_x, v.prev_y))
         #elif v.x != v.prev_x or v.y != v.prev_y:
         else:

@@ -7,6 +7,7 @@ import sys
 from v2.abm.sc_genetics import Chromosome
 
 
+# TODO: Add diseases!
 class Agent:
     def __init__(self, x, y, c_size, su, sp, genomes, a, tribe):
         """
@@ -38,10 +39,7 @@ class Agent:
         self.sugar_price = 0
         self.spice_price = 0
         self.children = []
-        if self.culture.count(0) > self.culture.count(1):
-            self.tribe_id = 0
-        else:
-            self.tribe_id = 1
+        self.tribe_id = max(set(self.culture), key=self.culture.count)
         self.tribe = tribe
 
     def visible_cells(self, ca):
@@ -75,27 +73,6 @@ class Agent:
             return rate_spice / rate_sugar
         else:
             return sys.maxsize
-
-    def perceive_and_act(self, ca, agent_positions):
-        """
-        Perceiving the environment and act according to the rules
-        """
-        self.grow_older()
-        self.prev_x = self.x
-        self.prev_y = self.y
-        self.sugar_gathered = 0
-        self.spice_gathered = 0
-        self.sugar_traded = 0
-        self.spice_traded = 0
-        wealth = self.sugar + self.spice
-        if not self.dead:
-            vc = ca.get_visible_cells(agent_positions, self.x, self.y, self.vision, self.tribe_id, wealth)
-            self.r1_select_best_cell(vc)
-            #nb = ca.get_neighborhood(agent_positions, self.x, self.y)
-            vc = ca.get_visible_cells(agent_positions, self.x, self.y, self.vision, self.tribe_id, wealth)
-            self.r2_reproduce(vc, agent_positions)
-            self.r3_culture(vc)
-            self.r4_trading(vc)
 
     def r1_select_best_cell(self, cells):
         """
@@ -242,7 +219,7 @@ class Agent:
                     m.spice -= int(m.init_spice / 2)
                     # Fuse mommy's and daddy's chromosomes to create Juniors attributes.
                     # This is the actual creation of the baby. Behold the wonders of nature!
-                    n_chromosome = Chromosome(self.chromosome.merge_with(m.chromosome.genomes))
+                    n_chromosome = Chromosome(self.chromosome.merge_with(m.chromosome))
                     child = Agent(n_x, n_y, n_s, n_su, n_sp, n_chromosome, 0, self.tribe)
                     # Give the parents a reference to their newborn so they can,
                     # inherit their wealth to it before their inevitable demise.
@@ -252,13 +229,28 @@ class Agent:
                     agent_positions[n_x, n_y] = child
 
     def r3_culture(self, neighbors):
+        """
+        Attempt to convert neighboring agents towards my culture.
+        """
         for n in neighbors:
-            if n[1]:
-                index = random.choice(range(len(self.culture)))
-                if n[1].culture[index] != self.culture[index]:
-                    n[1].culture[index] = self.culture[index]
+            if n[1] and n[1].tribe_id != self.tribe_id:
+                index = 0
+                while n[1].culture[index] == self.tribe_id:
+                    index = random.choice(range(len(self.culture)))
+                n[1].culture[index] = self.tribe_id
+                old_id = n[1].tribe_id
+                n[1].tribe_id = max(set(self.culture), key=self.culture.count)
+                # In case the neighbor has been won over to my tribe,
+                # shift its wealth over.
+                if old_id != n[1].tribe_id:
+                    wealth = n[1].sugar + n[1].spice
+                    n[1].tribe.tribal_wealth[old_id] -= wealth
+                    n[1].tribe.tribal_wealth[n[1].tribe_id] += wealth
 
     def r4_trading(self, neighbors):
+        """
+        Trade with neighboring agents if possible.
+        """
         sugar_count = 0
         spice_count = 0
         self.sugar_price = 0
@@ -317,15 +309,39 @@ class Agent:
         if spice_count > 0:
             self.spice_price /= spice_count
 
-# TODO: Add genetic mutation and diseases!
-
-    def inherit_on_death(self):
+    def on_death(self):
         """
         As the name suggests, this method is to be executed upon the agent's death.
-        All it does so far, is inheriting its wealth to all its offspring.
         """
+        # Inherit my wealth to all my kids
         if self.children:
             num_kids = len(self.children)
             for c in self.children:
                 c.sugar += math.floor(self.sugar / num_kids)
                 c.spice += math.floor(self.spice / num_kids)
+
+        # Update tribe's information
+        self.tribe.tribal_wealth -= (self.sugar + self.spice)
+        self.sugar = 0
+        self.spice = 0
+
+    def perceive_and_act(self, ca, agent_positions):
+        """
+        Perceiving the environment and act according to the rules
+        """
+        self.grow_older()
+        self.prev_x = self.x
+        self.prev_y = self.y
+        self.sugar_gathered = 0
+        self.spice_gathered = 0
+        self.sugar_traded = 0
+        self.spice_traded = 0
+        if not self.dead:
+            vc = ca.get_visible_cells(agent_positions, self.x, self.y, self.vision)
+            self.r1_select_best_cell(vc)
+            nb = ca.get_neighborhood(agent_positions, self.x, self.y)
+            #vc = ca.get_visible_cells(agent_positions, self.x, self.y, self.vision)
+            self.r2_reproduce(nb, agent_positions)
+            self.r3_culture(nb)
+            self.r4_trading(nb)
+            self.chromosome.mutate()

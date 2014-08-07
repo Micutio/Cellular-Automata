@@ -1,23 +1,23 @@
 __author__ = 'Michael Wagner'
 __version__ = '1.0'
 
-import random
+import numpy.random as npr
 
 
-# TODO: Complete implementation
+# TODO: Implement proper immune system.
 class Chromosome:
     """
     This class handles all biological aspects of an agent.
     """
 
-    def __init__(self, genomes):
+    def __init__(self, dna):
         """
         Standard initializer.
         :return:
         """
-        self.genomes = genomes
-        self.culture = None
-        self.immune_system = None
+        self.genomes = dna[0:2]
+        self.culture = dna[2]
+        self.immune_system = dna[3]
         self.attributes = None
         self.meta_sugar = None
         self.meta_spice = None
@@ -46,33 +46,113 @@ class Chromosome:
         Decodes the genome and creates the attribute of the individual.
         :return:
         """
-        # TODO: Improve genetics!
-        # TODO: How often do we have to build the chromosome from the genome?
-        gene = random.choice(self.genomes)
-        self.meta_sugar = int(gene[self.att_map['meta_sugar'][0]: self.att_map['meta_sugar'][1]], 2)
-        self.meta_spice = int(gene[self.att_map['meta_spice'][0]: self.att_map['meta_spice'][1]], 2)
-        self.init_sugar = int(gene[self.att_map['init_sugar'][0]: self.att_map['init_sugar'][1]], 2)
-        self.init_spice = int(gene[self.att_map['init_spice'][0]: self.att_map['init_spice'][1]], 2)
-        self.vision = int(gene[self.att_map['vision'][0]: self.att_map['vision'][1]], 2)
-        self.gender = int(gene[self.att_map['gender'][0]: self.att_map['gender'][1]], 2)
-        self.dying_age = int(gene[self.att_map['dying_age'][0]: self.att_map['dying_age'][1]], 2)
-        f1 = int(gene[self.att_map['fertility_1'][0]: self.att_map['fertility_1'][1]], 2)
-        f2 = int(gene[self.att_map['fertility_2'][0]: self.att_map['fertility_2'][1]], 2)
+        self.meta_sugar = int(self.choose_dominant(self.get_sub_genes('meta_sugar')), 2)
+        self.meta_spice = int(self.choose_dominant(self.get_sub_genes('meta_spice')), 2)
+        self.init_sugar = int(self.choose_dominant(self.get_sub_genes('init_sugar')), 2)
+        self.init_spice = int(self.choose_dominant(self.get_sub_genes('init_spice')), 2)
+        self.vision = int(self.choose_dominant(self.get_sub_genes('vision')), 2)
+        self.gender = int(self.choose_dominant(self.get_sub_genes('gender')), 2)
+        self.dying_age = int(self.choose_dominant(self.get_sub_genes('dying_age')), 2)
+        f1 = int(self.choose_dominant(self.get_sub_genes('fertility_1')), 2)
+        f2 = int(self.choose_dominant(self.get_sub_genes('fertility_2')), 2)
         self.fertility = (f1, f2)
 
         return
 
-    def merge_with(self, mate_genomes):
+    def get_sub_genes(self, key):
         """
-        Takes the chromosome from the mate and performs the fertilization.
-        :param mate_genomes:
+        Retrieves the partitions of both genes.
+        :param key: The key of the partition entries' location in the dictionary
+        :return: Two sub-strings of the genomes
+        """
+        indices = self.att_map[key]
+        start = indices[0]
+        end = indices[1]
+        return self.genomes[0][start: end], self.genomes[1][start: end]
+
+    def choose_dominant(self, strings):
+        """
+        Takes two gene strings and returns the dominant one,
+        or random if both are dominant/ recessive
+        :param strings: Two sub-genes of the chromosome
+        :return: The more dominant/ luckier string of both.
+        """
+        # How do we distinguish dominance?
+        # For now just by looking whether there is an even number of 'ones' in it.
+        dominant0 = strings[0].count('1') % 2 == 0
+        dominant1 = strings[1].count('1') % 2 == 0
+        if (dominant0 and dominant1) or (not (dominant0 or dominant1)):
+            return npr.choice([strings[0], strings[1]])
+        elif dominant1:
+            return strings[0]
+        else:
+            return strings[1]
+
+    def merge_with(self, mate_chromosome):
+        """
+        Takes the chromosome from the mate, performs
+        all necessary crossovers and returns the resulting DNA
+        :param mate_chromosome:
         :return: The child's chromosome.
         """
-        # TODO: Finish this!
         # Concept: divide genome in partions of varying length.
         # Exchange those parts between mother and father gametes?
-        return
+        genome1 = self.create_gamete(self.genomes)
+        genome2 = self.create_gamete(mate_chromosome.genomes)
+        culture = self.create_gamete((self.culture, mate_chromosome.culture))
+        immunesys = self.create_gamete((self.immune_system, mate_chromosome.immune_system))
+        return [genome1, genome2, culture, immunesys]
+
+    def create_gamete(self, genomes):
+        """
+        Creates and returns a gamete that consists of parts of
+        both genomes in this chromosome.
+        :return: Gamete in form of a single bitstring.
+        """
+        # 1) Generate a random number (gaussian distributed) of
+        # random indices which are then used to split the genes at the respective points.
+        genome_size = len(genomes[0]) - 1
+        num_partitions = npr.triangular(0, genome_size / 2, genome_size)
+        partitions = npr.sample(range(genome_size), num_partitions)
+        partitions.append(-1)  # Append the end of the string
+        partitions.sort()  # Now we have all our indices, and sorted.
+        start = 0
+        gamete = []
+        for p in partitions:
+            i = npr.choice([0, 1])
+            gamete.append(genomes[i][start:p])
+            start = p
+        return gamete
+
+    def mutate(self):
+        """
+        Has a chance of 1% to perform a random mutation in the dna.
+        :return:
+        """
+        if npr.random() < 0.01:
+            # Flip bit in genome
+            length = len(self.genomes)
+            index = npr.randint(length)
+            l = list(self.genomes[0])
+            l[index] = self.invert_bit(l[index])
+            self.genomes[0] = "".join(l)
+
+            index = npr.randint(length)
+            l = list(self.genomes[1])
+            l[index] = self.invert_bit(l[index])
+            self.genomes[1] = "".join(l)
+
+    def invert_bit(self, bit):
+        """
+        Takes the bit as a string and inverts it.
+        :param bit:
+        :return: Inverted bit
+        """
+        if bit == '0':
+            return '1'
+        else:
+            return '0'
 
     # This method makes sense only for Lamarckian Evolution!
-    def map_attributes_to_genome(self, attributes):
-        return
+    #def map_attributes_to_genome(self, attributes):
+    #    return

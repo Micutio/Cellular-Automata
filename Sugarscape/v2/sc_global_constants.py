@@ -13,6 +13,7 @@ class GlobalConstants:
         #     SIMULATION CONSTANTS     #
         ################################
         self.NUM_AGENTS = 200
+        self.NUM_TRIBES = 2
         self.LANDSCAPE_MODE = 2  # 3 = twohill, 2 = procedural, 1 = randomized
         self.RUN_SIMULATION = False
         self.CELL_SIZE = 15

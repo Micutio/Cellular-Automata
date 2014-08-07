@@ -268,16 +268,21 @@ class Agent:
                             n_c.append(self.culture[bit])
                         else:
                             n_c.append(random.choice([self.culture[bit], m.culture[bit]]))
-                    child = Agent(n_id, n_x, n_y, n_s, n_su, n_sp, n_m_su, n_m_sp, n_v, n_g, n_f, n_d, n_c, 0)
+                    child = Agent(n_id, n_x, n_y, n_s, n_su, n_sp, n_m_su, n_m_sp, n_v, n_g, n_f, n_d, n_c, 0, self.tribe)
                     self.children.append(child)
                     agent_positions[n_x, n_y] = child
 
     def r3_culture(self, neighbors):
         for n in neighbors:
-            if n[1]:
-                index = random.choice(range(len(self.culture)))
-                if n[1].culture[index] != self.culture[index]:
-                    n[1].culture[index] = self.culture[index]
+            if n[1] and self.tribe_id != n[1].tribe_id:
+                index = 0
+                while n[1].culture[index] == self.culture[index]:
+                    index = random.choice(range(len(self.culture)))
+                n[1].culture[index] = self.culture[index]
+                if n[1].culture.count(0) > n[1].culture.count(1):
+                    n[1].tribe_id = 0
+                else:
+                    n[1].tribe_id = 1
 
     def r4_trading(self, neighbors):
         sugar_count = 0
@@ -413,7 +418,7 @@ class ABM:
 
     def update_position(self, v):
         if v.dead:
-            v.inherit_on_death()
+            v.last_will()
             self.agent_dict.pop((v.prev_x, v.prev_y))
         #elif v.x != v.prev_x or v.y != v.prev_y:
         else:
