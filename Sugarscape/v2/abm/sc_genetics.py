@@ -35,9 +35,9 @@ class Chromosome:
                         'init_spice': (10, 16),
                         'vision': (16, 19),
                         'gender': (19, 20),
-                        'fertility_1': (20, 22),
-                        'fertility_2': (22, 24),
-                        'dying_age': (24, 31)}
+                        'fertility_1': (20, 24),
+                        'fertility_2': (24, 28),
+                        'dying_age': (28, 35)}
 
         self.map_genome_to_attributes()
 

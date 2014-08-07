@@ -9,7 +9,7 @@ class Statistics:
     This class records and outputs statistics about the sugarscape.
     """
 
-    def __init__(self, abm, ca):
+    def __init__(self, abm, ca, gc):
         """r
         Initializes the Statistics class.
         """
@@ -19,8 +19,8 @@ class Statistics:
         self.pop_per_gen = []
         self.male_per_gen = []
         self.female_per_gen = []
-        self.cult_white = []
-        self.cult_black = []
+        self.gc = gc
+        self.tribes = [[0] for _ in range(self.gc.NUM_TRIBES)]
         self.total_sugar = []
         self.total_spice = []
         self.production_sugar = []
@@ -38,8 +38,7 @@ class Statistics:
         self.pop_per_gen.append(len(self.abm.agent_dict))
         males = 0
         females = 0
-        black_cults = 0
-        white_cults = 0
+        tribes = [0 for _ in range(self.gc.NUM_TRIBES)]
         prod_sugar = 0
         prod_spice = 0
         tr_sugar = 0
@@ -55,10 +54,7 @@ class Statistics:
             else:
                 females += 1
             # count culture
-            if v.culture.count(0) > v.culture.count(1):
-                black_cults += 1
-            else:
-                white_cults += 1
+            tribes[v.tribe_id] += 1
             # count production
             prod_sugar += v.sugar_gathered
             prod_spice += v.spice_gathered
@@ -76,14 +72,15 @@ class Statistics:
 
         self.male_per_gen.append(males)
         self.female_per_gen.append(females)
-        self.cult_black.append(black_cults)
-        self.cult_white.append(white_cults)
         self.production_sugar.append(prod_sugar)
         self.production_spice.append(prod_spice)
         self.trade_sugar.append(tr_sugar)
         self.trade_spice.append(tr_spice)
         self.sugar_price.append(sugar_pr)
         self.spice_price.append(spice_pr)
+
+        for i in range(self.gc.NUM_TRIBES):
+            self.tribes[i].append(tribes[i])
 
         sugar = 0
         spice = 0
@@ -103,11 +100,13 @@ class Statistics:
         pop_graph.plot(gen_line, self.pop_per_gen, color="#505050", linewidth=1)
         pop_graph.plot(gen_line, self.male_per_gen, color="#0000FF", linewidth=1)
         pop_graph.plot(gen_line, self.female_per_gen, color="#FF0090", linewidth=1)
-        pop_graph.plot(gen_line, self.cult_black, ":", color="#606060", linewidth=1)
-        pop_graph.plot(gen_line, self.cult_white, "--", color="#BBBBBB", linewidth=1)
-        plt.ylabel("population")
+        for i in self.gc.NUM_TRIBES:
+            rgb = self.gc.TRIBE_COLORS[i]
+            color = '#%02x%02x%02x' % (rgb[0], rgb[1], rgb[2])
+            pop_graph.plot(gen_line, self.tribes[i], "-", color=color, linewidth=1)
+        plt.ylabel("population and tribes")
         pop_graph.grid()
-        #pop_graph.legend(("total pop", "male pop", "female pop", "white culture", "black culture"), loc=7)
+        #pop_graph.legend(("total pop", "male pop", "female pop", "tribes"), loc=7)
 
         resource_graph = plt.subplot(2, 2, 2)
         resource_graph.plot(gen_line, self.total_sugar, color="#90FF90", linewidth=1)

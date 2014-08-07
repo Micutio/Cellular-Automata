@@ -7,50 +7,47 @@ __version__ = '1.0'
 # "http://pygame.org/project-Cellular+Automata-1286-.html"
 
 from v2.ca.sc_cell import ClassCell
-from v2.sc_global_constants import GlobalConstants
 from numpy import *
 import random
 import copy
 
-GC = GlobalConstants()
-
 
 class CA:
-    def __init__(self, init_mode, grid_height, grid_width, cell_size, visualizer):
+    def __init__(self, visualizer, gc):
         """
         Initializes and returns the cellular automaton.
         The CA is a dictionary and not a list of lists
         :return: The initialized CA.
         """
         self.ca_grid = {}
-        self.grid_height = grid_height
-        self.grid_width = grid_width
-        self.height = int(self.grid_height / cell_size)
-        self.width = int(self.grid_width / cell_size)
-        self.cell_size = cell_size
+        self.grid_height = gc.GRID_HEIGHT
+        self.grid_width = gc.GRID_WIDTH
+        self.height = int(self.grid_height / gc.CELL_SIZE)
+        self.width = int(self.grid_width / gc.CELL_SIZE)
+        self.cell_size = gc.CELL_SIZE
         self.season_count = 0
         self.season = 1
         self.visualizer = visualizer
 
-        if init_mode == 1:
+        if gc.LANDSCAPE_MODE == 1:
             for i in range(0, self.height):
                 for j in range(0, self.width):
-                    self.ca_grid[i, j] = ClassCell(i, j, cell_size, random.randint(0, GC.MAX_SUGAR),
-                                                   random.randint(0, GC.MAX_SUGAR), GC.GROWTH_PER_TICK, self.season)
-        elif init_mode == 2:
-            landscape_sugar = get_procedural_landscape()
-            landscape_spice = get_procedural_landscape()
+                    self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, random.randint(0, gc.MAX_SUGAR),
+                                                   random.randint(0, gc.MAX_SUGAR), gc.GROWTH_PER_TICK, self.season)
+        elif gc.LANDSCAPE_MODE == 2:
+            landscape_sugar = get_procedural_landscape(gc)
+            landscape_spice = get_procedural_landscape(gc)
             for i in range(0, self.height):
                 for j in range(0, self.width):
-                    self.ca_grid[i, j] = ClassCell(i, j, cell_size, landscape_sugar[i][j], landscape_spice[i][j],
-                                                   GC.GROWTH_PER_TICK, self.season)
-        elif init_mode == 3:
+                    self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, landscape_sugar[i][j], landscape_spice[i][j],
+                                                   gc.GROWTH_PER_TICK, self.season)
+        elif gc.LANDSCAPE_MODE == 3:
             sugar_dist = get_two_hill_landscape()
             spice_dist = get_inverted_two_hill_landscape()
             for i in range(0, self.height):
                 for j in range(0, self.width):
-                    self.ca_grid[i, j] = ClassCell(i, j, cell_size, sugar_dist[i][j], spice_dist[j][i],
-                                                   GC.GROWTH_PER_TICK, self.season)
+                    self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, sugar_dist[i][j], spice_dist[j][i],
+                                                   gc.GROWTH_PER_TICK, self.season)
 
     def draw_cells(self):
         """
@@ -180,7 +177,7 @@ class CA:
 #########################################################################
 
 
-def get_procedural_landscape():
+def get_procedural_landscape(GC):
     landscape = [[0 for _ in range(50)] for _ in range(50)]
     # First step: plant some 'seeds' for hills
     num_hills = random.randint(5, 15)

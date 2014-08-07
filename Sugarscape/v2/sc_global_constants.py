@@ -2,11 +2,6 @@ __author__ = 'Michael Wagner'
 __version__ = '1.0'
 
 
-#########################################################################
-###                            CLASSES                                ###
-#########################################################################
-
-
 class GlobalConstants:
     def __init__(self):
         ################################
@@ -14,7 +9,7 @@ class GlobalConstants:
         ################################
         self.NUM_AGENTS = 200
         self.NUM_TRIBES = 2
-        self.LANDSCAPE_MODE = 2  # 3 = twohill, 2 = procedural, 1 = randomized
+        self.LANDSCAPE_MODE = 2  # 3 = two hills, 2 = procedural, 1 = randomized
         self.RUN_SIMULATION = False
         self.CELL_SIZE = 15
         self.GRID_WIDTH = int(500 / 10) * self.CELL_SIZE
@@ -24,6 +19,12 @@ class GlobalConstants:
         self.ABM_BOUNDS = (15, 35, 15, 35)
         self.TICKS = 0
         self.MS_PER_TICK = 60
+        self.TRIBE_COLORS = {0: (0, 0, 0),
+                             1: (1, 1, 1),
+                             2: (0.7, 0, 0.5),
+                             3: (0, 0.7, 0.5),
+                             4: (0.7, 0.9, 0.2),
+                             5: (0.6, 0.4, 0.1)}
         ################################
         #        ABM CONSTANTS         #
         ################################

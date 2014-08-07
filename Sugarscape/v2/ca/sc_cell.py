@@ -8,6 +8,9 @@ class ClassCell:
     """
 
     def __init__(self, x, y, c_size, sugar, spice, growth, period):
+        """
+        Standard initializer.
+        """
         self.x = x
         self.y = y
         self.w = c_size
@@ -23,13 +26,6 @@ class ClassCell:
         self.spice_period_counter = 0
         self.tribe_id = -1
         self.visits = 0
-
-    @property
-    def get_sugar(self):
-        return self.sugar
-
-    #def sense_neigh(self, neighbor):
-    #    self.sugar = self.get_sugar()
 
     def update(self):
         """

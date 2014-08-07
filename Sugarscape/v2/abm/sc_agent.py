@@ -42,9 +42,6 @@ class Agent:
         self.tribe_id = max(set(self.culture), key=self.culture.count)
         self.tribe = tribe
 
-    def visible_cells(self, ca):
-        return ca.get_all_cells_in_vision(self.x, self.y, self.vision)
-
     def is_fertile(self):
         return self.fertility[0] <= self.age <= self.fertility[1]
 
@@ -67,6 +64,12 @@ class Agent:
         return w1 * w2
 
     def mrs(self, su, sp):
+        """
+        Second important trading tool, after welfare. MRS is used to calculate sugar and spice prices on the market.
+        :param su:
+        :param sp:
+        :return:
+        """
         rate_sugar = (self.sugar + su) / self.meta_sugar
         rate_spice = (self.spice + sp) / self.meta_spice
         if rate_sugar > 0:
@@ -121,15 +124,15 @@ class Agent:
                 best_cells = [c]
                 max_w = self.welfare(c[0].sugar + occupant_sugar, c[0].spice + occupant_spice)
                 max_dist = (abs(c[0].x - grid_x) + abs(c[0].y - grid_y))
-                max_x = c[0].x
-                max_y = c[0].y
             else:
                 dist = (abs(c[0].x - grid_x) + abs(c[0].y - grid_y))
                 welfare = self.welfare(c[0].sugar + occupant_sugar, c[0].spice + occupant_spice)
-                if welfare >= max_w and dist < max_dist:
+                if welfare > max_w:
                     best_cells = [c]
                     max_w = welfare
-                elif welfare == max_w and dist == max_dist and c[0].x != max_x and c[0].y != max_y:
+                elif welfare == max_w and dist < max_dist:
+                    best_cells = [c]
+                elif welfare == max_w and dist == max_dist:
                     best_cells.append(c)
 
         # Finally, pick one of the best cells (if there are multiple)
@@ -342,6 +345,6 @@ class Agent:
             nb = ca.get_neighborhood(agent_positions, self.x, self.y)
             #vc = ca.get_visible_cells(agent_positions, self.x, self.y, self.vision)
             self.r2_reproduce(nb, agent_positions)
-            self.r3_culture(nb)
-            self.r4_trading(nb)
+            self.r3_culture(nb)  # vc
+            self.r4_trading(nb)  # vc
             self.chromosome.mutate()

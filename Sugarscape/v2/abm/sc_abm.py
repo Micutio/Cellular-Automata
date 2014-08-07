@@ -7,47 +7,46 @@ import random
 import copy
 from v2.abm.sc_agent import Agent
 from v2.abm.sc_tribes import Tribes
-from v2.sc_global_constants import GlobalConstants
-
-GC = GlobalConstants()
 
 
 class ABM:
-    def __init__(self, num_agents, c_size, min_x, max_x, min_y, max_y, visualizer):
+    def __init__(self, visualizer, gc):
         """
         Initializes an abm with the given number of agents and returns it
         :return: An initialized ABM.
         """
         self.agent_dict = {}
-        self.tribes = Tribes(GC.NUM_TRIBES)
+        self.tribes = Tribes(gc.NUM_TRIBES)
         self.visualizer = visualizer
         total_wealth = 0
         a_id = 0
-        c = c_size
-        r = int(c_size / 2)
-        positions = [((x * c) + r, (y * c) + r) for x in range(min_x, max_x) for y in range(min_y, max_y)]
-        positions = random.sample(positions, num_agents)
+        c = gc.CELL_SIZE
+        r = int(gc.CELL_SIZE / 2)
+        positions = [((x * c) + r, (y * c) + r)
+                     for x in range(gc.ABM_BOUNDS[0], gc.ABM_BOUNDS[1])
+                     for y in range(gc.ABM_BOUNDS[2], gc.ABM_BOUNDS[3])]
+        positions = random.sample(positions, gc.NUM_AGENTS)
         random.shuffle(positions)
 
         for p in positions:
-            meta_sugar = random.randint(GC.MIN_METABOLISM, GC.MAX_METABOLISM)
-            meta_spice = random.randint(GC.MIN_METABOLISM, GC.MAX_METABOLISM)
-            vision = random.randint(1, GC.VISION)
+            meta_sugar = random.randint(gc.MIN_METABOLISM, gc.MAX_METABOLISM)
+            meta_spice = random.randint(gc.MIN_METABOLISM, gc.MAX_METABOLISM)
+            vision = random.randint(1, gc.VISION)
             g = random.choice([0, 1])
             if g == 1:
-                f = [GC.F_FERTILITY_START, random.randint(GC.F_FERTILITY_END[0], GC.F_FERTILITY_END[1])]
+                f = [gc.F_FERTILITY_START, random.randint(gc.F_FERTILITY_END[0], gc.F_FERTILITY_END[1])]
             else:
-                f = [GC.M_FERTILITY_START, random.randint(GC.M_FERTILITY_END[0], GC.M_FERTILITY_END[1])]
-            su = random.randint(GC.STARTING_SUGAR[0], GC.STARTING_SUGAR[1])
-            sp = random.randint(GC.STARTING_SUGAR[0], GC.STARTING_SUGAR[1])
-            d = random.randint(f[1], GC.MAX_AGENT_LIFE)
-            c = [random.randint(0, GC.NUM_TRIBES - 1) for _ in range(11)]
+                f = [gc.M_FERTILITY_START, random.randint(gc.M_FERTILITY_END[0], gc.M_FERTILITY_END[1])]
+            su = random.randint(gc.STARTING_SUGAR[0], gc.STARTING_SUGAR[1])
+            sp = random.randint(gc.STARTING_SUGAR[0], gc.STARTING_SUGAR[1])
+            d = random.randint(f[1], gc.MAX_AGENT_LIFE)
+            c = [random.randint(0, gc.NUM_TRIBES - 1) for _ in range(11)]
             imm_sys = [random.getrandbits(1) for _ in range(50)]
-            a = random.randint(0, int(GC.MAX_AGENT_LIFE / 2))
+            a = random.randint(0, int(gc.MAX_AGENT_LIFE / 2))
             gene_string = bin(meta_sugar) + bin(meta_spice) + bin(su) + bin(sp)
             gene_string += bin(vision) + bin(g) + bin(f[0]) + bin(f[1]) + bin(d)
             genome = (gene_string, gene_string, c, imm_sys)
-            self.agent_dict[p[0], p[1]] = Agent(p[0], p[1], c_size, su, sp, genome, a, self.tribes)
+            self.agent_dict[p[0], p[1]] = Agent(p[0], p[1], gc.CELL_SIZE, su, sp, genome, a, self.tribes)
             a_id += 1
 
             total_wealth += (su + sp)
