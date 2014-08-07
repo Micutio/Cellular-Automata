@@ -9,22 +9,22 @@ class GlobalConstants:
         ################################
         self.NUM_AGENTS = 200
         self.NUM_TRIBES = 2
-        self.LANDSCAPE_MODE = 2  # 3 = two hills, 2 = procedural, 1 = randomized
+        self.LANDSCAPE_MODE = 3  # 3 = two hills, 2 = procedural, 1 = randomized
         self.RUN_SIMULATION = False
-        self.CELL_SIZE = 15
+        self.CELL_SIZE = 10
         self.GRID_WIDTH = int(500 / 10) * self.CELL_SIZE
         self.GRID_HEIGHT = int(500 / 10) * self.CELL_SIZE
         #self.ABM_BOUNDS = (0, 10, 40, 50)
         #self.ABM_BOUNDS = (0, 50, 0, 50)
         self.ABM_BOUNDS = (15, 35, 15, 35)
-        self.TICKS = 0
+        self.TICKS = 1
         self.MS_PER_TICK = 60
         self.TRIBE_COLORS = {0: (0, 0, 0),
-                             1: (1, 1, 1),
-                             2: (0.7, 0, 0.5),
-                             3: (0, 0.7, 0.5),
-                             4: (0.7, 0.9, 0.2),
-                             5: (0.6, 0.4, 0.1)}
+                             1: (255, 255, 255),
+                             2: (178, 0, 127),
+                             3: (0, 178, 127),
+                             4: (178, 229, 51),
+                             5: (150, 102, 25)}
         ################################
         #        ABM CONSTANTS         #
         ################################

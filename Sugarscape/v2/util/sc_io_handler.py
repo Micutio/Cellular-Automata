@@ -11,7 +11,7 @@ class EventHandler:
         self.mx = 0
         self.my = 0
         self.main = main
-        self.GC = main.gc
+        self.gc = main.gc
 
     def process_input(self):
         for event in pygame.event.get():
@@ -31,8 +31,8 @@ class EventHandler:
 
     def mouse_motion(self):
         self.mx, self.my = pygame.mouse.get_pos()
-        self.mx = (self.mx / self.GC.CELL_SIZE)
-        self.my = (self.my / self.GC.CELL_SIZE)
+        self.mx = (self.mx / self.gc.CELL_SIZE)
+        self.my = (self.my / self.gc.CELL_SIZE)
 
     def mouse_action(self, button):
         # Click on left mouse button
@@ -49,8 +49,8 @@ class EventHandler:
 
     def keyboard_action(self, active_key):
         if active_key == pygame.K_SPACE:
-            self.GC.RUN_SIMULATION = not self.GC.RUN_SIMULATION
-            if self.GC.RUN_SIMULATION:
+            self.gc.RUN_SIMULATION = not self.gc.RUN_SIMULATION
+            if self.gc.RUN_SIMULATION:
                 print("> simulation started")
             else:
                 print("> simulation paused")
@@ -67,16 +67,16 @@ class EventHandler:
                 elif a.sugar < min_wealth:
                     min_wealth = a.sugar
             print("+----- GENERAL INFO ---------------------------------------------------")
-            print("+ > ticks: " + str(self.GC.TICKS) + " remaining agents: " + str(len(self.main.abm.agent_dict)))
+            print("+ > ticks: " + str(self.gc.TICKS) + " remaining agents: " + str(len(self.main.abm.agent_dict)))
             print("+ > fertile agents: " + str(i) + ", richest: " + str(max_wealth) + ", poorest: " + str(min_wealth))
             print("+----------------------------------------------------------------------")
             self.main.stats.plot()
         # r key is pressed, reset the simulation
         if active_key == pygame.K_r:
-            self.main.ca.__init__(self.GC.LANDSCAPE_MODE, self.GC.GRID_WIDTH, self.GC.GRID_HEIGHT, self.GC.CELL_SIZE)
-            self.main.abm.__init__(self.GC.NUM_AGENTS, self.GC.CELL_SIZE, self.GC.ABM_BOUNDS[0], self.GC.ABM_BOUNDS[1], self.GC.ABM_BOUNDS[2], self.GC.ABM_BOUNDS[3])
-            self.main.stats.__init__(self.main.abm, self.main.ca)
-            self.GC.TICKS = 0
+            self.main.ca.__init__(self.main.visualizer, self.gc)
+            self.main.abm.__init__(self.main.visualizer, self.gc)
+            self.main.stats.__init__(self.main.abm, self.main.ca, self.gc)
+            self.gc.TICKS = 0
             #render_simulation(ca, abm, screen)
             print("> reset simulation")
 
@@ -89,39 +89,48 @@ class EventHandler:
         # 1 key is pressed
         if active_key == pygame.K_1:
             # ctrl is pressed
-            if active_key.get_mods() & pygame.KMOD_CTRL:
+            if pygame.key.get_mods() & pygame.KMOD_CTRL:
                 # ctrl + 1: change draw agent mode
                 self.main.visualizer.draw_agent_mode = 0
+                print("> set draw agent mode to 0 (tribe and age)")
             # shift is pressed
-            elif active_key.get_mods() & pygame.KMOD_SHIFT:
+            elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
                 # shift + 1: change landscape mode
-                self.GC.LANDSCAPE_MODE = 3
+                self.gc.LANDSCAPE_MODE = 3
+                print("> set landscape mode to 3 (procedurally random)")
             else:
                 # only 1: change draw cells mode
                 self.main.visualizer.draw_cell_mode = 0
+                print("> set draw cell mode to 0 (resource and tribal territories)")
         # 2 key is pressed
-        if active_key == pygame.K_1:
+        if active_key == pygame.K_2:
             # ctrl is also pressed
-            if active_key.get_mods() & pygame.KMOD_CTRL:
+            if pygame.key.get_mods() & pygame.KMOD_CTRL:
                 # ctrl + 1: change draw agent mode
                 self.main.visualizer.draw_agent_mode = 1
+                print("> set draw agent mode to 1 (gender)")
             # shift is pressed
-            elif active_key.get_mods() & pygame.KMOD_SHIFT:
+            elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
                 # shift + 2: change landscape mode
-                self.GC.LANDSCAPE_MODE = 2
+                self.gc.LANDSCAPE_MODE = 2
+                print("> set landscape mode to 2 (two hills)")
             else:
                 # only 1: change draw cells mode
                 self.main.visualizer.draw_cell_mode = 1
+                print("> set draw cell mode to 1 (tribal territories)")
         # 3 key is pressed
-        if active_key == pygame.K_1:
+        if active_key == pygame.K_3:
             # ctrl is also pressed
-            if active_key.get_mods() & pygame.KMOD_CTRL:
+            if pygame.key.get_mods() & pygame.KMOD_CTRL:
                 # ctrl + 1: change draw agent mode
                 self.main.visualizer.draw_agent_mode = 2
+                print("> set draw agent mode to 2 (tribe)")
             # shift is pressed
-            elif active_key.get_mods() & pygame.KMOD_SHIFT:
+            elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
                 # shift + 1: change landscape mode
-                self.GC.LANDSCAPE_MODE = 1
+                self.gc.LANDSCAPE_MODE = 1
+                print("> set landscape mode to 1 (random)")
             else:
                 # only 1: change draw cells mode
                 self.main.visualizer.draw_cell_mode = 2
+                print("> set draw cell mode to 2 (heat-map)")

@@ -94,7 +94,7 @@ class Agent:
                 if c[1].x == self.x and c[1].y == self.y:
                     available_cells.append(c)
                 # Case 1b: Cell has an opponent who is poorer than me.
-                elif c[1].tribe_id != self.tribe_id and (c[1].sugar + c[1].spice) <= (self.sugar + self.spice):
+                elif c[1].tribe_id != self.tribe_id and (c[1].sugar + c[1].spice) < (self.sugar + self.spice):
                     available_cells.append(c)
             # Case 2: Cell is not occupied
             else:
@@ -324,7 +324,7 @@ class Agent:
                 c.spice += math.floor(self.spice / num_kids)
 
         # Update tribe's information
-        self.tribe.tribal_wealth -= (self.sugar + self.spice)
+        self.tribe.tribal_wealth[self.tribe_id] -= (self.sugar + self.spice)
         self.sugar = 0
         self.spice = 0
 

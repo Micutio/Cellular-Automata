@@ -19,7 +19,6 @@ class ABM:
         self.tribes = Tribes(gc.NUM_TRIBES)
         self.visualizer = visualizer
         total_wealth = 0
-        a_id = 0
         c = gc.CELL_SIZE
         r = int(gc.CELL_SIZE / 2)
         positions = [((x * c) + r, (y * c) + r)
@@ -42,12 +41,15 @@ class ABM:
             d = random.randint(f[1], gc.MAX_AGENT_LIFE)
             c = [random.randint(0, gc.NUM_TRIBES - 1) for _ in range(11)]
             imm_sys = [random.getrandbits(1) for _ in range(50)]
-            a = random.randint(0, int(gc.MAX_AGENT_LIFE / 2))
-            gene_string = bin(meta_sugar) + bin(meta_spice) + bin(su) + bin(sp)
-            gene_string += bin(vision) + bin(g) + bin(f[0]) + bin(f[1]) + bin(d)
+            a = 0  #random.randint(0, int(gc.MAX_AGENT_LIFE / 2))
+            gene_string = bin(meta_sugar)[2:] + bin(meta_spice)[2:] + bin(su)[2:] + bin(sp)[2:]
+            gene_string += bin(vision)[2:] + bin(g)[2:] + bin(f[0])[2:] + bin(f[1])[2:] + bin(d)[2:]
             genome = (gene_string, gene_string, c, imm_sys)
             self.agent_dict[p[0], p[1]] = Agent(p[0], p[1], gc.CELL_SIZE, su, sp, genome, a, self.tribes)
-            a_id += 1
+
+            # Update the tribal information
+            tribal_id = max(set(c), key=c.count)
+            self.tribes.tribal_wealth[tribal_id] += su + sp
 
             total_wealth += (su + sp)
         self.tribes.total_wealth = total_wealth
@@ -80,7 +82,6 @@ class ABM:
         if v.dead:
             v.on_death()
             self.agent_dict.pop((v.prev_x, v.prev_y))
-        #elif v.x != v.prev_x or v.y != v.prev_y:
-        else:
+        elif v.x != v.prev_x or v.y != v.prev_y:
             self.agent_dict.pop((v.prev_x, v.prev_y))
             self.agent_dict[v.x, v.y] = v

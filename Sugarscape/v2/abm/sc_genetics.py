@@ -44,20 +44,18 @@ class Chromosome:
     def map_genome_to_attributes(self):
         """
         Decodes the genome and creates the attribute of the individual.
-        :return:
         """
-        self.meta_sugar = int(self.choose_dominant(self.get_sub_genes('meta_sugar')), 2)
-        self.meta_spice = int(self.choose_dominant(self.get_sub_genes('meta_spice')), 2)
-        self.init_sugar = int(self.choose_dominant(self.get_sub_genes('init_sugar')), 2)
-        self.init_spice = int(self.choose_dominant(self.get_sub_genes('init_spice')), 2)
+        # The meta and init attributes cannot become smaller than 1
+        self.meta_sugar = max(int(self.choose_dominant(self.get_sub_genes('meta_sugar')), 2), 1)
+        self.meta_spice = max(int(self.choose_dominant(self.get_sub_genes('meta_spice')), 2), 1)
+        self.init_sugar = max(int(self.choose_dominant(self.get_sub_genes('init_sugar')), 2), 1)
+        self.init_spice = max(int(self.choose_dominant(self.get_sub_genes('init_spice')), 2), 1)
         self.vision = int(self.choose_dominant(self.get_sub_genes('vision')), 2)
         self.gender = int(self.choose_dominant(self.get_sub_genes('gender')), 2)
         self.dying_age = int(self.choose_dominant(self.get_sub_genes('dying_age')), 2)
         f1 = int(self.choose_dominant(self.get_sub_genes('fertility_1')), 2)
         f2 = int(self.choose_dominant(self.get_sub_genes('fertility_2')), 2)
         self.fertility = (f1, f2)
-
-        return
 
     def get_sub_genes(self, key):
         """
@@ -100,8 +98,8 @@ class Chromosome:
         genome1 = self.create_gamete(self.genomes)
         genome2 = self.create_gamete(mate_chromosome.genomes)
         culture = self.create_gamete((self.culture, mate_chromosome.culture))
-        immunesys = self.create_gamete((self.immune_system, mate_chromosome.immune_system))
-        return [genome1, genome2, culture, immunesys]
+        immune_sys = self.create_gamete((self.immune_system, mate_chromosome.immune_system))
+        return [genome1, genome2, culture, immune_sys]
 
     def create_gamete(self, genomes):
         """
@@ -135,12 +133,14 @@ class Chromosome:
             index = npr.randint(length)
             l = list(self.genomes[0])
             l[index] = self.invert_bit(l[index])
-            self.genomes[0] = "".join(l)
+            g1 = "".join(l)
 
             index = npr.randint(length)
             l = list(self.genomes[1])
             l[index] = self.invert_bit(l[index])
-            self.genomes[1] = "".join(l)
+            g2 = "".join(l)
+
+            self.genomes = (g1, g2)
 
     def invert_bit(self, bit):
         """
