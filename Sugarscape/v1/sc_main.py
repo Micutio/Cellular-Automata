@@ -26,7 +26,7 @@ import sys
 class GlobalConstants:
     def __init__(self):
         self.num_agents = 200
-        self.landscape_mode = 2  # 3 = twohill, 2 = procedural, 1 = randomized
+        self.landscape_mode = 3  # 3 = twohill, 2 = procedural, 1 = randomized
         self.run_simulation = False
         self.cell_size = 15
         self.grid_width = int(500 / 10) * self.cell_size

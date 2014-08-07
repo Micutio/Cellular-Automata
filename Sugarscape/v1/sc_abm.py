@@ -385,7 +385,7 @@ class ABM:
             else:
                 while c.count(0) > c.count(1):
                     c = [random.getrandbits(1) for _ in range(11)]
-            a = random.randint(0, int(MAX_AGENT_LIFE / 2))
+            a = 0  #random.randint(0, int(MAX_AGENT_LIFE / 2))
             self.agent_dict[p[0], p[1]] = Agent(str(a_id), p[0], p[1], c_size, su, sp, metab_sugar, metab_spice, vision, g, f, d, c, a, self.tribes)
             a_id += 1
 
