@@ -92,7 +92,8 @@ class Agent:
             if c[1]:
                 # Case 1a: Cell is my own.
                 if c[1].x == self.x and c[1].y == self.y:
-                    available_cells.append(c)
+                    # Remove me from the (cell, agent) tuple. I don't want to kill myself.
+                    available_cells.append((c[0], None))
                 # Case 1b: Cell has an opponent who is poorer than me.
                 elif c[1].tribe_id != self.tribe_id and (c[1].sugar + c[1].spice) < (self.sugar + self.spice):
                     available_cells.append(c)

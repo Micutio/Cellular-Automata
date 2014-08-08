@@ -15,8 +15,8 @@ class GlobalConstants:
         self.GRID_WIDTH = int(500 / 10) * self.CELL_SIZE
         self.GRID_HEIGHT = int(500 / 10) * self.CELL_SIZE
         #self.ABM_BOUNDS = (0, 10, 40, 50)
-        #self.ABM_BOUNDS = (0, 50, 0, 50)
-        self.ABM_BOUNDS = (15, 35, 15, 35)
+        self.ABM_BOUNDS = (0, 50, 0, 50)
+        #self.ABM_BOUNDS = (15, 35, 15, 35)
         self.TICKS = 1
         self.MS_PER_TICK = 60
         self.TRIBE_COLORS = {0: (0, 0, 0),
