@@ -42,8 +42,10 @@ class ABM:
             c = [random.randint(0, gc.NUM_TRIBES - 1) for _ in range(11)]
             imm_sys = [random.getrandbits(1) for _ in range(50)]
             a = 0  #random.randint(0, int(gc.MAX_AGENT_LIFE / 2))
-            gene_string = bin(meta_sugar)[2:] + bin(meta_spice)[2:] + bin(su)[2:] + bin(sp)[2:]
-            gene_string += bin(vision)[2:] + bin(g)[2:] + bin(f[0])[2:] + bin(f[1])[2:] + bin(d)[2:]
+            gene_string = "{0:02b}".format(meta_sugar) + "{0:02b}".format(meta_spice)\
+                          + "{0:06b}".format(su) + "{0:06b}".format(sp) \
+                          + "{0:03b}".format(vision) + "{0:01b}".format(g)\
+                          + "{0:04b}".format(f[0]) + "{0:04b}".format(f[1]) + "{0:07b}".format(d)
             genome = (gene_string, gene_string, c, imm_sys)
             self.agent_dict[p[0], p[1]] = Agent(p[0], p[1], gc.CELL_SIZE, su, sp, genome, a, self.tribes)
 

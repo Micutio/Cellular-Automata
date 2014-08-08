@@ -20,7 +20,7 @@ class Statistics:
         self.male_per_gen = []
         self.female_per_gen = []
         self.gc = gc
-        self.tribes = [[0] for _ in range(self.gc.NUM_TRIBES)]
+        self.tribes = [[] for _ in range(self.gc.NUM_TRIBES)]
         self.total_sugar = []
         self.total_spice = []
         self.production_sugar = []
@@ -49,7 +49,7 @@ class Statistics:
 
         for k, v in self.abm.agent_dict.items():
             # count gender
-            if v.gender == "m":
+            if v.gender == 0:
                 males += 1
             else:
                 females += 1
@@ -100,7 +100,7 @@ class Statistics:
         pop_graph.plot(gen_line, self.pop_per_gen, color="#505050", linewidth=1)
         pop_graph.plot(gen_line, self.male_per_gen, color="#0000FF", linewidth=1)
         pop_graph.plot(gen_line, self.female_per_gen, color="#FF0090", linewidth=1)
-        for i in self.gc.NUM_TRIBES:
+        for i in range(self.gc.NUM_TRIBES):
             rgb = self.gc.TRIBE_COLORS[i]
             color = '#%02x%02x%02x' % (rgb[0], rgb[1], rgb[2])
             pop_graph.plot(gen_line, self.tribes[i], "-", color=color, linewidth=1)

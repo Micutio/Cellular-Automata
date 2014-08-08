@@ -95,7 +95,8 @@ class Agent:
                     # Remove me from the (cell, agent) tuple. I don't want to kill myself.
                     available_cells.append((c[0], None))
                 # Case 1b: Cell has an opponent who is poorer than me.
-                elif c[1].tribe_id != self.tribe_id and (c[1].sugar + c[1].spice) < (self.sugar + self.spice):
+                elif c[1].tribe_id != self.tribe_id and c[1].gender == self.gender and\
+                        (c[1].sugar + c[1].spice) < (self.sugar + self.spice):
                     available_cells.append(c)
             # Case 2: Cell is not occupied
             else:
@@ -209,6 +210,7 @@ class Agent:
                 both_wealthy2 = (self.spice >= self.init_spice and m.spice >= m.init_spice)
                 # All criteria is fulfilled to procreate!
                 if free_cells and m.is_fertile() and m.gender != self.gender and both_wealthy1 and both_wealthy2:
+                    print("Creating offspring...")
                     # Take one free cell to place Junior there.
                     c = random.choice(free_cells)
                     n_x = (c.x * self.size) + int(self.size / 2)
@@ -223,7 +225,7 @@ class Agent:
                     m.spice -= int(m.init_spice / 2)
                     # Fuse mommy's and daddy's chromosomes to create Juniors attributes.
                     # This is the actual creation of the baby. Behold the wonders of nature!
-                    n_chromosome = Chromosome(self.chromosome.merge_with(m.chromosome))
+                    n_chromosome = self.chromosome.merge_with(m.chromosome)
                     child = Agent(n_x, n_y, n_s, n_su, n_sp, n_chromosome, 0, self.tribe)
                     # Give the parents a reference to their newborn so they can,
                     # inherit their wealth to it before their inevitable demise.

@@ -49,11 +49,29 @@ class Visualization:
                 pygame.draw.circle(self.surface, color1, [agent.x, agent.y], radius, 0)
                 pygame.draw.circle(self.surface, color2, [agent.x, agent.y], radius - 2, 0)
             elif self.draw_agent_mode == 1:
-            # Show only gender of the agents.
-                if agent.gender == 0:  # A man.
-                    color = (100, 150, 255)
-                else:  # A woman
-                    color = (255, 100, 180)
+            # Show gender and age of the agents.
+                # Case 1: agent is a child.
+                if agent.age < agent.fertility[0]:
+                    red = int(128 * (1 - (agent.age / agent.fertility[0])))
+                    green = 255
+                    blue = int(128 * (1 - (agent.age / agent.fertility[0])))
+                # Case 2: agent is adult, display its gender.
+                elif agent.fertility[0] <= agent.age <= agent.fertility[1]:
+                    ratio = (agent.age / agent.fertility[1])
+                    if agent.gender == 0:  # A man.
+                        red = 100 * ratio
+                        green = 150 * ratio
+                        blue = 255 * ratio
+                    else:  # A woman.
+                        red = 255 * ratio
+                        green = 100 * ratio
+                        blue = 180 * ratio
+                # Case 3: agent is old.
+                else:
+                    red = int(255 * (agent.age / agent.dying_age))
+                    green = 0
+                    blue = 0
+                color = (red, green, blue)
                 pygame.draw.circle(self.surface, color, [agent.x, agent.y], radius, 0)
             elif self.draw_agent_mode == 2:
             # Show only tribe of the agents.
@@ -87,8 +105,7 @@ class Visualization:
         elif self.draw_cell_mode == 1:
             # Show only tribal territories.
             if cell.tribe_id != -1:
-                tribe = self.gc.TRIBE_COLORS[cell.tribe_id]
-                color = (255 * tribe[0], 255 * tribe[1], 255 * tribe[2])
+                color = self.gc.TRIBE_COLORS[cell.tribe_id]
                 color2 = (color[0] * 0.9, color[1] * 0.9, color[2] * 0.9)
                 pygame.draw.rect(self.surface, color, (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
                 lx = cell.x * cell.w
