@@ -93,7 +93,7 @@ class Agent:
                 # Case 1a: Cell is my own.
                 if c[1].x == self.x and c[1].y == self.y:
                     # Remove me from the (cell, agent) tuple. I don't want to kill myself.
-                    available_cells.append((c[0], None))
+                    available_cells.append((c[0], False))
                 # Case 1b: Cell has an opponent who is poorer than me.
                 elif c[1].tribe_id != self.tribe_id and c[1].gender == self.gender and\
                         (c[1].sugar + c[1].spice) < (self.sugar + self.spice):
@@ -141,7 +141,7 @@ class Agent:
         # and set it as new position for this agent
         c = random.choice(best_cells)
         # Claim cell for our tribe, if we can afford it.
-        if self.tribe.can_defend(self.tribe_id):
+        if c[0].tribe_id != self.tribe_id and self.tribe.can_defend(self.tribe_id):
             self.tribe.tribal_area[self.tribe_id] += 1
             self.tribe.tribal_area[c[0].tribe_id] -= 1
             c[0].tribe_id = self.tribe_id
@@ -348,6 +348,6 @@ class Agent:
             nb = ca.get_neighborhood(agent_positions, self.x, self.y)
             #vc = ca.get_visible_cells(agent_positions, self.x, self.y, self.vision)
             self.r2_reproduce(nb, agent_positions)
-            self.r3_culture(nb)  # vc
-            self.r4_trading(nb)  # vc
-            self.chromosome.mutate()
+            #self.r3_culture(nb)  # vc
+            #self.r4_trading(nb)  # vc
+            #self.chromosome.mutate()

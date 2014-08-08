@@ -2,7 +2,7 @@ __author__ = 'Michael Wagner'
 __version__ = '1.0'
 
 import pygame
-import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
 
 class Visualization:
@@ -79,7 +79,7 @@ class Visualization:
                 pygame.draw.circle(self.surface, color, [agent.x, agent.y], radius, 0)
         return
 
-    def draw_cell(self, cell):
+    def draw_cell(self, cell, max_visit):
         """
         Draw cell with
         :param cell:
@@ -117,8 +117,8 @@ class Visualization:
 
         elif self.draw_cell_mode == 2:
         # Show a heat map indicating which cells are the most visited.
-            col_map = plt.get_cmap("jet")
-            color = col_map(cell.visits / self.gc.TICKS)
+            j = cm.jet((cell.visits / self.gc.TICKS))#max_visit))
+            color = (255 * j[0], 255 * j[1], 255 * j[2])
             pygame.draw.rect(self.surface, color, (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
         return
 

@@ -27,7 +27,10 @@ class Tribes:
         for _, w in self.tribal_wealth.items():
             total_wealth += w
 
-        possible_area = tribal_wealth * self.total_cells / total_wealth
+        if total_wealth != 0:
+            possible_area = tribal_wealth * self.total_cells / total_wealth
+        else:
+            possible_area = 0
         conquest_possible = possible_area > self.tribal_area[tribe_id]
         return conquest_possible
 

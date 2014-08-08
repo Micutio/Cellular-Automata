@@ -51,7 +51,7 @@ class Chromosome:
         self.meta_spice = max(int(self.choose_dominant(self.get_sub_genes('meta_spice')), 2), 1)
         self.init_sugar = max(int(self.choose_dominant(self.get_sub_genes('init_sugar')), 2), 1)
         self.init_spice = max(int(self.choose_dominant(self.get_sub_genes('init_spice')), 2), 1)
-        self.vision = int(self.choose_dominant(self.get_sub_genes('vision')), 2)
+        self.vision = max(int(self.choose_dominant(self.get_sub_genes('vision')), 2), 1)
         self.gender = int(npr.choice(self.get_sub_genes('gender')), 2)
         self.dying_age = int(self.choose_dominant(self.get_sub_genes('dying_age')), 2)
         f1 = int(self.choose_dominant(self.get_sub_genes('fertility_1')), 2)
@@ -97,13 +97,12 @@ class Chromosome:
         # Concept: divide genome in partions of varying length.
         # Exchange those parts between mother and father gametes?
         genome1 = self.create_gamete(self.genomes)
-        # Create a string out of it
-        genome1 = "".join(map(str, genome1))
         genome2 = self.create_gamete(mate_chromosome.genomes)
-        # Create a string out of it
-        genome2 = "".join(map(str, genome2))
         culture = self.create_gamete((self.culture, mate_chromosome.culture))
         immune_sys = self.create_gamete((self.immune_system, mate_chromosome.immune_system))
+        # Create a string out of the gene strings
+        genome1 = "".join(map(str, genome1))
+        genome2 = "".join(map(str, genome2))
         return [genome1, genome2, culture, immune_sys]
 
     def create_gamete(self, genomes):
@@ -114,11 +113,11 @@ class Chromosome:
         """
         # 1) Generate a random number (gaussian distributed) of
         # random indices which are then used to split the genes at the respective points.
-        genome_size = len(genomes[0]) - 1
+        genome_size = len(genomes[0])
         num_partitions = int(npr.triangular(0, genome_size / 2, genome_size))
         partitions = random.sample(range(genome_size), num_partitions)
         partitions.sort()  # Now we have all our indices, and sorted.
-        partitions.append(-1)  # Append the end of the string
+        partitions.append(genome_size)  # Append the end of the string
         start = 0
         gamete = []
         for p in partitions:

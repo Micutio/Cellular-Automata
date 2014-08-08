@@ -28,6 +28,7 @@ class CA:
         self.season_count = 0
         self.season = 1
         self.visualizer = visualizer
+        self.max_visit = 1
 
         if gc.LANDSCAPE_MODE == 1:
             for i in range(0, self.height):
@@ -55,7 +56,7 @@ class CA:
         """
         for y in range(0, self.height):
             for x in range(0, self.width):
-                self.visualizer.draw_cell(self.ca_grid[x, y])
+                self.visualizer.draw_cell(self.ca_grid[x, y], self.max_visit)
 
     def cycle_automaton(self):
         """
@@ -150,15 +151,11 @@ class CA:
                     neighborhood.append((a, b))
         return neighborhood
 
-    def highlight_cell(self, screen, x, y):
-        cx = int(x / self.cell_size)
-        cy = int(y / self.cell_size)
-        self.ca_grid[cx, cy].highlight(screen)
-
     def update_from_neighs(self):
         """
         Looping over all cells to gather all the neighbor information they need to update
         """
+
         for y in range(0, self.height):
             for x in range(0, self.width):
                 if y - 1 > -1 and x - 1 > -1 and x + 1 < self.width and y + 1 < self.height:
@@ -170,7 +167,9 @@ class CA:
                     self.ca_grid[x, y].sense_neigh(self.ca_grid[(x + 1), (y + 1)])  # Bottom Right
                     self.ca_grid[x, y].sense_neigh(self.ca_grid[(x - 1), y])  # Left
                     self.ca_grid[x, y].sense_neigh(self.ca_grid[(x + 1), y])  # Right
-
+                    # Also find the most visited cell.
+                    if self.max_visit < self.ca_grid[x, y].visits:
+                        self.max_visit = self.ca_grid[x, y].visits
 
 #########################################################################
 ###                           OTHER METHODS                           ###
