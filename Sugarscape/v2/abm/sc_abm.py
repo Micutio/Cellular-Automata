@@ -33,19 +33,19 @@ class ABM:
             vision = random.randint(1, gc.VISION)
             g = random.choice([0, 1])
             if g == 1:
-                f = [gc.F_FERTILITY_START, random.randint(gc.F_FERTILITY_END[0], gc.F_FERTILITY_END[1])]
+                f = (gc.F_FERTILITY_START, random.randint(gc.F_FERTILITY_END[0], gc.F_FERTILITY_END[1]))
             else:
-                f = [gc.M_FERTILITY_START, random.randint(gc.M_FERTILITY_END[0], gc.M_FERTILITY_END[1])]
+                f = (gc.M_FERTILITY_START, random.randint(gc.M_FERTILITY_END[0], gc.M_FERTILITY_END[1]))
             su = random.randint(gc.STARTING_SUGAR[0], gc.STARTING_SUGAR[1])
             sp = random.randint(gc.STARTING_SUGAR[0], gc.STARTING_SUGAR[1])
             d = random.randint(f[1], gc.MAX_AGENT_LIFE)
             c = [random.randint(0, gc.NUM_TRIBES - 1) for _ in range(11)]
             imm_sys = [random.getrandbits(1) for _ in range(50)]
             a = 0  #random.randint(0, int(gc.MAX_AGENT_LIFE / 2))
-            gene_string = "{0:02b}".format(meta_sugar) + "{0:02b}".format(meta_spice)\
+            gene_string = "{0:03b}".format(meta_sugar) + "{0:03b}".format(meta_spice)\
                           + "{0:06b}".format(su) + "{0:06b}".format(sp) \
                           + "{0:03b}".format(vision) + "{0:01b}".format(g)\
-                          + "{0:04b}".format(f[0]) + "{0:04b}".format(f[1]) + "{0:07b}".format(d)
+                          + "{0:06b}".format(f[0]) + "{0:06b}".format(f[1]) + "{0:07b}".format(d)
             genome = (gene_string, gene_string, c, imm_sys)
             self.agent_dict[p[0], p[1]] = Agent(p[0], p[1], gc.CELL_SIZE, su, sp, genome, a, self.tribes)
 

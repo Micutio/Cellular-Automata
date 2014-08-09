@@ -30,15 +30,15 @@ class Chromosome:
         self.dying_age = None
         # Read dictionary entries as:
         # ----> {attribute: (start index, end index)}
-        self.att_map = {'meta_sugar': (0, 2),
-                        'meta_spice': (2, 4),
-                        'init_sugar': (4, 10),
-                        'init_spice': (10, 16),
-                        'vision': (16, 19),
-                        'gender': (19, 20),
-                        'fertility_1': (20, 24),
-                        'fertility_2': (24, 28),
-                        'dying_age': (28, 35)}
+        self.att_map = {'meta_sugar': (0, 3),
+                        'meta_spice': (3, 6),
+                        'init_sugar': (6, 12),
+                        'init_spice': (12, 18),
+                        'vision': (18, 21),
+                        'gender': (21, 22),
+                        'fertility_1': (22, 28),
+                        'fertility_2': (28, 34),
+                        'dying_age': (34, 41)}
 
         self.map_genome_to_attributes()
 
