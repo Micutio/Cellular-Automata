@@ -97,23 +97,19 @@ class Visualization:
             pygame.draw.line(self.surface, col2, [lx + 1, ly + w1], [lx + h1, ly + w1], int(cell.w * 0.2))
             pygame.draw.line(self.surface, col2, [lx + h1, ly + 1], [lx + h1, ly + w1], int(cell.w * 0.2))
 
-            if cell.tribe_id != -1:
-                color = self.gc.TRIBE_COLORS[cell.tribe_id]
-                pygame.draw.line(self.surface, color, [lx, ly], [lx + cell.h, ly + cell.w], 2)
-                pygame.draw.line(self.surface, color, [lx + cell.h, ly], [lx, ly + cell.w], 2)
+            #if cell.tribe_id != -1:
+            #    color = self.gc.TRIBE_COLORS[cell.tribe_id]
+            #    pygame.draw.line(self.surface, color, [lx, ly], [lx + cell.h, ly + cell.w], 2)
+            #    pygame.draw.line(self.surface, color, [lx + cell.h, ly], [lx, ly + cell.w], 2)
 
         elif self.draw_cell_mode == 1:
             # Show only tribal territories.
             if cell.tribe_id != -1:
                 color = self.gc.TRIBE_COLORS[cell.tribe_id]
-                color2 = (color[0] * 0.9, color[1] * 0.9, color[2] * 0.9)
                 pygame.draw.rect(self.surface, color, (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
-                lx = cell.x * cell.w
-                ly = cell.y * cell.h
-                w1 = cell.w - 1
-                h1 = cell.h - 1
-                pygame.draw.line(self.surface, color2, [lx + 1, ly + w1], [lx + h1, ly + w1], int(cell.w * 0.2))
-                pygame.draw.line(self.surface, color2, [lx + h1, ly + 1], [lx + h1, ly + w1], int(cell.w * 0.2))
+            else:
+                color = (80, 80, 80)
+                pygame.draw.rect(self.surface, color, (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
 
         elif self.draw_cell_mode == 2:
         # Show a heat map indicating which cells are the most visited.

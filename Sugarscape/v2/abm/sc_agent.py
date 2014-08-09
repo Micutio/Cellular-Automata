@@ -240,9 +240,8 @@ class Agent:
         """
         for n in neighbors:
             if n[1] and n[1].tribe_id != self.tribe_id:
-                index = 0
-                while n[1].culture[index] == self.tribe_id:
-                    index = random.choice(range(len(self.culture)))
+                genes_to_flip = [n[1].culture.index(g) for g in n[1].culture if g != self.tribe_id]
+                index = random.choice(genes_to_flip)
                 n[1].culture[index] = self.tribe_id
                 old_id = n[1].tribe_id
                 n[1].tribe_id = max(set(self.culture), key=self.culture.count)
@@ -348,6 +347,6 @@ class Agent:
             nb = ca.get_neighborhood(agent_positions, self.x, self.y)
             #vc = ca.get_visible_cells(agent_positions, self.x, self.y, self.vision)
             self.r2_reproduce(nb, agent_positions)
-            #self.r3_culture(nb)  # vc
-            #self.r4_trading(nb)  # vc
-            #self.chromosome.mutate()
+            self.r3_culture(nb)  # vc
+            self.r4_trading(nb)  # vc
+            self.chromosome.mutate()
