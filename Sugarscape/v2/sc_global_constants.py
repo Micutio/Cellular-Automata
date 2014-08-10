@@ -9,7 +9,7 @@ class GlobalConstants:
         ################################
         self.NUM_AGENTS = 200
         self.NUM_TRIBES = 2
-        self.LANDSCAPE_MODE = 3  # 3 = two hills, 2 = procedural, 1 = randomized
+        self.LANDSCAPE_MODE = 2  # 3 = two hills, 2 = procedural, 1 = randomized
         self.RUN_SIMULATION = False
         self.CELL_SIZE = 10
         self.GRID_WIDTH = int(500 / 10) * self.CELL_SIZE
@@ -20,7 +20,7 @@ class GlobalConstants:
         self.TICKS = 1
         self.MS_PER_TICK = 60
         self.TRIBE_COLORS = {0: (0, 0, 0),
-                             1: (255, 255, 255),
+                             1: (200, 200, 200),
                              2: (178, 0, 127),
                              3: (0, 178, 127),
                              4: (178, 229, 51),

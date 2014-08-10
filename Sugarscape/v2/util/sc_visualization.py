@@ -15,7 +15,6 @@ class Visualization:
         Initializes the visualization and passes the surface on which to draw.
         :param surface: Pygame surface object.
         """
-        # TODO: add different display modes to choose from.
         self.surface = surface
         # 0 = tribe, 1 = gender, 2 = age
         self.draw_agent_mode = 0

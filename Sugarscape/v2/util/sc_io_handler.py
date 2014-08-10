@@ -3,6 +3,7 @@ __version__ = '1.0'
 
 import pygame
 import sys
+import math
 from pygame.locals import *
 
 
@@ -71,6 +72,19 @@ class EventHandler:
             print("+ > fertile agents: " + str(i) + ", richest: " + str(max_wealth) + ", poorest: " + str(min_wealth))
             print("+----------------------------------------------------------------------")
             self.main.stats.plot()
+        # a key is pressed, display information about agent
+        if active_key == pygame.K_a:
+            agent_x = (math.floor(self.mx) * self.gc.CELL_SIZE) + int(self.gc.CELL_SIZE / 2)
+            agent_y = (math.floor(self.my) * self.gc.CELL_SIZE) + int(self.gc.CELL_SIZE / 2)
+            if (agent_x, agent_y) in self.main.abm.agent_dict:
+                agent_attributes = vars(self.main.abm.agent_dict[agent_x, agent_y].chromosome)
+                # del(agent_attributes["att_map"])
+                # del(agent_attributes["immune_system"])
+                print("+----- AGENT INFO -----------------------------------------------------")
+                for key in sorted(agent_attributes):
+                    if key != "att_map" or key != "immune_system":
+                        print("+ %s: %s" % (key, agent_attributes[key]))
+                print("+----------------------------------------------------------------------")
         # r key is pressed, reset the simulation
         if active_key == pygame.K_r:
             self.main.ca.__init__(self.main.visualizer, self.gc)

@@ -210,7 +210,6 @@ class Agent:
                 both_wealthy2 = (self.spice >= self.init_spice and m.spice >= m.init_spice)
                 # All criteria is fulfilled to procreate!
                 if free_cells and m.is_fertile() and m.gender != self.gender and both_wealthy1 and both_wealthy2:
-                    print("Creating offspring...")
                     # Take one free cell to place Junior there.
                     c = random.choice(free_cells)
                     n_x = (c.x * self.size) + int(self.size / 2)
@@ -242,9 +241,10 @@ class Agent:
             if n[1] and n[1].tribe_id != self.tribe_id:
                 genes_to_flip = [n[1].culture.index(g) for g in n[1].culture if g != self.tribe_id]
                 index = random.choice(genes_to_flip)
-                n[1].culture[index] = self.tribe_id
+                n[1].chromosome.culture[index] = self.tribe_id
+                n[1].culture = n[1].chromosome.culture
                 old_id = n[1].tribe_id
-                n[1].tribe_id = max(set(self.culture), key=self.culture.count)
+                n[1].tribe_id = max(set(n[1].culture), key=n[1].culture.count)
                 # In case the neighbor has been won over to my tribe,
                 # shift its wealth over.
                 if old_id != n[1].tribe_id:
@@ -298,7 +298,7 @@ class Agent:
                         self.spice -= p
                         self.sugar_traded += 1
                         self.spice_traded += p
-                    elif p < 1 and n[1].sugar > int(1 / p) and self.spice > 1 \
+                    elif 0 < p < 1 and n[1].sugar > int(1 / p) and self.spice > 1 \
                             and n[1].mrs(- int(1 / p), 1) < self.mrs(int(1 / p), -1):
                         n[1].sugar -= int(1 / p)
                         n[1].spice += 1

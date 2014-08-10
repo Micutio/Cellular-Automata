@@ -41,7 +41,7 @@ class ABM:
             d = random.randint(f[1], gc.MAX_AGENT_LIFE)
             c = [random.randint(0, gc.NUM_TRIBES - 1) for _ in range(11)]
             imm_sys = [random.getrandbits(1) for _ in range(50)]
-            a = 0  #random.randint(0, int(gc.MAX_AGENT_LIFE / 2))
+            a = 0  # random.randint(0, int(gc.MAX_AGENT_LIFE / 2))
             gene_string = "{0:03b}".format(meta_sugar) + "{0:03b}".format(meta_spice)\
                           + "{0:06b}".format(su) + "{0:06b}".format(sp) \
                           + "{0:03b}".format(vision) + "{0:01b}".format(g)\

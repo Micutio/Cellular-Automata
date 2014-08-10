@@ -19,7 +19,6 @@ class Chromosome:
         self.genomes = dna[0:2]
         self.culture = dna[2]
         self.immune_system = dna[3]
-        self.attributes = None
         self.meta_sugar = None
         self.meta_spice = None
         self.init_sugar = None
