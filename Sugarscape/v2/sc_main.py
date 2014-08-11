@@ -40,7 +40,6 @@ class Sugarscape:
         self.abm = ABM(self.visualizer, self.gc)
         self.handler = EventHandler(self)
         self.stats = Statistics(self.abm, self.ca, self.gc)
-        self.update = True
         return
 
     def step_simulation(self):

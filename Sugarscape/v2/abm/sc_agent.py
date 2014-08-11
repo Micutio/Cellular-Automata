@@ -1,9 +1,10 @@
 __author__ = 'Michael Wagner'
-__version__ = '1.0'
+__version__ = '2.0'
 
 import random
 import math
-import sys
+import copy
+import set
 from v2.abm.sc_genetics import Chromosome
 
 
@@ -41,21 +42,31 @@ class Agent:
         self.children = []
         self.tribe_id = max(set(self.culture), key=self.culture.count)
         self.tribe = tribe
+        self.diseases = {}
+        self.immune_system = ["".join(map(str, self.chromosome.immune_system))]
 
     def is_fertile(self):
         return self.fertility[0] <= self.age <= self.fertility[1]
 
-    def grow_older(self):
+    def check_status(self):
+        """
+        Check whether I'm still healthy and stuff
+        """
+        # Check my resources.
+        if self.sugar <= 0 or self.spice <= 0:
+            self.dead = True
+        # Grow older
         self.age += 1
         if self.age >= self.dying_age:
             self.dead = True
 
     def welfare(self, su, sp):
         """
+        Welfare function a.k.a. Cobb-Douglas form.
         Relates the time the agent will die of lack of sugar with
         the time the agent will die of lack of spice.
-        :param su: amount of sugar that can be gained during this move.
-        :param sp: amount of spice that can be gained during this move.
+        :param su: potential sugar gain of cell in question.
+        :param sp: potential spice gain of cell in question.
         :return: welfare value, important to calculate prices in the trading rule.
         """
         meta_total = self.meta_sugar + self.meta_spice
@@ -65,17 +76,16 @@ class Agent:
 
     def mrs(self, su, sp):
         """
-        Second important trading tool, after welfare. MRS is used to calculate sugar and spice prices on the market.
+        Marginal Rate of Substitution.
+        Second important trading tool after welfare.
+        MRS is used to calculate sugar and spice prices between two agents.
         :param su:
         :param sp:
         :return:
         """
         rate_sugar = (self.sugar + su) / self.meta_sugar
         rate_spice = (self.spice + sp) / self.meta_spice
-        if rate_sugar > 0:
-            return rate_spice / rate_sugar
-        else:
-            return sys.maxsize
+        return rate_spice / rate_sugar
 
     def r1_select_best_cell(self, cells):
         """
@@ -94,9 +104,8 @@ class Agent:
                 if c[1].x == self.x and c[1].y == self.y:
                     # Remove me from the (cell, agent) tuple. I don't want to kill myself.
                     available_cells.append((c[0], False))
-                # Case 1b: Cell has an opponent who is poorer than me.
-                elif c[1].tribe_id != self.tribe_id and c[1].gender == self.gender and\
-                        (c[1].sugar + c[1].spice) < (self.sugar + self.spice):
+                # Case 1b: Cell has an opponent who is poorer than me. (Old version: also the same gender required)
+                elif c[1].tribe_id != self.tribe_id and (c[1].sugar + c[1].spice) < (self.sugar + self.spice):
                     available_cells.append(c)
             # Case 2: Cell is not occupied
             else:
@@ -114,7 +123,7 @@ class Agent:
         best_cells = []
         while len(available_cells) > 0:
             c = available_cells.pop()
-            # Retrieve resources of possible occupants.
+            # Retrieve resources of possible neighbors occupying those cells.
             occupant_sugar = 0
             occupant_spice = 0
             if c[1]:
@@ -132,8 +141,10 @@ class Agent:
                 if welfare > max_w:
                     best_cells = [c]
                     max_w = welfare
+                    max_dist = dist
                 elif welfare == max_w and dist < max_dist:
                     best_cells = [c]
+                    max_dist = dist
                 elif welfare == max_w and dist == max_dist:
                     best_cells.append(c)
 
@@ -256,63 +267,118 @@ class Agent:
         """
         Trade with neighboring agents if possible.
         """
-        sugar_count = 0
-        spice_count = 0
+        trade_count = 0
         self.sugar_price = 0
         self.spice_price = 0
         for n in neighbors:
-            if n[1] and not self.dead and not n[1].dead:
-                w1 = self.mrs(0, 0)
-                w2 = n[1].mrs(0, 0)
-                if w1 < w2:
-                    p = math.sqrt(w1 * w2)
-                    # trade 1 unit of sugar for p units of spice, obey the constraints
-                    if 1 <= p < n[1].spice and self.sugar > 1 and n[1].spice > p \
-                            and self.mrs(-1, p) < n[1].mrs(1, -p):
-                        self.sugar -= 1
-                        self.spice += p
-                        n[1].sugar += 1
-                        n[1].spice -= p
-                        self.sugar_traded += 1
-                        self.spice_traded += p
-                    elif 0 < p < 1 and self.sugar > int(1 / p) and n[1].spice > 1 \
-                            and self.mrs(- int(1 / p), 1) < n[1].mrs(int(1 / p), -1):
-                        self.sugar -= int(1 / p)
-                        self.spice += 1
-                        n[1].sugar += int(1 / p)
-                        n[1].spice -= 1
-                        self.sugar_traded += int(1 / p)
-                        self.spice_traded += 1
-                    #self.sugar_price += 1 / p
-                    self.spice_price += 1
-                    spice_count += 1
+            if n[1] and not n[1].dead and not self.dead:
+                m1_now = self.mrs(0, 0)
+                m2_now = n[1].mrs(0, 0)
+                w1_now = self.welfare(0, 0)
+                w2_now = n[1].welfare(0, 0)
+                if m1_now != m2_now:
+                    # Set directions of traded resources
+                    if m1_now > m2_now:
+                        sugar_flow = -1
+                        spice_flow = 1
+                        direction = False
+                    else:  # m1 < m2
+                        sugar_flow = 1
+                        spice_flow = -1
+                        direction = True
+                    # Calculate exchange price p as geometric mean.
+                    price = math.sqrt(m1_now * m2_now)
+                    if price > 1:  # Trade p units of spice for 1 sugar.
+                        my_sugar_delta = int(sugar_flow * 1)
+                        my_spice_delta = int(spice_flow * int(price))
+                        neigh_sugar_delta = int(my_sugar_delta * -1)
+                        neigh_spice_delta = int(my_spice_delta * -1)
+                    else:  # p < 1, Trade 1/p units of sugar for 1 spice.
+                        my_sugar_delta = int(sugar_flow * int(1 / price))
+                        my_spice_delta = int(spice_flow * 1)
+                        neigh_sugar_delta = int(my_sugar_delta * -1)
+                        neigh_spice_delta = int(my_spice_delta * -1)
+                    # Trade only if neither agent loses resources.
+                    my_trade_valid = self.sugar + my_sugar_delta > 0 and self.spice + my_spice_delta > 0
+                    neigh_trade_valid = n[1].sugar + neigh_sugar_delta > 0 and n[1].spice + neigh_spice_delta > 0
+                    if my_trade_valid and neigh_trade_valid:
+                        # Trade only if welfare of both agents increases.
+                        w1_expected = self.welfare(my_sugar_delta, my_spice_delta)
+                        w2_expected = n[1].welfare(neigh_sugar_delta, neigh_spice_delta)
+                        if w1_expected > w1_now and w2_expected > w2_now:
+                            # Trade only if mrs values of agents are not flipping.
+                            # (If mrs flips, they would infinitely trade their goods back and forth.)
+                            m1_expected = self.mrs(my_sugar_delta, my_spice_delta)
+                            m2_expected = n[1].mrs(neigh_sugar_delta, neigh_spice_delta)
+                            mrs_diff = m1_expected - m2_expected
+                            if (mrs_diff > 0 and direction) or (mrs_diff < 0 and not direction):
+                                self.sugar += my_sugar_delta
+                                self.spice += my_spice_delta
+                                n[1].sugar += neigh_sugar_delta
+                                n[1].spice += neigh_spice_delta
+                                # Gather information for the trading statistics.
+                                # 1.) general trading stats
+                                self.sugar_traded += my_sugar_delta
+                                self.spice_traded += my_spice_delta
+                                self.sugar_price += price
+                                self.spice_price += 1 / price
+                                trade_count += 1
+                                # 2.) wealth change between tribes, if occurred
+                                if self.tribe_id != n[1].tribe_id:
+                                    my_wealth_change = my_sugar_delta + my_spice_delta
+                                    neigh_wealth_change = neigh_spice_delta + neigh_sugar_delta
+                                    self.tribe.tribal_wealth[self.tribe_id] += my_wealth_change
+                                    self.tribe.tribal_wealth[n[1].tribe_id] += neigh_wealth_change
+        # Finish up trading and save possibly gathered data.
+        if trade_count > 0:
+            self.sugar_price /= trade_count
+            self.spice_price /= trade_count
 
-                if w1 > w2:
-                    p = math.sqrt(w1 * w2)
-                    # trade 1 unit of sugar for p units of spice, obey the constraints
-                    if 1 <= p < self.spice and n[1].sugar > 1 and self.spice > p \
-                            and self.mrs(-1, p) < n[1].mrs(1, -p):
-                        n[1].sugar -= 1
-                        n[1].spice += p
-                        self.sugar += 1
-                        self.spice -= p
-                        self.sugar_traded += 1
-                        self.spice_traded += p
-                    elif 0 < p < 1 and n[1].sugar > int(1 / p) and self.spice > 1 \
-                            and n[1].mrs(- int(1 / p), 1) < self.mrs(int(1 / p), -1):
-                        n[1].sugar -= int(1 / p)
-                        n[1].spice += 1
-                        self.sugar += int(1 / p)
-                        self.spice -= 1
-                        self.sugar_traded += int(1 / p)
-                        self.spice_traded += 1
-                    self.sugar_price += p
-                    sugar_count += 1
-                    #self.spice_price += 1 / p
-        if sugar_count > 0:
-            self.sugar_price /= sugar_count
-        if spice_count > 0:
-            self.spice_price /= spice_count
+    def r5_diseases(self, neighbors):
+        """
+        If there are any infected neighbors, their diseases will
+        hop over to this agent. And any diseases from this agent will
+        also infect neighbors. In short: merge their disease lists!
+        """
+        for n in neighbors:
+            if n[1] and not n[1].dead and not self.dead:
+                union = dict(list(self.diseases.items()) + list(n[1].diseases.items()))
+                self.diseases = union
+                n[1].diseases = copy.deepcopy(union)
+        # Let the immune system build another instance
+        # and then attempt to fight the diseases.
+        self.is_create_copy()
+
+        # Reset the metabolism values of the agent to clear all past diseases.
+        # That way, the diseases just fought off by the immune system are not longer
+        # afflicting the body and possible new diseases can act on the agent.
+        self.meta_sugar = self.chromosome.meta_sugar
+        self.meta_spice = self.chromosome.meta_spice
+        # Have the diseases affect the agent
+        for d in self.diseases:
+            d.affect(self)
+
+    def is_create_copy(self):
+        is_copy = copy.deepcopy(self.immune_system)
+        length = len(is_copy)
+        num_bits_changed = int(random.triangular(0, int(length / 3), length))
+        index = random.sample(range(length), num_bits_changed)
+        for i in index:
+            is_copy[i] = 1 - is_copy[i]
+        self.immune_system.append("".join(map(str, is_copy)))
+
+    def is_fight_diseases(self):
+        eliminated = set()
+        for d in self.diseases:
+            for i in self.immune_system:
+                # If the immune system has one instance that fits
+                # into the disease genome, the agent is now
+                # successfully healed from it and immune to future infections.
+                if i in d.genome_string:
+                    eliminated.update(d.genome_string)
+        # Remove all eliminated diseases from our agent dictionary
+        for d in eliminated:
+            del(self.diseases[d])
 
     def on_death(self):
         """
@@ -334,7 +400,7 @@ class Agent:
         """
         Perceiving the environment and act according to the rules
         """
-        self.grow_older()
+        self.check_status()
         self.prev_x = self.x
         self.prev_y = self.y
         self.sugar_gathered = 0

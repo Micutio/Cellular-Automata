@@ -37,16 +37,28 @@ class EventHandler:
 
     def mouse_action(self, button):
         # Click on left mouse button
-        # -> display cell information
+        # -> display cell information and agent information
         if button == 1:
-            print("> cell %i, %i = 1, T = %i" %
-                  (self.mx, self.my, self.main.ca.ca_grid[int(self.mx), int(self.my)].sugar))
-
+            print("> cell %i, %i = 1, sugar = %i, spice = %i" %
+                  (self.mx, self.my,
+                   self.main.ca.ca_grid[int(self.mx), int(self.my)].sugar,
+                   self.main.ca.ca_grid[int(self.mx), int(self.my)].spice))
+            agent_x = (math.floor(self.mx) * self.gc.CELL_SIZE) + int(self.gc.CELL_SIZE / 2)
+            agent_y = (math.floor(self.my) * self.gc.CELL_SIZE) + int(self.gc.CELL_SIZE / 2)
+            if (agent_x, agent_y) in self.main.abm.agent_dict:
+                agent_attributes = vars(self.main.abm.agent_dict[agent_x, agent_y].chromosome)
+                print("+----- AGENT INFO -----------------------------------------------------")
+                for key in sorted(agent_attributes):
+                    if key != "att_map" or key != "immune_system":
+                        print("+ %s: %s" % (key, agent_attributes[key]))
+                print("+----------------------------------------------------------------------")
         # Click on right mouse button
         # -> display cell information
         elif button == 3:
-            print("> cell %i, %i = 1, T = %i" %
-                  (self.mx, self.my, self.main.ca.ca_grid[int(self.mx), int(self.my)].sugar))
+            print("> cell %i, %i = 1, sugar = %i, spice = %i" %
+                  (self.mx, self.my,
+                   self.main.ca.ca_grid[int(self.mx), int(self.my)].sugar,
+                   self.main.ca.ca_grid[int(self.mx), int(self.my)].spice))
 
     def keyboard_action(self, active_key):
         if active_key == pygame.K_SPACE:
@@ -72,20 +84,6 @@ class EventHandler:
             print("+ > fertile agents: " + str(i) + ", richest: " + str(max_wealth) + ", poorest: " + str(min_wealth))
             print("+----------------------------------------------------------------------")
             self.main.stats.plot()
-        # a key is pressed, display information about agent
-        if active_key == pygame.K_a:
-            agent_x = (math.floor(self.mx) * self.gc.CELL_SIZE) + int(self.gc.CELL_SIZE / 2)
-            agent_y = (math.floor(self.my) * self.gc.CELL_SIZE) + int(self.gc.CELL_SIZE / 2)
-            if (agent_x, agent_y) in self.main.abm.agent_dict:
-                agent_attributes = vars(self.main.abm.agent_dict[agent_x, agent_y].chromosome)
-                # del(agent_attributes["att_map"])
-                # del(agent_attributes["immune_system"])
-                print("+----- AGENT INFO -----------------------------------------------------")
-                for key in sorted(agent_attributes):
-                    if key != "att_map" or key != "immune_system":
-                        print("+ %s: %s" % (key, agent_attributes[key]))
-                print("+----------------------------------------------------------------------")
-        # r key is pressed, reset the simulation
         if active_key == pygame.K_r:
             self.main.ca.__init__(self.main.visualizer, self.gc)
             self.main.abm.__init__(self.main.visualizer, self.gc)
@@ -115,7 +113,7 @@ class EventHandler:
             else:
                 # only 1: change draw cells mode
                 self.main.visualizer.draw_cell_mode = 0
-                print("> set draw cell mode to 0 (resource and tribal territories)")
+                print("> set draw cell mode to 0 (resources)")
         # 2 key is pressed
         if active_key == pygame.K_2:
             # ctrl is also pressed

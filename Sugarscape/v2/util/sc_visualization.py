@@ -2,7 +2,6 @@ __author__ = 'Michael Wagner'
 __version__ = '1.0'
 
 import pygame
-import matplotlib.cm as cm
 
 
 class Visualization:
@@ -32,17 +31,22 @@ class Visualization:
             if self.draw_agent_mode == 0:
             # Show tribe and age of the agents.
                 if agent.age < agent.fertility[0]:  # Case 1: agent is a child.
-                    red = int(128 * (1 - (agent.age / agent.fertility[0])))
-                    green = 255
-                    blue = int(128 * (1 - (agent.age / agent.fertility[0])))
-                elif agent.fertility[0] <= agent.age <= agent.fertility[1]:  # Case 2: agent is adult.
-                    red = 255
-                    green = 255
-                    blue = int(128 * (1 - (agent.age / agent.fertility[1])))
-                else:  # Case 3: agent is old.
-                    red = int(255 * (agent.age / agent.dying_age))
-                    green = 0
+                    red = 0
+                    green = 200
                     blue = 0
+                elif agent.fertility[0] <= agent.age <= agent.fertility[1]:  # Case 2: agent is adult.
+                    if agent.gender == 0:  # A man.
+                        red = 0
+                        green = 0
+                        blue = 255
+                    else:  # A woman.
+                        red = 255
+                        green = 0
+                        blue = 0
+                else:  # Case 3: agent is old.
+                    red = 90
+                    green = 90
+                    blue = 90
                 color1 = (red, green, blue)
                 color2 = self.gc.TRIBE_COLORS[agent.tribe_id]
                 pygame.draw.circle(self.surface, color1, [agent.x, agent.y], radius, 0)
@@ -51,25 +55,24 @@ class Visualization:
             # Show gender and age of the agents.
                 # Case 1: agent is a child.
                 if agent.age < agent.fertility[0]:
-                    red = int(128 * (1 - (agent.age / agent.fertility[0])))
+                    red = 90
                     green = 255
-                    blue = int(128 * (1 - (agent.age / agent.fertility[0])))
+                    blue = 90
                 # Case 2: agent is adult, display its gender.
                 elif agent.fertility[0] <= agent.age <= agent.fertility[1]:
-                    ratio = (agent.age / agent.fertility[1])
                     if agent.gender == 0:  # A man.
-                        red = 100 * ratio
-                        green = 150 * ratio
-                        blue = 255 * ratio
+                        red = 0
+                        green = 0
+                        blue = 255
                     else:  # A woman.
-                        red = 255 * ratio
-                        green = 100 * ratio
-                        blue = 180 * ratio
+                        red = 255
+                        green = 0
+                        blue = 0
                 # Case 3: agent is old.
                 else:
-                    red = int(255 * (agent.age / agent.dying_age))
-                    green = 0
-                    blue = 0
+                    red = 160
+                    green = 160
+                    blue = 160
                 color = (red, green, blue)
                 pygame.draw.circle(self.surface, color, [agent.x, agent.y], radius, 0)
             elif self.draw_agent_mode == 2:
@@ -78,7 +81,7 @@ class Visualization:
                 pygame.draw.circle(self.surface, color, [agent.x, agent.y], radius, 0)
         return
 
-    def draw_cell(self, cell, max_visit):
+    def draw_cell(self, cell):
         """
         Draw cell with
         :param cell:
@@ -96,11 +99,6 @@ class Visualization:
             pygame.draw.line(self.surface, col2, [lx + 1, ly + w1], [lx + h1, ly + w1], int(cell.w * 0.2))
             pygame.draw.line(self.surface, col2, [lx + h1, ly + 1], [lx + h1, ly + w1], int(cell.w * 0.2))
 
-            #if cell.tribe_id != -1:
-            #    color = self.gc.TRIBE_COLORS[cell.tribe_id]
-            #    pygame.draw.line(self.surface, color, [lx, ly], [lx + cell.h, ly + cell.w], 2)
-            #    pygame.draw.line(self.surface, color, [lx + cell.h, ly], [lx, ly + cell.w], 2)
-
         elif self.draw_cell_mode == 1:
             # Show only tribal territories.
             if cell.tribe_id != -1:
@@ -112,8 +110,7 @@ class Visualization:
 
         elif self.draw_cell_mode == 2:
         # Show a heat map indicating which cells are the most visited.
-            j = cm.jet((cell.visits / self.gc.TICKS))#max_visit))
-            color = (255 * j[0], 255 * j[1], 255 * j[2])
+            color = self.calculate_density_color(cell)
             pygame.draw.rect(self.surface, color, (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
         return
 
@@ -131,3 +128,40 @@ class Visualization:
         green = 200 * normalized_su
         blue = 0
         return red, green, blue
+
+    def calculate_density_color(self, cell):
+        """
+        Calculates the RGB values depending on the cell's current temperature.
+        :return:
+        """
+        if self.gc.TICKS == 0:
+            normalized_v = 0
+        else:
+            normalized_v = cell.visits / self.gc.TICKS
+        red = 0
+        green = 0
+        blue = 0
+        if 0 <= normalized_v <= 1 / 8:
+            red = 0
+            green = 0
+            blue = 4 * normalized_v + 0.5
+        elif 1 / 8 < normalized_v <= 3 / 8:
+            red = 0
+            green = 4 * normalized_v - 0.5
+            blue = 1
+        elif 3 / 8 < normalized_v <= 5 / 8:
+            red = 4 * normalized_v - 1.5
+            green = 1
+            blue = -4 * normalized_v + 2.5
+        elif 5 / 8 < normalized_v <= 7 / 8:
+            red = 1
+            green = -4 * normalized_v + 3.5
+            blue = 0
+        elif 7 / 8 < normalized_v <= 1:
+            red = -4 * normalized_v + 4.5
+            green = 0
+            blue = 0
+        else:
+            pass
+
+        return red * 255, green * 255, blue * 255

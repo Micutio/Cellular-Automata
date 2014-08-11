@@ -40,13 +40,15 @@ class ABM:
             sp = random.randint(gc.STARTING_SUGAR[0], gc.STARTING_SUGAR[1])
             d = random.randint(f[1], gc.MAX_AGENT_LIFE)
             c = [random.randint(0, gc.NUM_TRIBES - 1) for _ in range(11)]
-            imm_sys = [random.getrandbits(1) for _ in range(50)]
+            imm_sys = [random.getrandbits(1) for _ in range(10)]
             a = 0  # random.randint(0, int(gc.MAX_AGENT_LIFE / 2))
             gene_string = "{0:03b}".format(meta_sugar) + "{0:03b}".format(meta_spice)\
                           + "{0:06b}".format(su) + "{0:06b}".format(sp) \
                           + "{0:03b}".format(vision) + "{0:01b}".format(g)\
                           + "{0:06b}".format(f[0]) + "{0:06b}".format(f[1]) + "{0:07b}".format(d)
-            genome = (gene_string, gene_string, c, imm_sys)
+            # We use generation to keep track of how far an agent has walked down the evolutionary road.
+            generation = (0, 0)
+            genome = (gene_string, gene_string, c, imm_sys, generation)
             self.agent_dict[p[0], p[1]] = Agent(p[0], p[1], gc.CELL_SIZE, su, sp, genome, a, self.tribes)
 
             # Update the tribal information

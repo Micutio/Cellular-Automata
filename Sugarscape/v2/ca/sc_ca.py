@@ -28,13 +28,13 @@ class CA:
         self.season_count = 0
         self.season = 1
         self.visualizer = visualizer
-        self.max_visit = 1
 
         if gc.LANDSCAPE_MODE == 1:
             for i in range(0, self.height):
                 for j in range(0, self.width):
-                    self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, random.randint(0, gc.MAX_SUGAR),
-                                                   random.randint(0, gc.MAX_SUGAR), gc.GROWTH_PER_TICK, self.season)
+                    self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, 2,#random.randint(0, gc.MAX_SUGAR),
+                                                   2,#random.randint(0, gc.MAX_SUGAR),
+                                                   gc.GROWTH_PER_TICK, self.season)
         elif gc.LANDSCAPE_MODE == 2:
             landscape_sugar = get_procedural_landscape(gc)
             landscape_spice = get_procedural_landscape(gc)
@@ -56,7 +56,7 @@ class CA:
         """
         for y in range(0, self.height):
             for x in range(0, self.width):
-                self.visualizer.draw_cell(self.ca_grid[x, y], self.max_visit)
+                self.visualizer.draw_cell(self.ca_grid[x, y])
 
     def cycle_automaton(self):
         """
@@ -120,9 +120,10 @@ class CA:
                 else:
                     new_agent = a_pos[agnt_x, agent_y]
                 visible_cells.append((new_cell, new_agent))
-            # 2. go through vertical line of sight
+            # 2. go through vertical line of sight. And this time skip your own cell,
+            # because we already checked it in the horizontal line of sight
             grid_y = y + i
-            if (x, grid_y) in self.ca_grid:
+            if (x, grid_y) in self.ca_grid and i != 0:
                 new_cell = self.ca_grid[x, grid_y]
                 agnt_y = ((grid_y * self.cell_size) + int(self.cell_size / 2))
                 if (agent_x, agnt_y) not in a_pos:
@@ -167,9 +168,6 @@ class CA:
                     self.ca_grid[x, y].sense_neigh(self.ca_grid[(x + 1), (y + 1)])  # Bottom Right
                     self.ca_grid[x, y].sense_neigh(self.ca_grid[(x - 1), y])  # Left
                     self.ca_grid[x, y].sense_neigh(self.ca_grid[(x + 1), y])  # Right
-                    # Also find the most visited cell.
-                    if self.max_visit < self.ca_grid[x, y].visits:
-                        self.max_visit = self.ca_grid[x, y].visits
 
 #########################################################################
 ###                           OTHER METHODS                           ###
