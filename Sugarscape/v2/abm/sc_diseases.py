@@ -1,22 +1,76 @@
 __author__ = 'Michael Wagner'
 __version__ = '1.0'
 
+import copy
+
 
 class Disease:
     """
     Interface for the two classes virus and bacteria.
     """
-    def __init__(self, genome, sugar_meta_modifier, spice_meta_modifier, color):
+    def __init__(self, genome, tag):
         # The modifiers indicate how much the metabolism of affected agents changes.
         self.genome = genome
         self.genome_string = "".join(map(str, genome))
-        self.su_mod = sugar_meta_modifier
-        self.sp_mod = spice_meta_modifier
-        # The color is used in the disease map mode.
-        self.color = color
+        self.tag = tag
+
+    def spread(self, agent):
+        return
 
     def affect(self, agent):
         return
 
+
+class Bacteria(Disease):
+    """
+    Bacteria are one kind of disease in the sugarscape, the other one being viruses.
+    Bacteria increase the sugar metabolism of an agent, causing it to need more sugar
+    to survive.
+    """
+    def __init__(self, genome):
+        """
+        Initializer. Bacteria have the fixed tag 'bacteria' in order to be identified by the system.
+        """
+        super().__init__(genome, "bacteria")
+
     def spread(self, agent):
-        return
+        """
+        It spreads to agents in the standard way: placing a copy into its disease list.
+        """
+        if not self.genome_string in agent.diseases:
+            agent.diseases[self.genome_string] = copy.deepcopy(self)
+
+    def affect(self, agent):
+        """
+        In this version of Sugarscape bacteria affect agents by raising their sugar consumption.
+        """
+        agent.meta_sugar += 1
+
+
+class Virus(Disease):
+    """
+    Viruses are one kind of disease in the sugarscape, the other one being bacteria.
+    Viruses increase the spice metabolism of an agent, causing it to need more spice
+    to survive.
+    """
+    def __init__(self, genome):
+        """
+        Initializer. Viruses have the fixed tag 'virus' in order to be identified by the system.
+        """
+        super().__init__(genome, "virus")
+
+    def spread(self, agent):
+        """
+        It spreads to agents in the standard way: placing a copy into its disease list.
+        """
+        if not self.genome_string in agent.diseases:
+            agent.diseases[self.genome_string] = copy.deepcopy(self)
+
+    def affect(self, agent):
+        """
+        In this version of Sugarscape viruses affect agents by raising their spice consumption.
+        Additionally viruses inject a part of their dna into their hosts.
+        Furthermore its own genome has a certain chance per tick to mutate.
+        """
+        agent.meta_spice += 1
+        # TODO: Inject part of own genome into agent

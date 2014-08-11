@@ -4,7 +4,6 @@ __version__ = '2.0'
 import random
 import math
 import copy
-import set
 from v2.abm.sc_genetics import Chromosome
 
 
@@ -336,46 +335,43 @@ class Agent:
 
     def r5_diseases(self, neighbors):
         """
-        If there are any infected neighbors, their diseases will
-        hop over to this agent. And any diseases from this agent will
-        also infect neighbors. In short: merge their disease lists!
+        All diseases, the agent is currently infected with, try to spread to its neighbors.
         """
         for n in neighbors:
             if n[1] and not n[1].dead and not self.dead:
-                union = dict(list(self.diseases.items()) + list(n[1].diseases.items()))
-                self.diseases = union
-                n[1].diseases = copy.deepcopy(union)
+                for _, d in self.diseases.items():
+                    d.spread(n[1])
         # Let the immune system build another instance
         # and then attempt to fight the diseases.
-        self.is_create_copy()
-
+        self.im_sys_create_copy()
+        self.im_sys_fight_diseases()
         # Reset the metabolism values of the agent to clear all past diseases.
         # That way, the diseases just fought off by the immune system are not longer
         # afflicting the body and possible new diseases can act on the agent.
         self.meta_sugar = self.chromosome.meta_sugar
         self.meta_spice = self.chromosome.meta_spice
         # Have the diseases affect the agent
-        for d in self.diseases:
+        for _, d in self.diseases.items():
             d.affect(self)
 
-    def is_create_copy(self):
-        is_copy = copy.deepcopy(self.immune_system)
-        length = len(is_copy)
-        num_bits_changed = int(random.triangular(0, int(length / 3), length))
-        index = random.sample(range(length), num_bits_changed)
-        for i in index:
-            is_copy[i] = 1 - is_copy[i]
-        self.immune_system.append("".join(map(str, is_copy)))
+    def im_sys_create_copy(self):
+        if random.random() < 0.01:
+            is_copy = copy.deepcopy(self.chromosome.immune_system)
+            length = len(is_copy)
+            index = random.choice(range(length))
+            is_copy[index] = 1 - is_copy[index]
+            self.immune_system.append("".join(map(str, is_copy)))
 
-    def is_fight_diseases(self):
+    def im_sys_fight_diseases(self):
         eliminated = set()
-        for d in self.diseases:
+        for _, d in self.diseases.items():
             for i in self.immune_system:
                 # If the immune system has one instance that fits
                 # into the disease genome, the agent is now
                 # successfully healed from it and immune to future infections.
                 if i in d.genome_string:
-                    eliminated.update(d.genome_string)
+                    eliminated.add(d.genome_string)
+                    print("> immune_system fought off a disease")
         # Remove all eliminated diseases from our agent dictionary
         for d in eliminated:
             del(self.diseases[d])
@@ -415,4 +411,5 @@ class Agent:
             self.r2_reproduce(nb, agent_positions)
             self.r3_culture(nb)  # vc
             self.r4_trading(nb)  # vc
+            self.r5_diseases(nb)
             self.chromosome.mutate()

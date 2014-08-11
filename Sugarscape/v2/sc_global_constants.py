@@ -40,6 +40,8 @@ class GlobalConstants:
         self.F_FERTILITY_END = (40, 50)
         self.MAX_AGENT_LIFE = 100
         self.STARTING_SUGAR = (20, 40)
+        self.IMMUNE_SYSTEM_GENOME_LENGTH = 5
+        self.DISEASE_GENOME_LENGTH = 20
         ################################
         #         CA CONSTANTS         #
         ################################

@@ -143,12 +143,12 @@ class Chromosome:
         # Flip bit in genome
         if random.random() < 0.005:
             length = len(self.genomes)
-            index = random.randint(length)
+            index = random.randrange(length)
             l = list(self.genomes[0])
             l[index] = self.invert_bit(l[index])
             g1 = "".join(l)
 
-            index = random.randint(length)
+            index = random.randrange(length)
             l = list(self.genomes[1])
             l[index] = self.invert_bit(l[index])
             g2 = "".join(l)

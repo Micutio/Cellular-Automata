@@ -76,9 +76,26 @@ class Visualization:
                 color = (red, green, blue)
                 pygame.draw.circle(self.surface, color, [agent.x, agent.y], radius, 0)
             elif self.draw_agent_mode == 2:
-            # Show only tribe of the agents.
+                # Show only tribe of the agents.
                 color = self.gc.TRIBE_COLORS[agent.tribe_id]
                 pygame.draw.circle(self.surface, color, [agent.x, agent.y], radius, 0)
+            elif self.draw_agent_mode == 3:
+                # Show diseases.
+                has_virus = False
+                has_bacteria = False
+                for _, d in agent.diseases.items():
+                    if d.tag == "bacteria":
+                        has_bacteria = True
+                    else:
+                        has_virus = True
+                if has_bacteria:
+                    pygame.draw.circle(self.surface, (0, 255, 0), [agent.x, agent.y], radius, 0)
+                else:
+                    pygame.draw.circle(self.surface, (255, 255, 255), [agent.x, agent.y], radius, 0)
+                if has_virus:
+                    pygame.draw.circle(self.surface, (255, 255, 0), [agent.x, agent.y], radius - 2, 0)
+                else:
+                    pygame.draw.circle(self.surface, (255, 255, 255), [agent.x, agent.y], radius - 2, 0)
         return
 
     def draw_cell(self, cell):
@@ -112,6 +129,8 @@ class Visualization:
         # Show a heat map indicating which cells are the most visited.
             color = self.calculate_density_color(cell)
             pygame.draw.rect(self.surface, color, (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
+        elif self.draw_cell_mode == 3:
+            pygame.draw.rect(self.surface, (0, 0, 0), (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
         return
 
     def calculate_cell_color(self, cell):

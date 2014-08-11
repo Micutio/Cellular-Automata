@@ -40,7 +40,7 @@ class ABM:
             sp = random.randint(gc.STARTING_SUGAR[0], gc.STARTING_SUGAR[1])
             d = random.randint(f[1], gc.MAX_AGENT_LIFE)
             c = [random.randint(0, gc.NUM_TRIBES - 1) for _ in range(11)]
-            imm_sys = [random.getrandbits(1) for _ in range(10)]
+            imm_sys = [random.getrandbits(1) for _ in range(gc.IMMUNE_SYSTEM_GENOME_LENGTH)]
             a = 0  # random.randint(0, int(gc.MAX_AGENT_LIFE / 2))
             gene_string = "{0:03b}".format(meta_sugar) + "{0:03b}".format(meta_spice)\
                           + "{0:06b}".format(su) + "{0:06b}".format(sp) \

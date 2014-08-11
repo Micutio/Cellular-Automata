@@ -26,6 +26,7 @@ class ClassCell:
         self.spice_period_counter = 0
         self.tribe_id = -1
         self.visits = 0
+        self.pollution = 0
 
     def update(self):
         """

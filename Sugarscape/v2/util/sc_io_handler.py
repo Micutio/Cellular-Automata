@@ -4,7 +4,9 @@ __version__ = '1.0'
 import pygame
 import sys
 import math
+import random
 from pygame.locals import *
+from v2.abm.sc_diseases import Virus, Bacteria
 
 
 class EventHandler:
@@ -13,6 +15,7 @@ class EventHandler:
         self.my = 0
         self.main = main
         self.gc = main.gc
+        self.disease = "b"
 
     def process_input(self):
         for event in pygame.event.get():
@@ -59,6 +62,19 @@ class EventHandler:
                   (self.mx, self.my,
                    self.main.ca.ca_grid[int(self.mx), int(self.my)].sugar,
                    self.main.ca.ca_grid[int(self.mx), int(self.my)].spice))
+            agent_x = (math.floor(self.mx) * self.gc.CELL_SIZE) + int(self.gc.CELL_SIZE / 2)
+            agent_y = (math.floor(self.my) * self.gc.CELL_SIZE) + int(self.gc.CELL_SIZE / 2)
+            # Create disease and infect selected agent.
+            if (agent_x, agent_y) in self.main.abm.agent_dict:
+                dis_genome = [random.getrandbits(1) for _ in range(self.gc.DISEASE_GENOME_LENGTH)]
+                if self.disease == "b":
+                    bacteria = Bacteria(dis_genome)
+                    self.main.abm.agent_dict[agent_x, agent_y].diseases[bacteria.genome_string] = bacteria
+                    print("> bacterial infection spawned")
+                if self.disease == "v":
+                    virus = Virus(dis_genome)
+                    self.main.abm.agent_dict[agent_x, agent_y].diseases[virus.genome_string] = virus
+                    print("> viral infection spawned")
 
     def keyboard_action(self, active_key):
         if active_key == pygame.K_SPACE:
@@ -67,6 +83,7 @@ class EventHandler:
                 print("> simulation started")
             else:
                 print("> simulation paused")
+
         # i key is pressed, display general info about the automata
         if active_key == pygame.K_i:
             i = 0
@@ -84,6 +101,8 @@ class EventHandler:
             print("+ > fertile agents: " + str(i) + ", richest: " + str(max_wealth) + ", poorest: " + str(min_wealth))
             print("+----------------------------------------------------------------------")
             self.main.stats.plot()
+
+        # r key is pressed, reset the simulation
         if active_key == pygame.K_r:
             self.main.ca.__init__(self.main.visualizer, self.gc)
             self.main.abm.__init__(self.main.visualizer, self.gc)
@@ -96,6 +115,16 @@ class EventHandler:
         if active_key == pygame.K_s:
             self.main.step_simulation()
             self.main.render_simulation()
+
+        # v key is pressed, set disease-to-be-spawned to virus
+        if active_key == pygame.K_v:
+            self.disease = "v"
+            print("> set spawn-able disease to 'virus'")
+
+        # b key is pressed, set disease-to-be-spawned to bacteria
+        if active_key == pygame.K_b:
+            self.disease = "b"
+            print("> set spawn-able disease to bacteria")
 
         # NUMBER KEYS
         # 1 key is pressed
@@ -118,7 +147,7 @@ class EventHandler:
         if active_key == pygame.K_2:
             # ctrl is also pressed
             if pygame.key.get_mods() & pygame.KMOD_CTRL:
-                # ctrl + 1: change draw agent mode
+                # ctrl + 2: change draw agent mode
                 self.main.visualizer.draw_agent_mode = 1
                 print("> set draw agent mode to 1 (gender)")
             # shift is pressed
@@ -127,22 +156,33 @@ class EventHandler:
                 self.gc.LANDSCAPE_MODE = 2
                 print("> set landscape mode to 2 (two hills)")
             else:
-                # only 1: change draw cells mode
+                # only 2: change draw cells mode
                 self.main.visualizer.draw_cell_mode = 1
                 print("> set draw cell mode to 1 (tribal territories)")
         # 3 key is pressed
         if active_key == pygame.K_3:
             # ctrl is also pressed
             if pygame.key.get_mods() & pygame.KMOD_CTRL:
-                # ctrl + 1: change draw agent mode
+                # ctrl + 3: change draw agent mode
                 self.main.visualizer.draw_agent_mode = 2
                 print("> set draw agent mode to 2 (tribe)")
             # shift is pressed
             elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
-                # shift + 1: change landscape mode
+                # shift + 3: change landscape mode
                 self.gc.LANDSCAPE_MODE = 1
                 print("> set landscape mode to 1 (random)")
             else:
-                # only 1: change draw cells mode
+                # only 3: change draw cells mode
                 self.main.visualizer.draw_cell_mode = 2
                 print("> set draw cell mode to 2 (heat-map)")
+        # 4 key is pressed
+        if active_key == pygame.K_4:
+            # ctrl is also pressed
+            if pygame.key.get_mods() & pygame.KMOD_CTRL:
+                # ctrl + 4: change draw agent mode
+                self.main.visualizer.draw_agent_mode = 3
+                print("> set draw agent mode to 3 (diseases)")
+            else:
+                # only 3: change draw cells mode
+                self.main.visualizer.draw_cell_mode = 2
+                print("> set draw cell mode to 3 (diseases)")
