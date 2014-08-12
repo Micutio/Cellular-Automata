@@ -103,8 +103,11 @@ class Agent:
                 if c[1].x == self.x and c[1].y == self.y:
                     # Remove me from the (cell, agent) tuple. I don't want to kill myself.
                     available_cells.append((c[0], False))
-                # Case 1b: Cell has an opponent who is poorer than me. (Old version: also the same gender required)
-                elif c[1].tribe_id != self.tribe_id and (c[1].sugar + c[1].spice) < (self.sugar + self.spice):
+                # Case 1b: Cell has an opponent who is poorer than me and the same gender and we're both adults
+                # Then I am allowed to kill the agent and take its cell
+                elif (c[1].tribe_id != self.tribe_id) and (c[1].sugar + c[1].spice) < (self.sugar + self.spice)\
+                        and c[1].gender == self.gender and c[1].fertility[0] < c[1].age < c[1].fertility[1]\
+                        and self.fertility[0] < self.age < self.fertility[1]:
                     available_cells.append(c)
             # Case 2: Cell is not occupied
             else:
@@ -270,14 +273,16 @@ class Agent:
         self.sugar_price = 0
         self.spice_price = 0
         for n in neighbors:
-            if n[1] and not n[1].dead and not self.dead:
+            if n[1] and not n[1].dead and not self.dead and n[1].sugar > 0 and n[1].spice > 0:
                 m1_now = self.mrs(0, 0)
                 m2_now = n[1].mrs(0, 0)
-                w1_now = self.welfare(0, 0)
-                w2_now = n[1].welfare(0, 0)
-                if m1_now != m2_now:
+                mrs_diff = m1_now - m2_now
+                while mrs_diff != 0:
+                    # Calculate welfare.
+                    w1_now = self.welfare(0, 0)
+                    w2_now = n[1].welfare(0, 0)
                     # Set directions of traded resources
-                    if m1_now > m2_now:
+                    if mrs_diff < 0:
                         sugar_flow = -1
                         spice_flow = 1
                         direction = False
@@ -297,11 +302,11 @@ class Agent:
                         my_spice_delta = int(spice_flow * 1)
                         neigh_sugar_delta = int(my_sugar_delta * -1)
                         neigh_spice_delta = int(my_spice_delta * -1)
+                    # Trade only if welfare of both agents increases.
                     # Trade only if neither agent loses resources.
                     my_trade_valid = self.sugar + my_sugar_delta > 0 and self.spice + my_spice_delta > 0
                     neigh_trade_valid = n[1].sugar + neigh_sugar_delta > 0 and n[1].spice + neigh_spice_delta > 0
                     if my_trade_valid and neigh_trade_valid:
-                        # Trade only if welfare of both agents increases.
                         w1_expected = self.welfare(my_sugar_delta, my_spice_delta)
                         w2_expected = n[1].welfare(neigh_sugar_delta, neigh_spice_delta)
                         if w1_expected > w1_now and w2_expected > w2_now:
@@ -317,10 +322,10 @@ class Agent:
                                 n[1].spice += neigh_spice_delta
                                 # Gather information for the trading statistics.
                                 # 1.) general trading stats
-                                self.sugar_traded += my_sugar_delta
-                                self.spice_traded += my_spice_delta
-                                self.sugar_price += price
-                                self.spice_price += 1 / price
+                                self.sugar_traded += abs(my_sugar_delta)
+                                self.spice_traded += abs(my_spice_delta)
+                                self.sugar_price += abs(price)
+                                self.spice_price += abs(1 / price)
                                 trade_count += 1
                                 # 2.) wealth change between tribes, if occurred
                                 if self.tribe_id != n[1].tribe_id:
@@ -328,6 +333,12 @@ class Agent:
                                     neigh_wealth_change = neigh_spice_delta + neigh_sugar_delta
                                     self.tribe.tribal_wealth[self.tribe_id] += my_wealth_change
                                     self.tribe.tribal_wealth[n[1].tribe_id] += neigh_wealth_change
+                            else:
+                                mrs_diff = 0
+                        else:
+                            mrs_diff = 0
+                    else:
+                        mrs_diff = 0
         # Finish up trading and save possibly gathered data.
         if trade_count > 0:
             self.sugar_price /= trade_count
@@ -335,7 +346,7 @@ class Agent:
 
     def r5_diseases(self, neighbors):
         """
-        All diseases, the agent is currently infected with, try to spread to its neighbors.
+        All diseases, the agent is currently infected with, are trying to spread to its neighbors.
         """
         for n in neighbors:
             if n[1] and not n[1].dead and not self.dead:
@@ -343,8 +354,8 @@ class Agent:
                     d.spread(n[1])
         # Let the immune system build another instance
         # and then attempt to fight the diseases.
-        self.im_sys_create_copy()
-        self.im_sys_fight_diseases()
+        self.im_create_antibodies()
+        self.immune_reaction()
         # Reset the metabolism values of the agent to clear all past diseases.
         # That way, the diseases just fought off by the immune system are not longer
         # afflicting the body and possible new diseases can act on the agent.
@@ -354,15 +365,15 @@ class Agent:
         for _, d in self.diseases.items():
             d.affect(self)
 
-    def im_sys_create_copy(self):
-        if random.random() < 0.01:
+    def im_create_antibodies(self):
+        if self.fertility[0] < self.age < self.fertility[1] and len(self.immune_system) <= 10:
             is_copy = copy.deepcopy(self.chromosome.immune_system)
             length = len(is_copy)
             index = random.choice(range(length))
             is_copy[index] = 1 - is_copy[index]
             self.immune_system.append("".join(map(str, is_copy)))
 
-    def im_sys_fight_diseases(self):
+    def immune_reaction(self):
         eliminated = set()
         for _, d in self.diseases.items():
             for i in self.immune_system:
@@ -371,7 +382,6 @@ class Agent:
                 # successfully healed from it and immune to future infections.
                 if i in d.genome_string:
                     eliminated.add(d.genome_string)
-                    print("> immune_system fought off a disease")
         # Remove all eliminated diseases from our agent dictionary
         for d in eliminated:
             del(self.diseases[d])

@@ -21,13 +21,14 @@ class ABM:
         total_wealth = 0
         c = gc.CELL_SIZE
         r = int(gc.CELL_SIZE / 2)
-        positions = [((x * c) + r, (y * c) + r)
-                     for x in range(gc.ABM_BOUNDS[0], gc.ABM_BOUNDS[1])
-                     for y in range(gc.ABM_BOUNDS[2], gc.ABM_BOUNDS[3])]
-        positions = random.sample(positions, gc.NUM_AGENTS)
-        random.shuffle(positions)
+        # Create a list with possible spawn positions for every tribe, then pack them all into a list.
+        position_list = []
+        for b in gc.ABM_BOUNDS:
+            positions = [((x * c) + r, (y * c) + r) for x in range(b[0], b[1]) for y in range(b[2], b[3])]
+            random.shuffle(positions)
+            position_list.append(positions)
 
-        for p in positions:
+        for _ in range(gc.NUM_AGENTS):
             meta_sugar = random.randint(gc.MIN_METABOLISM, gc.MAX_METABOLISM)
             meta_spice = random.randint(gc.MIN_METABOLISM, gc.MAX_METABOLISM)
             vision = random.randint(1, gc.VISION)
@@ -40,7 +41,7 @@ class ABM:
             sp = random.randint(gc.STARTING_SUGAR[0], gc.STARTING_SUGAR[1])
             d = random.randint(f[1], gc.MAX_AGENT_LIFE)
             c = [random.randint(0, gc.NUM_TRIBES - 1) for _ in range(11)]
-            imm_sys = [random.getrandbits(1) for _ in range(gc.IMMUNE_SYSTEM_GENOME_LENGTH)]
+            imm_sys = [random.getrandbits(gc.NUM_TRIBES - 1) for _ in range(gc.IMMUNE_SYSTEM_GENOME_LENGTH)]
             a = 0  # random.randint(0, int(gc.MAX_AGENT_LIFE / 2))
             gene_string = "{0:03b}".format(meta_sugar) + "{0:03b}".format(meta_spice)\
                           + "{0:06b}".format(su) + "{0:06b}".format(sp) \
@@ -49,6 +50,10 @@ class ABM:
             # We use generation to keep track of how far an agent has walked down the evolutionary road.
             generation = (0, 0)
             genome = (gene_string, gene_string, c, imm_sys, generation)
+
+            # Retrieve a spawn position from the position list belonging to its tribe.
+            tribe_id = max(set(c), key=c.count)
+            p = random.choice(position_list[tribe_id])
             self.agent_dict[p[0], p[1]] = Agent(p[0], p[1], gc.CELL_SIZE, su, sp, genome, a, self.tribes)
 
             # Update the tribal information

@@ -14,7 +14,6 @@ class EventHandler:
         self.mx = 0
         self.my = 0
         self.main = main
-        self.gc = main.gc
         self.disease = "b"
 
     def process_input(self):
@@ -35,8 +34,8 @@ class EventHandler:
 
     def mouse_motion(self):
         self.mx, self.my = pygame.mouse.get_pos()
-        self.mx = (self.mx / self.gc.CELL_SIZE)
-        self.my = (self.my / self.gc.CELL_SIZE)
+        self.mx = (self.mx / self.main.gc.CELL_SIZE)
+        self.my = (self.my / self.main.gc.CELL_SIZE)
 
     def mouse_action(self, button):
         # Click on left mouse button
@@ -46,8 +45,8 @@ class EventHandler:
                   (self.mx, self.my,
                    self.main.ca.ca_grid[int(self.mx), int(self.my)].sugar,
                    self.main.ca.ca_grid[int(self.mx), int(self.my)].spice))
-            agent_x = (math.floor(self.mx) * self.gc.CELL_SIZE) + int(self.gc.CELL_SIZE / 2)
-            agent_y = (math.floor(self.my) * self.gc.CELL_SIZE) + int(self.gc.CELL_SIZE / 2)
+            agent_x = (math.floor(self.mx) * self.main.gc.CELL_SIZE) + int(self.main.gc.CELL_SIZE / 2)
+            agent_y = (math.floor(self.my) * self.main.gc.CELL_SIZE) + int(self.main.gc.CELL_SIZE / 2)
             if (agent_x, agent_y) in self.main.abm.agent_dict:
                 agent_attributes = vars(self.main.abm.agent_dict[agent_x, agent_y].chromosome)
                 print("+----- AGENT INFO -----------------------------------------------------")
@@ -62,24 +61,24 @@ class EventHandler:
                   (self.mx, self.my,
                    self.main.ca.ca_grid[int(self.mx), int(self.my)].sugar,
                    self.main.ca.ca_grid[int(self.mx), int(self.my)].spice))
-            agent_x = (math.floor(self.mx) * self.gc.CELL_SIZE) + int(self.gc.CELL_SIZE / 2)
-            agent_y = (math.floor(self.my) * self.gc.CELL_SIZE) + int(self.gc.CELL_SIZE / 2)
+            agent_x = (math.floor(self.mx) * self.main.gc.CELL_SIZE) + int(self.main.gc.CELL_SIZE / 2)
+            agent_y = (math.floor(self.my) * self.main.gc.CELL_SIZE) + int(self.main.gc.CELL_SIZE / 2)
             # Create disease and infect selected agent.
             if (agent_x, agent_y) in self.main.abm.agent_dict:
-                dis_genome = [random.getrandbits(1) for _ in range(self.gc.DISEASE_GENOME_LENGTH)]
+                dis_genome = [random.getrandbits(1) for _ in range(self.main.gc.DISEASE_GENOME_LENGTH)]
                 if self.disease == "b":
                     bacteria = Bacteria(dis_genome)
                     self.main.abm.agent_dict[agent_x, agent_y].diseases[bacteria.genome_string] = bacteria
-                    print("> bacterial infection spawned")
+                    print("> bacterial infection spawned: %s", bacteria.genome_string)
                 if self.disease == "v":
                     virus = Virus(dis_genome)
                     self.main.abm.agent_dict[agent_x, agent_y].diseases[virus.genome_string] = virus
-                    print("> viral infection spawned")
+                    print("> viral infection spawned: %s", virus.genome_string)
 
     def keyboard_action(self, active_key):
         if active_key == pygame.K_SPACE:
-            self.gc.RUN_SIMULATION = not self.gc.RUN_SIMULATION
-            if self.gc.RUN_SIMULATION:
+            self.main.gc.RUN_SIMULATION = not self.main.gc.RUN_SIMULATION
+            if self.main.gc.RUN_SIMULATION:
                 print("> simulation started")
             else:
                 print("> simulation paused")
@@ -97,17 +96,17 @@ class EventHandler:
                 elif a.sugar < min_wealth:
                     min_wealth = a.sugar
             print("+----- GENERAL INFO ---------------------------------------------------")
-            print("+ > ticks: " + str(self.gc.TICKS) + " remaining agents: " + str(len(self.main.abm.agent_dict)))
+            print("+ > ticks: " + str(self.main.gc.TICKS) + " remaining agents: " + str(len(self.main.abm.agent_dict)))
             print("+ > fertile agents: " + str(i) + ", richest: " + str(max_wealth) + ", poorest: " + str(min_wealth))
             print("+----------------------------------------------------------------------")
             self.main.stats.plot()
 
         # r key is pressed, reset the simulation
         if active_key == pygame.K_r:
-            self.main.ca.__init__(self.main.visualizer, self.gc)
-            self.main.abm.__init__(self.main.visualizer, self.gc)
-            self.main.stats.__init__(self.main.abm, self.main.ca, self.gc)
-            self.gc.TICKS = 0
+            self.main.ca.__init__(self.main.visualizer, self.main.gc)
+            self.main.abm.__init__(self.main.visualizer, self.main.gc)
+            self.main.stats.__init__(self.main.abm, self.main.ca, self.main.gc)
+            self.main.gc.TICKS = 0
             #render_simulation(ca, abm, screen)
             print("> reset simulation")
 
@@ -124,7 +123,7 @@ class EventHandler:
         # b key is pressed, set disease-to-be-spawned to bacteria
         if active_key == pygame.K_b:
             self.disease = "b"
-            print("> set spawn-able disease to bacteria")
+            print("> set spawn-able disease to 'bacteria'")
 
         # NUMBER KEYS
         # 1 key is pressed
@@ -137,8 +136,8 @@ class EventHandler:
             # shift is pressed
             elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
                 # shift + 1: change landscape mode
-                self.gc.LANDSCAPE_MODE = 3
-                print("> set landscape mode to 3 (procedurally random)")
+                self.main.gc.LANDSCAPE_MODE = 1
+                print("> set landscape mode to 1 (plain)")
             else:
                 # only 1: change draw cells mode
                 self.main.visualizer.draw_cell_mode = 0
@@ -153,8 +152,8 @@ class EventHandler:
             # shift is pressed
             elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
                 # shift + 2: change landscape mode
-                self.gc.LANDSCAPE_MODE = 2
-                print("> set landscape mode to 2 (two hills)")
+                self.main.gc.LANDSCAPE_MODE = 2
+                print("> set landscape mode to 2 (procedurally random)")
             else:
                 # only 2: change draw cells mode
                 self.main.visualizer.draw_cell_mode = 1
@@ -169,8 +168,8 @@ class EventHandler:
             # shift is pressed
             elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
                 # shift + 3: change landscape mode
-                self.gc.LANDSCAPE_MODE = 1
-                print("> set landscape mode to 1 (random)")
+                self.main.gc.LANDSCAPE_MODE = 3
+                print("> set landscape mode to 3 (two hills)")
             else:
                 # only 3: change draw cells mode
                 self.main.visualizer.draw_cell_mode = 2
@@ -184,5 +183,5 @@ class EventHandler:
                 print("> set draw agent mode to 3 (diseases)")
             else:
                 # only 3: change draw cells mode
-                self.main.visualizer.draw_cell_mode = 2
+                self.main.visualizer.draw_cell_mode = 3
                 print("> set draw cell mode to 3 (diseases)")

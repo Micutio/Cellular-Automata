@@ -2,6 +2,7 @@ __author__ = 'Michael Wagner'
 __version__ = '1.0'
 
 import copy
+import random
 
 
 class Disease:
@@ -57,14 +58,20 @@ class Virus(Disease):
         """
         Initializer. Viruses have the fixed tag 'virus' in order to be identified by the system.
         """
-        super().__init__(genome, "virus")
+        half = int(len(genome) / 2)
+        virus_genome = genome[0: half]
+        super().__init__(virus_genome, "virus")
 
     def spread(self, agent):
         """
         It spreads to agents in the standard way: placing a copy into its disease list.
         """
         if not self.genome_string in agent.diseases:
+            genome_offspring = self.genome
+            index = random.choice(range(0, len(self.genome)))
+            genome_offspring[index] = 1 - genome_offspring[index]
             agent.diseases[self.genome_string] = copy.deepcopy(self)
+            agent.diseases[self.genome_string].genome = genome_offspring
 
     def affect(self, agent):
         """

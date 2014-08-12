@@ -89,11 +89,11 @@ class Visualization:
                     else:
                         has_virus = True
                 if has_bacteria:
-                    pygame.draw.circle(self.surface, (0, 255, 0), [agent.x, agent.y], radius, 0)
+                    pygame.draw.circle(self.surface, (0, 0, 255), [agent.x, agent.y], radius, 0)
                 else:
                     pygame.draw.circle(self.surface, (255, 255, 255), [agent.x, agent.y], radius, 0)
                 if has_virus:
-                    pygame.draw.circle(self.surface, (255, 255, 0), [agent.x, agent.y], radius - 2, 0)
+                    pygame.draw.circle(self.surface, (170, 170, 0), [agent.x, agent.y], radius - 2, 0)
                 else:
                     pygame.draw.circle(self.surface, (255, 255, 255), [agent.x, agent.y], radius - 2, 0)
         return

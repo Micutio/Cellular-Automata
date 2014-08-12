@@ -7,7 +7,7 @@ class GlobalConstants:
         ################################
         #     SIMULATION CONSTANTS     #
         ################################
-        self.NUM_AGENTS = 250
+        self.NUM_AGENTS = 200
         self.NUM_TRIBES = 2
         self.LANDSCAPE_MODE = 2  # 3 = two hills, 2 = procedural, 1 = randomized
         self.RUN_SIMULATION = False
@@ -16,10 +16,8 @@ class GlobalConstants:
         self.GRID_HEIGHT = 50 * self.CELL_SIZE
         # ABM_BOUNDS (x1, x2, y1, y2) describe a rectangle spanning
         # between the two points (x1, y1) and (x2, y2)
-        # Use one of the following three or define custom coordinates.
-        #self.ABM_BOUNDS = (0, 10, 40, 50)  # Spawn all agents in the lower left corner
-        #self.ABM_BOUNDS = (15, 35, 15, 35)  # Spawn all agents in the middle of the field
-        self.ABM_BOUNDS = (0, 50, 0, 50)  # Spawn the agents all over the field
+        # We use two rectangles to mark the areas the agents are spawning in.
+        self.ABM_BOUNDS = [(25, 50, 0, 25), (0, 25, 25, 50)]
         self.TICKS = 1
         self.MS_PER_TICK = 60
         self.TRIBE_COLORS = {0: (0, 0, 0),

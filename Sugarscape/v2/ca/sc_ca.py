@@ -32,9 +32,8 @@ class CA:
         if gc.LANDSCAPE_MODE == 1:
             for i in range(0, self.height):
                 for j in range(0, self.width):
-                    self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, 2,#random.randint(0, gc.MAX_SUGAR),
-                                                   2,#random.randint(0, gc.MAX_SUGAR),
-                                                   gc.GROWTH_PER_TICK, self.season)
+                    self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, 2, 2, gc.GROWTH_PER_TICK, self.season)
+
         elif gc.LANDSCAPE_MODE == 2:
             landscape_sugar = get_procedural_landscape(gc)
             landscape_spice = get_procedural_landscape(gc)
@@ -174,14 +173,14 @@ class CA:
 #########################################################################
 
 
-def get_procedural_landscape(GC):
+def get_procedural_landscape(gc):
     landscape = [[0 for _ in range(50)] for _ in range(50)]
     # First step: plant some 'seeds' for hills
     num_hills = random.randint(5, 15)
     for _ in range(num_hills):
         rand_x = random.randint(0, 49)
         rand_y = random.randint(0, 49)
-        landscape[rand_x][rand_y] = GC.MAX_SUGAR
+        landscape[rand_x][rand_y] = gc.MAX_SUGAR
     for _ in range(50):
         for i in range(1, 49):
             for j in range(1, 49):
@@ -190,7 +189,7 @@ def get_procedural_landscape(GC):
                 c3 = landscape[i][j - 1]
                 c4 = landscape[i][j + 1]
                 choice = random.choice([c1, c2, c3, c4])
-                if 0 < choice and landscape[i][j] < GC.MAX_SUGAR:
+                if 0 < choice and landscape[i][j] < gc.MAX_SUGAR:
                     landscape[i][j] = random.choice(range(1, choice + 1))
     return landscape
 

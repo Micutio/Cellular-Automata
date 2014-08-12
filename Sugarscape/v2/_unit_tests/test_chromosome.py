@@ -1,15 +1,17 @@
 from unittest import TestCase
 import unittest
 import random
-import sys, traceback
 from v2.abm.sc_genetics import Chromosome
 
 __author__ = 'Michl'
 
 
 class TestChromosome(TestCase):
-
+    """
+    The purpose of this test in to ensure that the encoding / decoding of chromosomes delivers the correct values.
+    """
     def setUp(self):
+        # Create new genome, encode the single attributes into bit strings and concatenate them.
         self.meta_sugar = random.randint(1, 4)
         self.meta_spice = random.randint(1, 4)
         self.vision = random.randint(1, 6)
@@ -32,6 +34,7 @@ class TestChromosome(TestCase):
 
     def test_sample(self):
         with self.assertRaises(ValueError):
+            # Hand new genome to chromosome, which decodes it automatically into attributes.
             chromosome = Chromosome(self.genome)
             meta_sugar = chromosome.meta_sugar
             meta_spice = chromosome.meta_spice
@@ -43,6 +46,7 @@ class TestChromosome(TestCase):
             d = chromosome.dying_age
             c = chromosome.culture
             imm_sys = chromosome.immune_system
+            # Assert that all the new attributes are the same as the old attributes.
             self.assertEqual(self.meta_sugar, meta_sugar)
             self.assertEqual(self.meta_spice, meta_spice)
             self.assertEqual(self.vision, vision)
