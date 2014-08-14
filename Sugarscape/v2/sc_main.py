@@ -59,7 +59,10 @@ class Sugarscape:
         self.gc.TICKS = 0
         self.gc.EXPERIMENT_RUN += 1
         #render_simulation(ca, abm, screen)
-        print("+ < resetting simulation")
+        print("+-[SYSTEM]---------------------------------------------------------------------+")
+        print("+ > simulation ended after %i ticks" % self.gc.TICKS)
+        print("+ > starting experiment run %i" % self.gc.EXPERIMENT_RUN)
+        print("+------------------------------------------------------------------------------+")
 
     def run_main_loop(self):
         """
@@ -90,7 +93,8 @@ class Sugarscape:
               "\n++ > [LEFT MOUSE BUTTON] show information about selected cell and agent       ++"
               "\n++ > [i] show simulation statistics                                           ++"
               "\n++ > [p] plot graphs with statistics and additional information               ++"
-              "\n+------------------------------------------------------------------------------+")
+              "\n+------------------------------------------------------------------------------+"
+              "\n+-----------------------------[Simulation LOG]---------------------------------+")
         while 1:
             # This block performs a simulation step.
             if GC.RUN_SIMULATION:
@@ -101,9 +105,6 @@ class Sugarscape:
             self.handler.process_input()
 
             if len(self.abm.agent_dict) == 0:
-                print("+-[SYSTEM]---------------------------------------------------------------------+")
-                print("+ > simulation ended after %i ticks" % self.gc.TICKS)
-                print("+------------------------------------------------------------------------------+")
                 self.reset_simulation()
 
 
