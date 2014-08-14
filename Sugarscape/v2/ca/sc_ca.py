@@ -6,7 +6,7 @@ __version__ = '1.0'
 # Original CA code taken from
 # "http://pygame.org/project-Cellular+Automata-1286-.html"
 
-from v2.ca.sc_cell import ClassCell
+from ca.sc_cell import ClassCell
 from numpy import *
 import random
 import copy
@@ -28,11 +28,14 @@ class CA:
         self.season_count = 0
         self.season = 1
         self.visualizer = visualizer
+        self.gc = gc
 
         if gc.LANDSCAPE_MODE == 1:
             for i in range(0, self.height):
                 for j in range(0, self.width):
-                    self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, 2, 2, gc.GROWTH_PER_TICK, self.season)
+                    self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, 2, 2, gc.GROWTH_PER_TICK,
+                                                   self.season, gc.POLLUTION_COEFFICIENTS,
+                                                   gc.MAX_POLLUTION)
 
         elif gc.LANDSCAPE_MODE == 2:
             landscape_sugar = get_procedural_landscape(gc)
@@ -40,14 +43,16 @@ class CA:
             for i in range(0, self.height):
                 for j in range(0, self.width):
                     self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, landscape_sugar[i][j], landscape_spice[i][j],
-                                                   gc.GROWTH_PER_TICK, self.season)
+                                                   gc.GROWTH_PER_TICK, self.season, gc.POLLUTION_COEFFICIENTS,
+                                                   gc.MAX_POLLUTION)
         elif gc.LANDSCAPE_MODE == 3:
             sugar_dist = get_two_hill_landscape()
             spice_dist = get_inverted_two_hill_landscape()
             for i in range(0, self.height):
                 for j in range(0, self.width):
                     self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, sugar_dist[i][j], spice_dist[j][i],
-                                                   gc.GROWTH_PER_TICK, self.season)
+                                                   gc.GROWTH_PER_TICK, self.season, gc.POLLUTION_COEFFICIENTS,
+                                                   gc.MAX_POLLUTION)
 
     def draw_cells(self):
         """
@@ -61,7 +66,8 @@ class CA:
         """
         This method updates the cellular automaton
         """
-        # self.ca_grid = update_from_neighs(ca_grid)
+        if self.gc.POLLUTION:
+            self.update_from_neighs()
         self.update_states()
         self.switch_season()
 
@@ -155,16 +161,15 @@ class CA:
         """
         Looping over all cells to gather all the neighbor information they need to update
         """
-
         for y in range(0, self.height):
             for x in range(0, self.width):
                 if y - 1 > -1 and x - 1 > -1 and x + 1 < self.width and y + 1 < self.height:
-                    self.ca_grid[x, y].sense_neigh(self.ca_grid[(x - 1), (y - 1)])  # Top Left
+                    #self.ca_grid[x, y].sense_neigh(self.ca_grid[(x - 1), (y - 1)])  # Top Left
                     self.ca_grid[x, y].sense_neigh(self.ca_grid[x, (y - 1)])  # Top
-                    self.ca_grid[x, y].sense_neigh(self.ca_grid[(x + 1), (y - 1)])  # Top Right
-                    self.ca_grid[x, y].sense_neigh(self.ca_grid[(x - 1), (y + 1)])  # Bottom Left
+                    #self.ca_grid[x, y].sense_neigh(self.ca_grid[(x + 1), (y - 1)])  # Top Right
+                    #self.ca_grid[x, y].sense_neigh(self.ca_grid[(x - 1), (y + 1)])  # Bottom Left
                     self.ca_grid[x, y].sense_neigh(self.ca_grid[x, (y + 1)])  # Bottom
-                    self.ca_grid[x, y].sense_neigh(self.ca_grid[(x + 1), (y + 1)])  # Bottom Right
+                    #self.ca_grid[x, y].sense_neigh(self.ca_grid[(x + 1), (y + 1)])  # Bottom Right
                     self.ca_grid[x, y].sense_neigh(self.ca_grid[(x - 1), y])  # Left
                     self.ca_grid[x, y].sense_neigh(self.ca_grid[(x + 1), y])  # Right
 

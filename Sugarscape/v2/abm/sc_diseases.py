@@ -45,7 +45,8 @@ class Bacteria(Disease):
         """
         In this version of Sugarscape bacteria affect agents by raising their sugar consumption.
         """
-        agent.meta_sugar += 1
+        agent.meta_sugar += 2
+        agent.meta_spice += 2
 
 
 class Virus(Disease):
@@ -79,5 +80,6 @@ class Virus(Disease):
         Additionally viruses inject a part of their dna into their hosts.
         Furthermore its own genome has a certain chance per tick to mutate.
         """
-        agent.meta_spice += 1
-        # TODO: Inject part of own genome into agent
+        agent.vision = max(agent.vision - 1, 0)
+        # TODO: Inject part of own genome into agent instead of just temporarily changing an attribute
+        # TODO: When genome injected into agent, give it the possibility to repair its genome, if the virus is defeated.

@@ -7,7 +7,7 @@ class ClassCell:
     This class models one cell of the CA, while the grid itself will be a dictionary of ClassCell instances.
     """
 
-    def __init__(self, x, y, c_size, sugar, spice, growth, period):
+    def __init__(self, x, y, c_size, sugar, spice, growth, period, pollution_coefficients, max_pollution):
         """
         Standard initializer.
         """
@@ -27,6 +27,10 @@ class ClassCell:
         self.tribe_id = -1
         self.visits = 0
         self.pollution = 0
+        self.num_neighs = 0
+        self.neigh_pollution = 0.0
+        self.pc = pollution_coefficients
+        self.max_p = max_pollution
 
     def update(self):
         """
@@ -43,3 +47,15 @@ class ClassCell:
             self.spice += self.growth
         else:
             self.spice_period_counter += 1
+
+        if self.num_neighs > 0:
+            self.pollution = min((self.neigh_pollution / self.num_neighs), self.max_p)
+            self.num_neighs = 0
+            self.neigh_pollution = 0
+
+    def sense_neigh(self, neighbor):
+        self.num_neighs += 1
+        self.neigh_pollution += neighbor.pollution
+
+    def pollute(self, production, metabolism):
+        self.pollution += (self.pc[0] * production) + (self.pc[1] * metabolism)

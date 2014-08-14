@@ -7,6 +7,7 @@ class GlobalConstants:
         ################################
         #     SIMULATION CONSTANTS     #
         ################################
+        self.EXPERIMENT_RUN = 1
         self.NUM_AGENTS = 200
         self.NUM_TRIBES = 2
         self.LANDSCAPE_MODE = 2  # 3 = two hills, 2 = procedural, 1 = randomized
@@ -47,3 +48,6 @@ class GlobalConstants:
         self.GROWTH_PER_TICK = 1
         self.GROWTH_PERIOD = 1
         self.TOROIDAL = False
+        self.POLLUTION = False
+        self.POLLUTION_COEFFICIENTS = (0.003, 0.004)
+        self.MAX_POLLUTION = 10

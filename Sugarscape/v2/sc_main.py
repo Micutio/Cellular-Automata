@@ -1,3 +1,5 @@
+from v2.abm.sc_abm import ABM
+
 __author__ = 'Michael Wagner'
 __version__ = '1.0'
 
@@ -11,12 +13,11 @@ __version__ = '1.0'
 
 import pygame
 
-from v2.abm.sc_abm import ABM
-from v2.ca.sc_ca import CA
-from v2.util.sc_stat import Statistics
-from v2.sc_global_constants import GlobalConstants
-from v2.util.sc_io_handler import EventHandler
-from v2.util.sc_visualization import Visualization
+from ca.sc_ca import CA
+from util.sc_stat import Statistics
+from sc_global_constants import GlobalConstants
+from util.sc_visualization import Visualization
+from util.sc_io_handler import EventHandler
 
 
 class Sugarscape:
@@ -51,10 +52,45 @@ class Sugarscape:
         self.abm.draw_agents()
         pygame.display.flip()
 
+    def reset_simulation(self):
+        self.ca.__init__(self.visualizer, self.gc)
+        self.abm.__init__(self.visualizer, self.gc)
+        self.stats.__init__(self.abm, self.ca, self.gc)
+        self.gc.TICKS = 0
+        self.gc.EXPERIMENT_RUN += 1
+        #render_simulation(ca, abm, screen)
+        print("+ < resetting simulation")
+
     def run_main_loop(self):
         """
         Main method. It executes the CA.
         """
+        print("\n+--------------------------[SUGARSCAPE SIMULATION]-----------------------------+"
+              "\n+ > version 08-2014                                                            +"
+              "\n+------------------------------------------------------------------------------+"
+              "\n+-[commands]-------------------------------------------------------------------+"
+              "\n++-[rendering]----------------------------------------------------------------++"
+              "\n++ > [1] cells show resources                                                 ++"
+              "\n++ > [2] cells show tribal territories                                        ++"
+              "\n++ > [3] cells show population density                                        ++"
+              "\n++ > [5] cells show pollution                                                 ++"
+              "\n++ > [CTRL] + [1] agents show age, gender and tribe                           ++"
+              "\n++ > [CTRL] + [2] agents show tribe                                           ++"
+              "\n++ > [CTRL] + [3] agents show gender                                          ++"
+              "\n++ > [CTRL] + [4] agents show diseases                                        ++"
+              "\n++-[simulation control]-------------------------------------------------------++"
+              "\n++ > [SPACE] pause/resume simulation                                          ++"
+              "\n++ > [SHIFT] + [1] plain resource distribution                                ++"
+              "\n++ > [SHIFT] + [2] random resource distribution                               ++"
+              "\n++ > [SHIFT] + [3] classic 'two-hill' resource distribution                   ++"
+              "\n++ > [RIGHT MOUSE BUTTON] infect agent with disease (default=bacteria)        ++"
+              "\n++ > [b] set disease infection on mouse click to 'bacteria'                   ++"
+              "\n++ > [v] set disease infection on mouse click to 'virus'                      ++"
+              "\n++-[simulation info]----------------------------------------------------------++"
+              "\n++ > [LEFT MOUSE BUTTON] show information about selected cell and agent       ++"
+              "\n++ > [i] show simulation statistics                                           ++"
+              "\n++ > [p] plot graphs with statistics and additional information               ++"
+              "\n+------------------------------------------------------------------------------+")
         while 1:
             # This block performs a simulation step.
             if GC.RUN_SIMULATION:
@@ -63,6 +99,12 @@ class Sugarscape:
                 self.gc.TICKS += 1
             self.render_simulation()
             self.handler.process_input()
+
+            if len(self.abm.agent_dict) == 0:
+                print("+-[SYSTEM]---------------------------------------------------------------------+")
+                print("+ > simulation ended after %i ticks" % self.gc.TICKS)
+                print("+------------------------------------------------------------------------------+")
+                self.reset_simulation()
 
 
 if __name__ == '__main__':

@@ -5,8 +5,9 @@ __version__ = '2.0'
 
 import random
 import copy
-from v2.abm.sc_agent import Agent
-from v2.abm.sc_tribes import Tribes
+from abm.sc_agent import Agent
+from abm.sc_tribes import Tribes
+from abm.sc_diseases import Bacteria, Virus
 
 
 class ABM:
@@ -18,6 +19,7 @@ class ABM:
         self.agent_dict = {}
         self.tribes = Tribes(gc.NUM_TRIBES)
         self.visualizer = visualizer
+        self.gc = gc
         total_wealth = 0
         c = gc.CELL_SIZE
         r = int(gc.CELL_SIZE / 2)
@@ -31,7 +33,7 @@ class ABM:
         for _ in range(gc.NUM_AGENTS):
             meta_sugar = random.randint(gc.MIN_METABOLISM, gc.MAX_METABOLISM)
             meta_spice = random.randint(gc.MIN_METABOLISM, gc.MAX_METABOLISM)
-            vision = random.randint(1, gc.VISION)
+            vision = random.randint(1, gc.VISION + 1)
             g = random.choice([0, 1])
             if g == 1:
                 f = (gc.F_FERTILITY_START, random.randint(gc.F_FERTILITY_END[0], gc.F_FERTILITY_END[1]))
@@ -74,6 +76,7 @@ class ABM:
             v.perceive_and_act(ca, self.agent_dict)
             # In case the agent has updated it's position we change the position list accordingly.
             self.update_position(v)
+            self.spawn_disease()
 
     def draw_agents(self):
         """
@@ -94,3 +97,22 @@ class ABM:
         else:
             self.agent_dict.pop((v.prev_x, v.prev_y))
             self.agent_dict[v.x, v.y] = v
+
+    def spawn_disease(self):
+        """
+        Have a small chance of spawning a disease in a random agent.
+        """
+        if random.random() < 0.0001:
+            # 50% chance of either, bacterial or viral infection
+            dis_genome = [random.getrandbits(1) for _ in range(self.gc.DISEASE_GENOME_LENGTH)]
+
+            # Choose a random agent as victim
+            victim = random.choice(list(self.agent_dict.values()))
+            if len(victim.diseases) == 0:
+                if random.choice([0, 1]) == 0:
+                    disease = Bacteria(dis_genome)
+                    print("+ > bacterial infection spawned: %s" % disease.genome_string)
+                else:
+                    disease = Virus(dis_genome)
+                    print("+ > viral infection spawned: %s" % disease.genome_string)
+                victim.diseases[disease.genome_string] = disease

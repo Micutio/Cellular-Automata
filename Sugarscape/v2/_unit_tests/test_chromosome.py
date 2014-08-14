@@ -1,7 +1,7 @@
 from unittest import TestCase
 import unittest
 import random
-from v2.abm.sc_genetics import Chromosome
+from abm.sc_genetics import Chromosome
 
 __author__ = 'Michl'
 
