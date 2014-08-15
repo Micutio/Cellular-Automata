@@ -346,12 +346,15 @@ class Agent:
         """
         for n in neighbors:
             if n[1] and n[1].tribe_id != self.tribe_id:
-                genes_to_flip = [n[1].culture.index(g) for g in n[1].culture if g != self.tribe_id]
-                index = random.choice(genes_to_flip)
-                n[1].chromosome.culture[index] = self.tribe_id
-                n[1].culture = n[1].chromosome.culture
                 old_id = n[1].tribe_id
-                n[1].tribe_id = max(set(n[1].culture), key=n[1].culture.count)
+                genes_to_flip = [n[1].culture.index(g) for g in n[1].culture if g != self.tribe_id]
+                if genes_to_flip:
+                    index = random.choice(genes_to_flip)
+                    n[1].chromosome.culture[index] = self.tribe_id
+                    n[1].culture = n[1].chromosome.culture
+                    n[1].tribe_id = max(set(n[1].culture), key=n[1].culture.count)
+                else:
+                    n[1].tribe_id = self.tribe_id
                 # In case the neighbor has been won over to my tribe,
                 # shift its wealth over.
                 if old_id != n[1].tribe_id:

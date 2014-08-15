@@ -12,6 +12,7 @@ __version__ = '1.0'
 # Also thanks to David Grotzki for comprehensive advice on biology and especially genetics.
 
 import pygame
+import random
 
 from ca.sc_ca import CA
 from util.sc_stat import Statistics
@@ -31,6 +32,9 @@ class Sugarscape:
         :param global_constants: All constants or important variables that control the simulation.
         """
         self.gc = global_constants
+
+        # Init random seed
+        random.seed(a="SUGARSCAPE", version=2)
 
         pygame.init()
         self.screen = pygame.display.set_mode((self.gc.GRID_WIDTH, self.gc.GRID_HEIGHT), pygame.RESIZABLE, 32)
@@ -56,13 +60,13 @@ class Sugarscape:
         self.ca.__init__(self.visualizer, self.gc)
         self.abm.__init__(self.visualizer, self.gc)
         self.stats.__init__(self.abm, self.ca, self.gc)
-        self.gc.TICKS = 0
         self.gc.EXPERIMENT_RUN += 1
         #render_simulation(ca, abm, screen)
         print("+-[SYSTEM]---------------------------------------------------------------------+")
         print("+ > simulation ended after %i ticks" % self.gc.TICKS)
         print("+ > starting experiment run %i" % self.gc.EXPERIMENT_RUN)
         print("+------------------------------------------------------------------------------+")
+        self.gc.TICKS = 0
 
     def run_main_loop(self):
         """
