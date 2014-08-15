@@ -20,6 +20,7 @@ class GlobalConstants:
         # We use two rectangles to mark the areas the agents are spawning in.
         self.ABM_BOUNDS = [(25, 50, 0, 25), (0, 25, 25, 50)]
         self.TICKS = 1
+        self.MAX_MEASURED_TICKS = 0
         self.MS_PER_TICK = 60
         self.TRIBE_COLORS = {0: (0, 0, 0),
                              1: (200, 200, 200),

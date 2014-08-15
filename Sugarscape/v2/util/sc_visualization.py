@@ -14,11 +14,10 @@ class Visualization:
         Initializes the visualization and passes the surface on which to draw.
         :param surface: Pygame surface object.
         """
+        # TODO: Comment what the modes do, for better overview.
         self.surface = surface
-        # 0 = tribe, 1 = gender, 2 = age
-        self.draw_agent_mode = 0
-        # 0 = resources+tribes, 1 = only tribes, 2 = heat map
-        self.draw_cell_mode = 0
+        self.draw_agent_mode = 1
+        self.draw_cell_mode = 1
         self.gc = gc
 
     def draw_agent(self, agent):
@@ -29,6 +28,8 @@ class Visualization:
         radius = int(agent.size / 2)
         if not agent.dead:
             if self.draw_agent_mode == 0:
+                return
+            elif self.draw_agent_mode == 1:
             # Show tribe and age of the agents.
                 if agent.age < agent.fertility[0]:  # Case 1: agent is a child.
                     red = 0
@@ -51,7 +52,7 @@ class Visualization:
                 color2 = self.gc.TRIBE_COLORS[agent.tribe_id]
                 pygame.draw.circle(self.surface, color1, [agent.x, agent.y], radius, 0)
                 pygame.draw.circle(self.surface, color2, [agent.x, agent.y], radius - 2, 0)
-            elif self.draw_agent_mode == 1:
+            elif self.draw_agent_mode == 2:
             # Show gender and age of the agents.
                 # Case 1: agent is a child.
                 if agent.age < agent.fertility[0]:
@@ -75,11 +76,11 @@ class Visualization:
                     blue = 160
                 color = (red, green, blue)
                 pygame.draw.circle(self.surface, color, [agent.x, agent.y], radius, 0)
-            elif self.draw_agent_mode == 2:
+            elif self.draw_agent_mode == 3:
                 # Show only tribe of the agents.
                 color = self.gc.TRIBE_COLORS[agent.tribe_id]
                 pygame.draw.circle(self.surface, color, [agent.x, agent.y], radius, 0)
-            elif self.draw_agent_mode == 3:
+            elif self.draw_agent_mode == 4:
                 # Show diseases.
                 has_virus = False
                 has_bacteria = False
@@ -105,6 +106,8 @@ class Visualization:
         :return:
         """
         if self.draw_cell_mode == 0:
+            return
+        elif self.draw_cell_mode == 1:
             # Show resources and tribal territory.
             col = self.calculate_cell_color(cell)
             col2 = (col[0] * 0.9, col[1] * 0.9, col[2] * 0.9)
@@ -116,7 +119,7 @@ class Visualization:
             pygame.draw.line(self.surface, col2, [lx + 1, ly + w1], [lx + h1, ly + w1], int(cell.w * 0.2))
             pygame.draw.line(self.surface, col2, [lx + h1, ly + 1], [lx + h1, ly + w1], int(cell.w * 0.2))
 
-        elif self.draw_cell_mode == 1:
+        elif self.draw_cell_mode == 2:
             # Show only tribal territories.
             if cell.tribe_id != -1:
                 color = self.gc.TRIBE_COLORS[cell.tribe_id]
@@ -125,13 +128,13 @@ class Visualization:
                 color = (80, 80, 80)
                 pygame.draw.rect(self.surface, color, (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
 
-        elif self.draw_cell_mode == 2:
+        elif self.draw_cell_mode == 3:
         # Show a heat map indicating which cells are the most visited.
             color = self.calculate_density_color(cell)
             pygame.draw.rect(self.surface, color, (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
-        elif self.draw_cell_mode == 3:
-            pygame.draw.rect(self.surface, (0, 0, 0), (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
         elif self.draw_cell_mode == 4:
+            pygame.draw.rect(self.surface, (0, 0, 0), (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
+        elif self.draw_cell_mode == 5:
             # Show resources and tribal territory.
             col = self.calculate_cell_color(cell)
             col2 = (col[0] * 0.9, col[1] * 0.9, col[2] * 0.9)

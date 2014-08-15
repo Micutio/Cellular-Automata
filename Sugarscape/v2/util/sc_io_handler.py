@@ -124,12 +124,18 @@ class EventHandler:
             print("+ < set spawn-able disease to 'bacteria'")
 
         # NUMBER KEYS
+        # 0 is pressed
+        if active_key == pygame.K_0:
+            print("+ < set draw cell and agent mode to 'disabled'")
+            self.main.visualizer.draw_agent_mode = 0
+            self.main.visualizer.draw_cell_mode = 0
+            self.main.screen.fill((0, 0, 0))
         # 1 key is pressed
         if active_key == pygame.K_1:
             # ctrl is pressed
             if pygame.key.get_mods() & pygame.KMOD_CTRL:
                 # ctrl + 1: change draw agent mode
-                self.main.visualizer.draw_agent_mode = 0
+                self.main.visualizer.draw_agent_mode = 1
                 print("+ < set draw agent mode to 0 (tribe and age)")
             # shift is pressed
             elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
@@ -138,14 +144,14 @@ class EventHandler:
                 print("+ < set landscape mode to 1 (plain)")
             else:
                 # only 1: change draw cells mode
-                self.main.visualizer.draw_cell_mode = 0
+                self.main.visualizer.draw_cell_mode = 1
                 print("+ < set draw cell mode to 0 (resources)")
         # 2 key is pressed
         if active_key == pygame.K_2:
             # ctrl is also pressed
             if pygame.key.get_mods() & pygame.KMOD_CTRL:
                 # ctrl + 2: change draw agent mode
-                self.main.visualizer.draw_agent_mode = 1
+                self.main.visualizer.draw_agent_mode = 2
                 print("+ < set draw agent mode to 1 (gender)")
             # shift is pressed
             elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
@@ -154,14 +160,14 @@ class EventHandler:
                 print("+ < set landscape mode to 2 (procedurally random)")
             else:
                 # only 2: change draw cells mode
-                self.main.visualizer.draw_cell_mode = 1
+                self.main.visualizer.draw_cell_mode = 2
                 print("+ < set draw cell mode to 1 (tribal territories)")
         # 3 key is pressed
         if active_key == pygame.K_3:
             # ctrl is also pressed
             if pygame.key.get_mods() & pygame.KMOD_CTRL:
                 # ctrl + 3: change draw agent mode
-                self.main.visualizer.draw_agent_mode = 2
+                self.main.visualizer.draw_agent_mode = 3
                 print("+ < set draw agent mode to 2 (tribe)")
             # shift is pressed
             elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
@@ -170,18 +176,18 @@ class EventHandler:
                 print("+ < set landscape mode to 3 (two hills)")
             else:
                 # only 3: change draw cells mode
-                self.main.visualizer.draw_cell_mode = 2
+                self.main.visualizer.draw_cell_mode = 3
                 print("+ < set draw cell mode to 2 (heat-map)")
         # 4 key is pressed
         if active_key == pygame.K_4:
             # ctrl is also pressed
             if pygame.key.get_mods() & pygame.KMOD_CTRL:
                 # ctrl + 4: change draw agent mode
-                self.main.visualizer.draw_agent_mode = 3
+                self.main.visualizer.draw_agent_mode = 4
                 print("+ < set draw agent mode to 3 (diseases)")
             else:
                 # only 3: change draw cells mode
-                self.main.visualizer.draw_cell_mode = 3
+                self.main.visualizer.draw_cell_mode = 4
                 print("+ < set draw cell mode to 3 (diseases)")
         if active_key == pygame.K_5:
             self.main.visualizer.draw_cell_mode = 4

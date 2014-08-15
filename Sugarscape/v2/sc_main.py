@@ -61,9 +61,12 @@ class Sugarscape:
         self.abm.__init__(self.visualizer, self.gc)
         self.stats.__init__(self.abm, self.ca, self.gc)
         self.gc.EXPERIMENT_RUN += 1
+        if self.gc.TICKS > self.gc.MAX_MEASURED_TICKS:
+            self.gc.MAX_MEASURED_TICKS = self.gc.TICKS
         #render_simulation(ca, abm, screen)
         print("+-[SYSTEM]---------------------------------------------------------------------+")
-        print("+ > simulation ended after %i ticks" % self.gc.TICKS)
+        print("+ > simulation ended after %i ticks (longest ever recorded: %i)"
+              % (self.gc.TICKS, self.gc.MAX_MEASURED_TICKS))
         print("+ > starting experiment run %i" % self.gc.EXPERIMENT_RUN)
         print("+------------------------------------------------------------------------------+")
         self.gc.TICKS = 0
@@ -77,6 +80,7 @@ class Sugarscape:
               "\n+------------------------------------------------------------------------------+"
               "\n+-[commands]-------------------------------------------------------------------+"
               "\n++-[rendering]----------------------------------------------------------------++"
+              "\n++ > [0] no rendering at all (speeds up the simulation)                       ++"
               "\n++ > [1] cells show resources                                                 ++"
               "\n++ > [2] cells show tribal territories                                        ++"
               "\n++ > [3] cells show population density                                        ++"
