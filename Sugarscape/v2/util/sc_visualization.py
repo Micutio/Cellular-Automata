@@ -106,6 +106,7 @@ class Visualization:
         :return:
         """
         if self.draw_cell_mode == 0:
+            # Do nothing at all, disable drawing.
             return
         elif self.draw_cell_mode == 1:
             # Show resources and tribal territory.
@@ -135,7 +136,7 @@ class Visualization:
         elif self.draw_cell_mode == 4:
             pygame.draw.rect(self.surface, (0, 0, 0), (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
         elif self.draw_cell_mode == 5:
-            # Show resources and tribal territory.
+            # Show pollution.
             col = self.calculate_cell_color(cell)
             col2 = (col[0] * 0.9, col[1] * 0.9, col[2] * 0.9)
             pygame.draw.rect(self.surface, col, (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
@@ -149,6 +150,17 @@ class Visualization:
             c_y = int(cell.y * cell.h + (cell.h / 2))
             r = int((cell.w / 2) * (cell.pollution / self.gc.MAX_POLLUTION))
             pygame.draw.circle(self.surface, (50, 50, 50), [c_x, c_y], r, 0)
+        elif self.draw_cell_mode == 6:
+            col = self.calculate_cell_color(cell)
+            size = (cell.sugar + cell.spice) / (self.gc.MAX_SUGAR * 2)
+            offset_w = int(((1 - size) * cell.w) / 2)
+            offset_h = int(((1 - size) * cell.h) / 2)
+            x = cell.x * cell.w + offset_w
+            y = cell.y * cell.h + offset_h
+            new_w = int(cell.w * size)
+            new_h = int(cell.h * size)
+            pygame.draw.rect(self.surface, (0, 0, 0), (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
+            pygame.draw.rect(self.surface, col, (x, y, new_w, new_h), 0)
         return
 
     def calculate_cell_color(self, cell):
