@@ -13,7 +13,7 @@ import copy
 
 
 class CA:
-    def __init__(self, visualizer, gc):
+    def __init__(self, visualizer, gc, ls_sugar=None, ls_spice=None):
         """
         Initializes and returns the cellular automaton.
         The CA is a dictionary and not a list of lists
@@ -29,30 +29,30 @@ class CA:
         self.season = 1
         self.visualizer = visualizer
         self.gc = gc
+        self.landscape_sugar = []
+        self.landscape_spice = []
 
-        if gc.LANDSCAPE_MODE == 1:
-            for i in range(0, self.height):
-                for j in range(0, self.width):
-                    self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, 2, 2, gc.GROWTH_PER_TICK,
-                                                   self.season, gc.POLLUTION_COEFFICIENTS,
-                                                   gc.MAX_POLLUTION)
+        # In case we load a landscape from file, initialize sugar and spice accordingly.
+        if ls_sugar and ls_spice:
+            self.landscape_sugar = ls_sugar
+            self.landscape_spice = ls_spice
+        # Or else build up the landscape from scratch
+        else:
+            if gc.LANDSCAPE_MODE == 1:
+                self.landscape_sugar = get_plain_landscape(gc)
+                self.landscape_spice = get_plain_landscape(gc)
+            elif gc.LANDSCAPE_MODE == 2:
+                self.landscape_sugar = get_procedural_landscape(gc)
+                self.landscape_spice = get_procedural_landscape(gc)
+            elif gc.LANDSCAPE_MODE == 3:
+                self.landscape_sugar = get_two_hill_landscape()
+                self.landscape_spice = get_inverted_two_hill_landscape()
 
-        elif gc.LANDSCAPE_MODE == 2:
-            landscape_sugar = get_procedural_landscape(gc)
-            landscape_spice = get_procedural_landscape(gc)
-            for i in range(0, self.height):
-                for j in range(0, self.width):
-                    self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, landscape_sugar[i][j], landscape_spice[i][j],
-                                                   gc.GROWTH_PER_TICK, self.season, gc.POLLUTION_COEFFICIENTS,
-                                                   gc.MAX_POLLUTION)
-        elif gc.LANDSCAPE_MODE == 3:
-            sugar_dist = get_two_hill_landscape()
-            spice_dist = get_inverted_two_hill_landscape()
-            for i in range(0, self.height):
-                for j in range(0, self.width):
-                    self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, sugar_dist[i][j], spice_dist[j][i],
-                                                   gc.GROWTH_PER_TICK, self.season, gc.POLLUTION_COEFFICIENTS,
-                                                   gc.MAX_POLLUTION)
+        for i in range(0, self.height):
+            for j in range(0, self.width):
+                self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, self.landscape_sugar[i][j],
+                                               self.landscape_spice[j][i], gc.GROWTH_PER_TICK,
+                                               self.season, gc.POLLUTION_COEFFICIENTS, gc.MAX_POLLUTION)
 
     def draw_cells(self):
         """
@@ -176,6 +176,11 @@ class CA:
 #########################################################################
 ###                           OTHER METHODS                           ###
 #########################################################################
+
+
+def get_plain_landscape(gc):
+    landscape = [[2 for _ in range(50)] for _ in range(50)]
+    return landscape
 
 
 def get_procedural_landscape(gc):

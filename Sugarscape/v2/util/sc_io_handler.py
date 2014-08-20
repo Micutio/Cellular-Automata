@@ -5,6 +5,9 @@ import pygame
 import sys
 import math
 import random
+import pickle
+import os, os.path
+
 from pygame.locals import *
 from abm.sc_diseases import Virus, Bacteria
 
@@ -109,9 +112,18 @@ class EventHandler:
             self.main.reset_simulation()
 
         # s key is pressed, perform one step of the simulation
+        # if ctrl + s is pressed, save the current configuration
         if active_key == pygame.K_s:
-            self.main.step_simulation()
-            self.main.render_simulation()
+            if pygame.key.get_mods() & pygame.KMOD_CTRL:
+                self.save_sim_status_to_file()
+            else:
+                self.main.step_simulation()
+                self.main.render_simulation()
+
+        # l key is pressed, load saved configuration
+        if active_key == pygame.K_l:
+            if pygame.key.get_mods() & pygame.KMOD_CTRL:
+                self.load_sim_status_from_file()
 
         # v key is pressed, set disease-to-be-spawned to virus
         if active_key == pygame.K_v:
@@ -192,3 +204,36 @@ class EventHandler:
         if active_key == pygame.K_5:
             self.main.visualizer.draw_cell_mode = 4
             print("+ < set draw cell mode to 4 (pollution)")
+
+    def save_sim_status_to_file(self):
+        filename = self.main.gc.FILE_PATH + "sgrscp_" + str(self.main.gc.TICKS) + ".sav"
+        sim_state = {"ca_sugar": self.main.ca.landscape_sugar,
+                     "ca_spice": self.main.ca.landscape_spice,
+                     "random_state": self.main.random_state}
+        with open(filename, "wb") as handle:
+            pickle.dump(sim_state, handle)
+        print("+ > saved landscape to file")
+
+    def load_sim_status_from_file(self):
+        found_files = [name for name in os.listdir(self.main.gc.FILE_PATH)
+                       if os.path.isfile(name) and "sgrscp_" in name]
+        l = len(found_files)
+        if l == 0:
+            print("+ < ERROR: no file found")
+            return
+        elif l == 1:
+            file = found_files[0]
+        else:
+            print("+ > found multiple files:")
+            for name in found_files:
+                print("+ >> [" + str(found_files.index(name)) + "] " + name)
+            index = int(input("+ < enter number of file to load: "))
+            file = found_files[index]
+
+        print("+ < loading file: " + file)
+
+        # If we found a file to load, load it.
+        # First reset the simulation and then insert the loaded properties into the simulation run.
+        with open(file, "rb") as handle:
+            sim_state = pickle.load(handle)
+            self.main.reset_simulation(sim_state)

@@ -10,7 +10,7 @@ class GlobalConstants:
         self.EXPERIMENT_RUN = 1
         self.NUM_AGENTS = 200
         self.NUM_TRIBES = 2
-        self.LANDSCAPE_MODE = 2  # 3 = two hills, 2 = procedural, 1 = randomized
+        self.LANDSCAPE_MODE = 2  # 1 = randomized, 2 = procedural, 3 = two hills, 4 = use same as last time
         self.RUN_SIMULATION = False
         self.CELL_SIZE = 15
         self.GRID_WIDTH = 50 * self.CELL_SIZE
@@ -52,3 +52,7 @@ class GlobalConstants:
         self.POLLUTION = False
         self.POLLUTION_COEFFICIENTS = (0.003, 0.004)
         self.MAX_POLLUTION = 10
+        ################################
+        #      UTILITY CONSTANTS       #
+        ################################
+        self.FILE_PATH = "./"
