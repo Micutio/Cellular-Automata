@@ -1,7 +1,9 @@
 *.pyc
+*.sav
 .idea
 /LatticeGasCA_v1/.idea
 /LatticeGasCA_v2/.idea
 /Sugarscape_v1/.idea
 /Sugarscape_v2/.idea
 /ThermalCreep/.idea
+*.sav
