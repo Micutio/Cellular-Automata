@@ -26,6 +26,7 @@ This repository contains a collection of simple simulations based on cellular au
     * **currently in development**
 
 **Technical Requirements**
+
 All of the sub-projects are written completely in Python 3.4 and use the Pygame engine for visualization.
 Required libraries are:
 * Matplotlib
@@ -35,4 +36,5 @@ Required libraries are:
 all of which can be found here: http://www.lfd.uci.edu/~gohlke/pythonlibs/ (windows only)
 
 **Media**
+
 This [short clip](http://www.youtube.com/watch?v=930o5KScl-o) shows the Sugarscape V2 in action.
