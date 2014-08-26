@@ -22,10 +22,10 @@ class EventHandler:
     def process_input(self):
         for event in pygame.event.get():
             # The 'x' on the window is clicked
-            if event.type == QUIT:
+            if event.type == pygame.QUIT:
                 sys.exit()
             # Mouse motion
-            elif event.type == MOUSEMOTION:
+            elif event.type == pygame.MOUSEMOTION:
                 self.mouse_motion()
             # Mouse action
             elif event.type == pygame.MOUSEBUTTONUP:
@@ -241,3 +241,15 @@ class EventHandler:
         with open(file, "rb") as handle:
             sim_state = pickle.load(handle)
             self.main.reset_simulation(sim_state)
+
+
+class Terminal:
+    def __init__(self):
+        self.red = "\x1b[0;31m"
+        self.green = "\x1b[0;32m"
+        self.yellow = "\x1b[0;33m"
+        self.blue = "\x1b[0;34m"
+        self.pink = "\x1b[0;35m"
+        self.teal = "\x1b[0;36"
+        self.white = "\x1b[0;37m"
+        self.endc = "\x1b[0m"

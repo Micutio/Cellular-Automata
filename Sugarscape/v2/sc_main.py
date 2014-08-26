@@ -17,7 +17,7 @@ from ca.sc_ca import CA
 from util.sc_stat import Statistics
 from sc_global_constants import GlobalConstants
 from util.sc_visualization import Visualization
-from util.sc_io_handler import EventHandler
+from util.sc_io_handler import EventHandler, Terminal
 
 
 class Sugarscape:
@@ -37,6 +37,7 @@ class Sugarscape:
         # Save random state at the beginning of the run in case
         # we want to save and load the exact same sim instance later.
         self.random_state = random.getstate()
+        self.terminal = Terminal()
 
         pygame.init()
         self.screen = pygame.display.set_mode((self.gc.GRID_WIDTH, self.gc.GRID_HEIGHT), pygame.RESIZABLE, 32)
@@ -51,7 +52,7 @@ class Sugarscape:
         return
 
     def display_info(self):
-        print("\n\033[94m--------------------------[SUGARSCAPE SIMULATION]------------------------------"
+        print("\n--------------------------[SUGARSCAPE SIMULATION]------------------------------"
               "\n > version 08-2014                                                             "
               "\n-------------------------------------------------------------------------------"
               "\n [COMMANDS]------------------------------------------------------------------- "
