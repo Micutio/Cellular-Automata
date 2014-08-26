@@ -207,9 +207,9 @@ class CA:
                     a2[i][j] = a[i][j]
                 except IndexError:
                     a2[i][j] = 0
-        for l in range(self.gc.dimx - 1, -1, -1):
+        for l in range(self.gc.dim_x - 1, -1, -1):
             a3.append(a2[l])
-        return a3
+        return a2
 
     def get_inverted_two_hill_landscape(self):
         a = two_hill_landscape
@@ -221,7 +221,7 @@ class CA:
                     a2[j][i] = a[i][j]
                 except IndexError:
                     a2[j][i] = 0
-        for l in range(self.gc.dimx - 1, -1, -1):
+        for l in range(self.gc.dim_x - 1, -1, -1):
             a3.append(a2[l])
         return a3
 
