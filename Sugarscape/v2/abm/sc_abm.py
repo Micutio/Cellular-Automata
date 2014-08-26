@@ -111,8 +111,8 @@ class ABM:
             if len(victim.diseases) == 0:
                 if random.choice([0, 1]) == 0:
                     disease = Bacteria(dis_genome)
-                    print("+ > bacterial infection spawned: %s" % disease.genome_string)
+                    print(" > bacterial infection spawned: %s" % disease.genome_string)
                 else:
                     disease = Virus(dis_genome)
-                    print("+ > viral infection spawned: %s" % disease.genome_string)
+                    print(" > viral infection spawned: %s" % disease.genome_string)
                 victim.diseases[disease.genome_string] = disease

@@ -1,5 +1,3 @@
-from v2.abm.sc_abm import ABM
-
 __author__ = 'Michael Wagner'
 __version__ = '1.0'
 
@@ -14,6 +12,7 @@ __version__ = '1.0'
 import pygame
 import random
 
+from abm.sc_abm import ABM
 from ca.sc_ca import CA
 from util.sc_stat import Statistics
 from sc_global_constants import GlobalConstants
@@ -48,7 +47,42 @@ class Sugarscape:
         self.abm = ABM(self.visualizer, self.gc)
         self.handler = EventHandler(self)
         self.stats = Statistics(self.abm, self.ca, self.gc)
+        self.display_info()
         return
+
+    def display_info(self):
+        print("\n\033[94m--------------------------[SUGARSCAPE SIMULATION]------------------------------"
+              "\n > version 08-2014                                                             "
+              "\n-------------------------------------------------------------------------------"
+              "\n [COMMANDS]------------------------------------------------------------------- "
+              "\n  [RENDERING]----------------------------------------------------------------  "
+              "\n   > [0] no rendering at all (speeds up the simulation)                        "
+              "\n   > [1] cells show resources                                                  "
+              "\n   > [2] cells show tribal territories                                         "
+              "\n   > [3] cells show population density                                         "
+              "\n   > [5] cells show pollution                                                  "
+              "\n   > [CTRL] + [1] agents show age, gender and tribe                            "
+              "\n   > [CTRL] + [2] agents show tribe                                            "
+              "\n   > [CTRL] + [3] agents show gender                                           "
+              "\n   > [CTRL] + [4] agents show diseases                                         "
+              "\n                                                                               "
+              "\n  [SIMULATION CONTROL]-------------------------------------------------------  "
+              "\n   > [SPACE] pause/resume simulation                                           "
+              "\n   > [RIGHT MOUSE BUTTON] infect agent with disease (default=bacteria)         "
+              "\n   > [b] set disease infection on mouse click to 'bacteria'                    "
+              "\n   > [v] set disease infection on mouse click to 'virus'                       "
+              "\n   > [SHIFT] + [1] initialize next run with plain resource distribution        "
+              "\n   > [SHIFT] + [2] initialize next run with random resource distribution       "
+              "\n   > [SHIFT] + [3] initialize next run with classic 'two-hill' resource dist.  "
+              "\n   > [CTRL] + [s] save simulation configuration into file                      "
+              "\n   > [CTRL] + [l] load simulation configuration from file                      "
+              "\n                                                                               "
+              "\n  [SIMULATION INFO]----------------------------------------------------------  "
+              "\n   > [LEFT MOUSE BUTTON] show information about selected cell and agent        "
+              "\n   > [i] show simulation statistics                                            "
+              "\n   > [p] plot graphs with statistics and additional information                "
+              "\n  ---------------------------------------------------------------------------  "
+              "\n                                                                               ")
 
     def step_simulation(self):
         self.abm.cycle_system(self.ca)
@@ -68,11 +102,11 @@ class Sugarscape:
             self.handler.save_sim_status_to_file()
 
         # Print out some information about the reset.
-        print("+-[SYSTEM]---------------------------------------------------------------------+")
-        print("+ > simulation ended after %i ticks (longest ever recorded: %i)"
+        print("[SIMULATION][SYSTEM]---------------------------------------------------------")
+        print(" > simulation ended after %i ticks (longest ever recorded: %i)"
               % (self.gc.TICKS, self.gc.MAX_MEASURED_TICKS))
-        print("+ > starting experiment run %i" % self.gc.EXPERIMENT_RUN)
-        print("+------------------------------------------------------------------------------+")
+        print(" > starting experiment run %i" % self.gc.EXPERIMENT_RUN)
+        print("-----------------------------------------------------------------------------")
         self.gc.TICKS = 0
 
         # Save random state at the beginning of the run in case
@@ -95,38 +129,10 @@ class Sugarscape:
         """
         Main method. It executes the CA.
         """
-        print("\n+--------------------------[SUGARSCAPE SIMULATION]-----------------------------+"
-              "\n+ > version 08-2014                                                            +"
-              "\n+------------------------------------------------------------------------------+"
-              "\n+-[commands]-------------------------------------------------------------------+"
-              "\n++-[rendering]----------------------------------------------------------------++"
-              "\n++ > [0] no rendering at all (speeds up the simulation)                       ++"
-              "\n++ > [1] cells show resources                                                 ++"
-              "\n++ > [2] cells show tribal territories                                        ++"
-              "\n++ > [3] cells show population density                                        ++"
-              "\n++ > [5] cells show pollution                                                 ++"
-              "\n++ > [CTRL] + [1] agents show age, gender and tribe                           ++"
-              "\n++ > [CTRL] + [2] agents show tribe                                           ++"
-              "\n++ > [CTRL] + [3] agents show gender                                          ++"
-              "\n++ > [CTRL] + [4] agents show diseases                                        ++"
-              "\n++----------------------------------------------------------------------------++"
-              "\n++-[simulation control]-------------------------------------------------------++"
-              "\n++ > [SPACE] pause/resume simulation                                          ++"
-              "\n++ > [RIGHT MOUSE BUTTON] infect agent with disease (default=bacteria)        ++"
-              "\n++ > [b] set disease infection on mouse click to 'bacteria'                   ++"
-              "\n++ > [v] set disease infection on mouse click to 'virus'                      ++"
-              "\n++ > [SHIFT] + [1] initialize next run with plain resource distribution       ++"
-              "\n++ > [SHIFT] + [2] initialize next run with random resource distribution      ++"
-              "\n++ > [SHIFT] + [3] initialize next run with classic 'two-hill' resource dist. ++"
-              "\n++ > [CTRL] + [s] save simulation configuration into file                     ++"
-              "\n++ > [CTRL] + [l] load simulation configuration from file                     ++"
-              "\n++----------------------------------------------------------------------------++"
-              "\n++-[simulation info]----------------------------------------------------------++"
-              "\n++ > [LEFT MOUSE BUTTON] show information about selected cell and agent       ++"
-              "\n++ > [i] show simulation statistics                                           ++"
-              "\n++ > [p] plot graphs with statistics and additional information               ++"
-              "\n++----------------------------------------------------------------------------++"
-              "\n+-----------------------------[Simulation LOG]---------------------------------+")
+
+        print("------------------------------[SIMULATION LOG]---------------------------------\n"
+              "                                                                               ")
+
         while 1:
             # This block performs a simulation step.
             if GC.RUN_SIMULATION:
