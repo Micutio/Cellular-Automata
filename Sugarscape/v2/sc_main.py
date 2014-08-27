@@ -17,7 +17,7 @@ from ca.sc_ca import CA
 from util.sc_stat import Statistics
 from sc_global_constants import GlobalConstants
 from util.sc_visualization import Visualization
-from util.sc_io_handler import EventHandler, Terminal
+from util.sc_io_handling import EventHandler, Terminal
 
 
 class Sugarscape:

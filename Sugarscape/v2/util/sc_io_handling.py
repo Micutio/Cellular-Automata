@@ -8,7 +8,6 @@ import random
 import pickle
 import os
 import os.path
-from pygame.locals import *
 from abm.sc_diseases import Virus, Bacteria
 
 
@@ -208,7 +207,7 @@ class EventHandler:
         if active_key == pygame.K_6:
             self.main.visualizer.draw_cell_mode = 6
             print(" < set draw cell mode to 5 (variable cell size)")
-            
+
     def save_sim_status_to_file(self):
         filename = self.main.gc.FILE_PATH + "sgrscp_" + str(self.main.gc.TICKS) + ".sav"
         sim_state = {"ca_sugar": self.main.ca.landscape_sugar,

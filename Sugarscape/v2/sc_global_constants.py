@@ -7,21 +7,22 @@ class GlobalConstants:
         ################################
         #     SIMULATION CONSTANTS     #
         ################################
-        self.EXPERIMENT_RUN = 1
+        self.RUN_SIMULATION = False
         self.NUM_AGENTS = 200
         self.NUM_TRIBES = 2
-        self.LANDSCAPE_MODE = 2  # 1 = randomized, 2 = procedural, 3 = two hills, 4 = use same as last time
-        self.RUN_SIMULATION = False
         self.CELL_SIZE = 12
-        self.dim_x = 50  # How many cells is the ca wide?
-        self.dim_y = 50  # How many cells is the ca high?
-        self.GRID_WIDTH = self.dim_x * self.CELL_SIZE
-        self.GRID_HEIGHT = self.dim_y * self.CELL_SIZE
+        self.DIM_X = 50  # How many cells is the ca wide?
+        self.DIM_Y = 50  # How many cells is the ca high?
+        self.GRID_WIDTH = self.DIM_X * self.CELL_SIZE
+        self.GRID_HEIGHT = self.DIM_Y * self.CELL_SIZE
         # ABM_BOUNDS (x1, x2, y1, y2) describe a rectangle spanning
         # between the two points (x1, y1) and (x2, y2)
         # We use two rectangles to mark the areas the agents are spawning in.
-        self.ABM_BOUNDS = [(25, 50, 0, 25), (0, 25, 25, 50)]
+        half_x = int(self.DIM_X / 2)
+        half_y = int(self.DIM_Y / 2)
+        self.ABM_BOUNDS = [(half_x, 50, 0, half_y), (0, half_x, half_y, 50)]
         self.TICKS = 1
+        self.EXPERIMENT_RUN = 1
         self.MAX_MEASURED_TICKS = 0
         self.MS_PER_TICK = 60
         self.TRIBE_COLORS = {0: (0, 0, 0),
@@ -47,6 +48,7 @@ class GlobalConstants:
         ################################
         #         CA CONSTANTS         #
         ################################
+        self.LANDSCAPE_MODE = 2  # 1 = randomized, 2 = procedural, 3 = two hills, 4 = use same as last time
         self.MAX_SUGAR = 4
         self.GROWTH_PER_TICK = 1
         self.GROWTH_PERIOD = 1

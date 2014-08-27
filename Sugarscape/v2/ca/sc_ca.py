@@ -174,20 +174,20 @@ class CA:
                     self.ca_grid[x, y].sense_neigh(self.ca_grid[(x + 1), y])  # Right
 
     def get_plain_landscape(self):
-        landscape = [[2 for _ in range(self.gc.dim_y)] for _ in range(self.gc.dim_x)]
+        landscape = [[2 for _ in range(self.gc.DIM_Y)] for _ in range(self.gc.DIM_X)]
         return landscape
 
     def get_procedural_landscape(self):
-        landscape = [[0 for _ in range(self.gc.dim_y)] for _ in range(self.gc.dim_x)]
+        landscape = [[0 for _ in range(self.gc.DIM_Y)] for _ in range(self.gc.DIM_X)]
         # First step: plant some 'seeds' for hills
         num_hills = random.randint(5, 15)
         for _ in range(num_hills):
-            rand_x = random.randint(0, self.gc.dim_x - 1)
-            rand_y = random.randint(0, self.gc.dim_y - 1)
+            rand_x = random.randint(0, self.gc.DIM_X - 1)
+            rand_y = random.randint(0, self.gc.DIM_Y - 1)
             landscape[rand_x][rand_y] = self.gc.MAX_SUGAR
         for _ in range(50):
-            for j in range(1, self.gc.dim_y - 1):
-                for i in range(1, self.gc.dim_x - 1):
+            for j in range(1, self.gc.DIM_Y - 1):
+                for i in range(1, self.gc.DIM_X - 1):
                     c1 = landscape[i - 1][j]
                     c2 = landscape[i + 1][j]
                     c3 = landscape[i][j - 1]
@@ -201,13 +201,13 @@ class CA:
         a = two_hill_landscape
         a2 = copy.deepcopy(a)
         a3 = []
-        for i in range(self.gc.dim_x):
-            for j in range(self.gc.dim_y):
+        for i in range(self.gc.DIM_X):
+            for j in range(self.gc.DIM_Y):
                 try:
                     a2[i][j] = a[i][j]
                 except IndexError:
                     a2[i][j] = 0
-        for l in range(self.gc.dim_x - 1, -1, -1):
+        for l in range(self.gc.DIM_X - 1, -1, -1):
             a3.append(a2[l])
         return a2
 
@@ -215,13 +215,13 @@ class CA:
         a = two_hill_landscape
         a2 = copy.deepcopy(a)
         a3 = []
-        for i in range(self.gc.dim_x):
-            for j in range(self.gc.dim_y):
+        for i in range(self.gc.DIM_X):
+            for j in range(self.gc.DIM_Y):
                 try:
                     a2[j][i] = a[i][j]
                 except IndexError:
                     a2[j][i] = 0
-        for l in range(self.gc.dim_x - 1, -1, -1):
+        for l in range(self.gc.DIM_X - 1, -1, -1):
             a3.append(a2[l])
         return a3
 
