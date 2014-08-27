@@ -5,7 +5,7 @@ __version__ = '2.0'
 
 
 class CA:
-    def __init__(self, gc, visualizer):
+    def __init__(self, visualizer, gc):
         """
         Initializes and returns the cellular automaton.
         The CA is a dictionary and not a list of lists
@@ -21,7 +21,7 @@ class CA:
 
         for j in range(0, self.height):
             for i in range(0, self.width):
-                self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, gc.IN_FLUX, gc.OUT_FLUX)
+                self.ca_grid[i, j] = ClassCell(i, j, gc.CELL_SIZE, gc.IN_FLUX, gc.OUT_FLUX, 0, False)
 
     def draw_cells(self):
         """

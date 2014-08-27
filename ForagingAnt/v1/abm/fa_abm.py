@@ -45,12 +45,12 @@ class ABM:
             # In case the agent has updated it's position we change the position list accordingly.
             self.update_position(v)
 
-    def draw_agents(self, surf):
+    def draw_agents(self):
         """
         Iterates over all agents and draws them on the grid
         """
         for (_, _), v in self.agent_dict.items():
-            v.draw(surf)
+            self.visualizer.draw_agent(v)
 
     def get_agent_at_position(self, x, y):
         for (_, _), v in self.agent_dict.items():

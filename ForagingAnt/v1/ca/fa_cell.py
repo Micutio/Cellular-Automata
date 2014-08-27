@@ -24,7 +24,7 @@ class ClassCell:
 
     def sense_neighbor(self, neigh):
         self.num_neighbors += 1
-        for i in range(len(neigh)):
+        for i in range(len(self.pheromones)):
             self.neighbor_pheromones[i] += neigh.pheromones[i]
 
     def update(self):
@@ -37,11 +37,14 @@ class ClassCell:
                 # This cells pheromone amount is greater than in the surrounding
                 # We have a pheromone flux out this cell.
                 if self.pheromones[i] > avg:
-                    self.pheromones[i] = math.floor(self.out_flux * (self.pheromones[i] - avg))
+                    self.pheromones[i] -= math.floor(self.out_flux * (self.pheromones[i] - avg))
                 # This cells pheromone amount is lesser than in the surrounding
                 # We have an influx of pheromone
                 else:
-                    self.pheromones[i] = math.floor(self.in_flux * (avg - self.pheromones[i]))
+                    self.pheromones[i] += math.floor(self.in_flux * (avg - self.pheromones[i]))
+
+                if self.pheromones[i] <= 2:
+                    self.pheromones[i] = 0
         # Reset the control variables for the next round.
         self.num_neighbors = 0
         self.neighbor_pheromones = [0, 0]

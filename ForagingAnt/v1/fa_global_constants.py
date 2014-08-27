@@ -8,7 +8,7 @@ class GlobalConstants:
         #     SIMULATION CONSTANTS     #
         ################################
         self.RUN_SIMULATION = False
-        self.NUM_AGENTS = 200
+        self.NUM_AGENTS = 25
         self.NUM_TRIBES = 2
         self.CELL_SIZE = 12
         self.DIM_X = 50  # How many cells is the ca wide?
@@ -20,17 +20,18 @@ class GlobalConstants:
         # We use two rectangles to mark the areas the agents are spawning in.
         half_x = int(self.DIM_X / 2)
         half_y = int(self.DIM_Y / 2)
-        self.ABM_BOUNDS = [(half_x, 50, 0, half_y), (0, half_x, half_y, 50)]
+        self.ABM_BOUNDS = [(half_x, self.DIM_X, 0, half_y), (0, half_x, half_y, self.DIM_Y)]
         ################################
         #        ABM CONSTANTS         #
         ################################
+        self.VISION = 1
         ################################
         #         CA CONSTANTS         #
         ################################
         self.MAX_PHEROMONE = 100
         self.MAX_FOOD = 100
         self.IN_FLUX = 0.1
-        self.OUT_FLUX = 0.7
+        self.OUT_FLUX = 0.1
         ################################
         #      UTILITY CONSTANTS       #
         ################################

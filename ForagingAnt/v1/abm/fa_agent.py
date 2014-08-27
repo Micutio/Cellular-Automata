@@ -42,6 +42,7 @@ class Agent:
         best_cells = []
         while len(available_cells) > 0:
             c = available_cells.pop()
+            max_pheromone = 0
             if not c[1]:
                 # If we were on our way home and found it, stop right away and deliver the foraged food.
                 if c[0].is_hive and self.state == 0:
@@ -59,20 +60,21 @@ class Agent:
                     best_cells.append(c[0])
 
         # Pick a random cell from the best ones we found.
-        c = random.choice(best_cells)
-        # Leave pheromone on the cell
-        if c.pheromones[1 - self.state] < self.max_pheromone:
-            c.pheromones[1 - self.state] += 1
-        # Save my current position...
-        self.prev_x = self.x
-        self.prev_y = self.y
-        # ... and move to the new one.
-        self.x = (c.x * self.size) + int(self.size / 2)
-        self.y = (c.y * self.size) + int(self.size / 2)
+        if best_cells:
+            c = random.choice(best_cells)
+            # Leave pheromone on the cell
+            if c.pheromones[1 - self.state] < self.max_pheromone:
+                c.pheromones[1 - self.state] += 20
+            # Save my current position...
+            self.prev_x = self.x
+            self.prev_y = self.y
+            # ... and move to the new one.
+            self.x = (c.x * self.size) + int(self.size / 2)
+            self.y = (c.y * self.size) + int(self.size / 2)
 
-        # If the new cell has food, then take some
-        self.eat(c)
-        self.store_in_hive(c)
+            # If the new cell has food, then take some
+            self.eat(c)
+            self.store_in_hive(c)
 
     def eat(self, cell):
         if cell.food > 0 and not cell.is_hive:
