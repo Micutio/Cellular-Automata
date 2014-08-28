@@ -47,8 +47,8 @@ class Visualization:
             red = green = int(255 * food_ratio)
             color1 = (red, green, 0)
         else:
-            green = int(255 * (cell.pheromones[0] / self.gc.MAX_PHEROMONE))
-            blue = int(255 * (cell.pheromones[1] / self.gc.MAX_PHEROMONE))
+            green = int(255 * (cell.pheromones["hive"] / self.gc.MAX_PHEROMONE))
+            blue = int(255 * (cell.pheromones["food"] / self.gc.MAX_PHEROMONE))
             red = int((green + blue) / 2)
             color1 = (red, green, blue)
         pygame.draw.rect(self.surface, color1, (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)

@@ -35,7 +35,7 @@ class CA:
         """
         This method updates the cellular automaton
         """
-        self.update_from_neighbors()
+        # self.update_from_neighbors()
         self.update_states()
 
     def update_states(self):

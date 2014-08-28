@@ -31,7 +31,8 @@ class ABM:
 
         for _ in range(gc.NUM_AGENTS):
             p = random.choice(position_list[0])
-            self.agent_dict[p[0], p[1]] = Agent(p[0], p[1], gc.CELL_SIZE, gc.VISION, gc.MAX_PHEROMONE)
+            self.agent_dict[p[0], p[1]] =\
+                Agent(p[0], p[1], gc.CELL_SIZE, gc.VISION, gc.MAX_PHEROMONE, gc.MAX_DIST)
 
     def cycle_system(self, ca):
         """
