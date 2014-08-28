@@ -66,7 +66,7 @@ class CA:
                         b = False
                     else:
                         b = a_pos[agnt_x, agnt_y]
-                    neighborhood[agnt_x, agnt_y] = (a, b)
+                    neighborhood[grid_x, grid_y] = (a, b)
         return neighborhood
 
     def highlight_cell(self, screen, x, y):

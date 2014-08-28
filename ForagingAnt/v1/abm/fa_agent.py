@@ -113,13 +113,13 @@ class Ant(Agent):
         result = None
         result_list = []
         for p in positions:
-            x = self.x + self.directions[p][0]
-            y = self.y + self.directions[p][1]
+            x = int(self.x / self.size) + self.directions[p][0]
+            y = int(self.y / self.size) + self.directions[p][1]
             cell = neighborhood[x, y]
-            if cell[0].pheromone[target_ph] > max_ph and len(cell[1]) < 10:
+            if cell[0].pheromones[target_ph] > max_ph and len(cell[1]) < 10:
                 result_list = [cell]
-                max_ph = cell[0].pheromone[target_ph]
-            elif cell[0].pheromone[target_ph] == max_ph and len(cell[1]) < 10:
+                max_ph = cell[0].pheromones[target_ph]
+            elif cell[0].pheromones[target_ph] == max_ph and len(cell[1]) < 10:
                 result_list.append(cell)
         if result_list:
             result = random.choice(result_list)
@@ -135,13 +135,13 @@ class Ant(Agent):
             for p in positions:
                 pos_list.remove(p)
         for p in pos_list:
-            x = self.x + self.directions[p][0]
-            y = self.y + self.directions[p][1]
+            x = int(self.x / self.size) + self.directions[p][0]
+            y = int(self.y / self.size) + self.directions[p][1]
             cell = neighborhood[x, y]
-            if cell[0].pheromone[target_ph] > max_ph and len(cell[1]) < 10:
+            if cell[0].pheromones[target_ph] > max_ph and len(cell[1]) < 10:
                 result_list = [cell]
-                max_ph = cell[0].pheromone[target_ph]
-            elif cell[0].pheromone[target_ph] == max_ph and len(cell[1]) < 10:
+                max_ph = cell[0].pheromones[target_ph]
+            elif cell[0].pheromones[target_ph] == max_ph and len(cell[1]) < 10:
                 result_list.append((cell, p))
         if result_list:
             best = random.choice(result_list)
@@ -154,8 +154,8 @@ class Ant(Agent):
         result = None
         result_list = []
         for p in positions:
-            x = self.x + self.directions[p][0]
-            y = self.y + self.directions[p][1]
+            x = int(self.x / self.size) + self.directions[p][0]
+            y = int(self.y / self.size) + self.directions[p][1]
             cell = neighborhood[x, y]
             if len(cell[1]) < 10:
                 result_list.append(cell)
@@ -172,8 +172,8 @@ class Ant(Agent):
             for p in positions:
                 pos_list.remove(p)
         for p in pos_list:
-            x = self.x + self.directions[p][0]
-            y = self.y + self.directions[p][1]
+            x = int(self.x / self.size) + self.directions[p][0]
+            y = int(self.y / self.size) + self.directions[p][1]
             cell = neighborhood[x, y]
             if len(cell[1]) < 10:
                 result_list.append((cell, p))
@@ -190,7 +190,7 @@ class Ant(Agent):
                 if agent.id == target_ph:
                     cell[0].pheromones[target_ph] = self.max_ph
                 else:
-                    max_ph = cell[0].neighbor_max_pheromone[target_ph]
+                    max_ph = cell[0].neighbor_max_pheromones[target_ph]
                     des = max_ph - 2
                     d = des - cell[0].pheromones[target_ph]
                     if d > 0:

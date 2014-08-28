@@ -38,7 +38,7 @@ class ABM:
         """
         Adds an agent to be scheduled by the abm.
         """
-        pos = (agent.x, agent.y)
+        pos = (int(agent.x / self.gc.CELL_SIZE), int(agent.y / self.gc.CELL_SIZE))
         if pos in self.agent_dict:
             self.agent_dict[pos].append(agent)
         else:
@@ -59,27 +59,29 @@ class ABM:
                     return agent
 
     def update_position(self, v):
+        x = int(v.prev_x / self.gc.CELL_SIZE)
+        y = int(v.prev_y / self.gc.CELL_SIZE)
         if v.dead:
             # Remove dead agent from agent list on position p
             #self.agent_dict[v.prev_x, v.prev_y].remove(v)
             a_index = None
-            for a in self.agent_dict[v.prev_x, v.prev_y]:
+            for a in self.agent_dict[x, y]:
                 if a.a_id == v.a_id:
-                    a_index = self.agent_dict[v.prev_x, v.prev_y].index(a)
+                    a_index = self.agent_dict[x, y].index(a)
             if a_index:
-                self.agent_dict[v.prev_x, v.prev_y].pop(a_index)
+                self.agent_dict[x, y].pop(a_index)
         else:
             # Also remove agent from former position
             a_index = None
-            for a in self.agent_dict[v.prev_x, v.prev_y]:
+            for a in self.agent_dict[x, y]:
                 if a.a_id == v.a_id:
-                    a_index = self.agent_dict[v.prev_x, v.prev_y].index(a)
+                    a_index = self.agent_dict[x, y].index(a)
             if a_index:
-                self.agent_dict[v.prev_x, v.prev_y].pop(a_index)
+                self.agent_dict[x, y].pop(a_index)
             #self.agent_dict[v.prev_x, v.prev_y].remove(v)
             # ... and insert into new one
             self.add_agent(v)
 
         # If there is no one else at the old position left, delete it from the dict
-        if not self.agent_dict[v.prev_x, v.prev_y]:
-            self.agent_dict.pop((v.prev_x, v.prev_y))
+        if not self.agent_dict[x, y]:
+            self.agent_dict.pop((x, y))
