@@ -61,10 +61,22 @@ class ABM:
     def update_position(self, v):
         if v.dead:
             # Remove dead agent from agent list on position p
-            self.agent_dict[v.prev_x, v.prev_y].remove(v)
+            #self.agent_dict[v.prev_x, v.prev_y].remove(v)
+            a_index = None
+            for a in self.agent_dict[v.prev_x, v.prev_y]:
+                if a.a_id == v.a_id:
+                    a_index = self.agent_dict[v.prev_x, v.prev_y].index(a)
+            if a_index:
+                self.agent_dict[v.prev_x, v.prev_y].pop(a_index)
         else:
             # Also remove agent from former position
-            self.agent_dict[v.prev_x, v.prev_y].remove(v)
+            a_index = None
+            for a in self.agent_dict[v.prev_x, v.prev_y]:
+                if a.a_id == v.a_id:
+                    a_index = self.agent_dict[v.prev_x, v.prev_y].index(a)
+            if a_index:
+                self.agent_dict[v.prev_x, v.prev_y].pop(a_index)
+            #self.agent_dict[v.prev_x, v.prev_y].remove(v)
             # ... and insert into new one
             self.add_agent(v)
 

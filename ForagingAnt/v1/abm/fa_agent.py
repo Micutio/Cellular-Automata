@@ -2,10 +2,12 @@ __author__ = 'Michael Wagner'
 __version__ = '1.0'
 
 import random
+import uuid
 
 
 class Agent:
     def __init__(self, x, y, c_size):
+        self.a_id = uuid.uuid4()
         self.x = x
         self.y = y
         self.prev_x = x
