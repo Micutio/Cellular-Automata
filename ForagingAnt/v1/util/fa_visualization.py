@@ -27,7 +27,14 @@ class Visualization:
         """
         radius = int(agent.size / 2)
         if not agent.dead:
-            color1 = (255, 0, 0)
+            if agent.id == "hive":
+                color1 = (0, 0, 200)
+            elif agent.id == "food" and agent.food > 0:
+                food_ratio = agent.food / self.gc.MAX_FOOD
+                red = green = int(255 * food_ratio)
+                color1 = (red, green, 0)
+            else:
+                color1 = (255, 0, 0)
             pygame.draw.circle(self.surface, color1, [agent.x, agent.y], radius, 0)
         return
 
@@ -40,16 +47,9 @@ class Visualization:
         :param cell:
         :return:
         """
-        if cell.is_hive:
-            color1 = (0, 0, 200)
-        elif cell.food > 0:
-            food_ratio = cell.food / self.gc.MAX_FOOD
-            red = green = int(255 * food_ratio)
-            color1 = (red, green, 0)
-        else:
-            green = int(255 * (cell.pheromones["hive"] / self.gc.MAX_PHEROMONE))
-            blue = int(255 * (cell.pheromones["food"] / self.gc.MAX_PHEROMONE))
-            red = int((green + blue) / 2)
-            color1 = (red, green, blue)
+        green = int(255 * (cell.pheromones["hive"] / self.gc.MAX_PHEROMONE))
+        blue = int(255 * (cell.pheromones["food"] / self.gc.MAX_PHEROMONE))
+        red = int((green + blue) / 2)
+        color1 = (red, green, blue)
         pygame.draw.rect(self.surface, color1, (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
         return

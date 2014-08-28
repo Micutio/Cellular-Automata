@@ -46,37 +46,28 @@ class CA:
             for x in range(0, self.width):
                 self.ca_grid[x, y].update()
 
-    def get_visible_cells(self, a_pos, agent_x, agent_y, v):
+    def get_neighborhood(self, a_pos, agent_x, agent_y):
         """
-        Delivers all cells that are in sight of cell(x,y) with sight range of v.
-        Here we use the von-Neumann neighborhood
+        Creates a dictionary {'position': (cell, [agents on that cell])} for the agent
+        to get an overview over its immediate surrounding.
         """
         x = int(agent_x / self.cell_size)
         y = int(agent_y / self.cell_size)
-        visible_cells = []
-        for i in range(-v, v + 1):
-            # 1. go through horizontal line of sight
-            grid_x = x + i
-            if (grid_x, y) in self.ca_grid:
-                new_cell = self.ca_grid[grid_x, y]
+        neighborhood = {}
+        for i in range(-1, 2):
+            for j in range(-1, 2):
+                grid_x = x + i
                 agnt_x = ((grid_x * self.cell_size) + int(self.cell_size / 2))
-                if (agnt_x, agent_y) not in a_pos:
-                    new_agent = False
-                else:
-                    new_agent = a_pos[agnt_x, agent_y]
-                visible_cells.append((new_cell, new_agent))
-            # 2. go through vertical line of sight. And this time skip your own cell,
-            # because we already checked it in the horizontal line of sight
-            grid_y = y + i
-            if (x, grid_y) in self.ca_grid and i != 0:
-                new_cell = self.ca_grid[x, grid_y]
+                grid_y = y + j
                 agnt_y = ((grid_y * self.cell_size) + int(self.cell_size / 2))
-                if (agent_x, agnt_y) not in a_pos:
-                    new_agent = False
-                else:
-                    new_agent = a_pos[agent_x, agnt_y]
-                visible_cells.append((new_cell, new_agent))
-        return visible_cells
+                if (grid_x, grid_y) in self.ca_grid and not (grid_x == 0 and grid_y == 0):
+                    a = self.ca_grid[grid_x, grid_y]
+                    if (agnt_x, agnt_y) not in a_pos:
+                        b = False
+                    else:
+                        b = a_pos[agnt_x, agnt_y]
+                    neighborhood[agnt_x, agnt_y] = (a, b)
+        return neighborhood
 
     def highlight_cell(self, screen, x, y):
         cx = int(x / 10)

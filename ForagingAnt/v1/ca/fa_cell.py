@@ -19,11 +19,18 @@ class ClassCell:
         #self.num_neighbors = 0
         self.food = food
         self.is_hive = is_hive
+        self.num_neighbors = 0
+        self.neighbor_pheromones = {"hive": 0, "food": 0}
+        self.neighbor_max_pheromone = {"hive": 0, "food": 0}
 
-    #def sense_neighbor(self, neigh):
-    #    self.num_neighbors += 1
-    #    for i in range(len(self.pheromones)):
-    #        self.neighbor_pheromones[i] += neigh.pheromones[i]
+    def sense_neighbor(self, neigh):
+        self.num_neighbors += 1
+        self.neighbor_pheromones["hive"] += neigh.pheromones["hive"]
+        self.neighbor_pheromones["food"] += neigh.pheromones["food"]
+        if neigh.pheromone["hive"] > self.neighbor_max_pheromone["hive"]:
+            self.neighbor_max_pheromone["hive"] = neigh.pheromones["hive"]
+        if neigh.pheromone["food"] > self.neighbor_max_pheromone["food"]:
+            self.neighbor_max_pheromone["food"] = neigh.pheromones["food"]
 
     def update(self):
         """

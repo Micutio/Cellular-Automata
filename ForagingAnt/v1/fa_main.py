@@ -61,10 +61,8 @@ class ForagingAnt:
         """
         Main method. It executes the CA.
         """
-
         print("------------------------------[SIMULATION LOG]---------------------------------\n"
               "                                                                               ")
-
         while 1:
             # This block performs a simulation step.
             if GC.RUN_SIMULATION:

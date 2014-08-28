@@ -1,8 +1,11 @@
+from v1.abm.fa_agent import Food, Hive
+
 __author__ = 'Michael Wagner'
 __version__ = '1.0'
 
 import pygame
 import sys
+import math
 
 
 class EventHandler:
@@ -38,22 +41,19 @@ class EventHandler:
         # Click on left mouse button.
         # -> set food of cell to max.
         if button == 1:
-            #print(self.main.ca.ca_grid[int(self.mx), int(self.my)].pheromones[0])
-            #print(self.main.ca.ca_grid[int(self.mx), int(self.my)].pheromones[1])
-            self.main.ca.ca_grid[int(self.mx), int(self.my)].food = self.main.gc.MAX_FOOD
+            agent_x = (math.floor(self.mx) * self.main.gc.CELL_SIZE) + int(self.main.gc.CELL_SIZE / 2)
+            agent_y = (math.floor(self.my) * self.main.gc.CELL_SIZE) + int(self.main.gc.CELL_SIZE / 2)
+            food = Food(agent_x, agent_y, self.main.gc.CELL_SIZE, self.main.gc.MAX_FOOD)
+            self.main.abm.add_agent(food)
         # Click on right mouse button
         # -> toggle cell to be a hive
         elif button == 3:
-            if self.old_hive_pos:
-                old_cell = self.main.ca.ca_grid[self.old_hive_pos]
-                old_cell.is_hive = False
-                old_cell.food = 0
-            self.old_hive_pos = (int(self.mx), int(self.my))
-            cell = self.main.ca.ca_grid[int(self.mx), int(self.my)]
-            cell.is_hive = True
-            cell.food = 0
-            for _, agent in self.main.abm.agent_dict.items():
-                agent.hive_pos = self.old_hive_pos
+            agent_x = (math.floor(self.mx) * self.main.gc.CELL_SIZE) + int(self.main.gc.CELL_SIZE / 2)
+            agent_y = (math.floor(self.my) * self.main.gc.CELL_SIZE) + int(self.main.gc.CELL_SIZE / 2)
+            max_ants = self.main.gc.MAX_ANTS
+            max_ph = self.main.gc.MAX_PHEROMONE
+            hive = Hive(agent_x, agent_y, self.main.gc.CELL_SIZE, self.main.abm, max_ants, max_ph)
+            self.main.abm.add_agent(hive)
 
     def keyboard_action(self, active_key):
         if active_key == pygame.K_SPACE:
