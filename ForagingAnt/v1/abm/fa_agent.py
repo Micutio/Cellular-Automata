@@ -3,11 +3,12 @@ __version__ = '1.0'
 
 import random
 import uuid
+import math
 
 
 class Agent:
     def __init__(self, x, y, c_size):
-        self.a_id = uuid.uuid4()
+        self.a_id = uuid.uuid4().urn
         self.x = x
         self.y = y
         self.prev_x = x
@@ -59,7 +60,7 @@ class Ant(Agent):
         self.prev_y = y
         self.max_ph = max_pheromone
         self.food = 1
-        self.has_food = True
+        self.has_food = False
         self.dead = False
         self.directions = [(0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1)]
         self.current_dir = random.randint(0, 7)
@@ -81,107 +82,51 @@ class Ant(Agent):
             self.find_food_source(neighborhood)
 
     def return_to_hive(self, neighborhood):
-        # Get forward location with max hive_pheromone
-        forward_positions = [self.current_dir - 1, self.current_dir, self.current_dir + 1]
-        cell = self.get_best_cell_with_pheromone_in_direction("hive", forward_positions, neighborhood)
-
-        # If we can't move forward (no suitable cells found in that direction) then try out other directions.
-        if not cell:
-            cell = self.get_best_cell_with_pheromone("hive", forward_positions, neighborhood)
-
+        cell = self.get_cell_with_pheromone("hive", neighborhood)
         if cell:
-            self.drop_pheromones("food", cell)
+            x = int(self.x / self.size)
+            y = int(self.y / self.size)
+            this_cell = neighborhood[x, y]
+            self.drop_pheromones("food", this_cell)
             self.move_to(cell[0])
             self.check_if_at_hive(cell[1])
 
     def find_food_source(self, neighborhood):
-        # Get forward locations
-        forward_positions = [self.current_dir - 1, self.current_dir, self.current_dir + 1]
-        cell = self.get_best_cell_in_direction(forward_positions, neighborhood)
-
-        # If we can't move forward (no suitable cells found in that direction) then try out other directions.
-        if not cell:
-            cell = self.get_best_cell(forward_positions, neighborhood)
-
+        cell = self.get_cell_with_pheromone("food", neighborhood)
         if cell:
-            self.drop_pheromones("hive", cell)
+            x = int(self.x / self.size)
+            y = int(self.y / self.size)
+            this_cell = neighborhood[x, y]
+            self.drop_pheromones("hive", this_cell)
             self.move_to(cell[0])
-            self.check_if_at_hive(cell[1])
+            self.check_if_at_food(cell[1])
 
-    def get_best_cell_with_pheromone_in_direction(self, target_ph, positions, neighborhood):
+    def get_cell_with_pheromone(self, target_ph, neighborhood):
+        result = None
+        result_list = []
+        backup_list = []
+        best_cell = None
         max_ph = 0
-        result = None
-        result_list = []
-        for p in positions:
-            x = int(self.x / self.size) + self.directions[p][0]
-            y = int(self.y / self.size) + self.directions[p][1]
-            cell = neighborhood[x, y]
-            if cell[0].pheromones[target_ph] > max_ph and len(cell[1]) < 10:
-                result_list = [cell]
-                max_ph = cell[0].pheromones[target_ph]
-            elif cell[0].pheromones[target_ph] == max_ph and len(cell[1]) < 10:
-                result_list.append(cell)
+        for d in self.directions:
+            x = int(self.x / self.size) + d[0]
+            y = int(self.y / self.size) + d[1]
+            if (x, y) in neighborhood:
+                cell = neighborhood[x, y]
+                if cell[0].pheromones[target_ph] > 0 and (not cell[1] or len(cell[1]) < 10):
+                    ph = cell[0].pheromones[target_ph]
+                    if ph > max_ph:
+                        best_cell = cell
+                        max_ph = ph
+                    result_list.append((cell, ph))
+                elif not cell[1] or len(cell[1]) < 10:
+                    backup_list.append(cell)
         if result_list:
-            result = random.choice(result_list)
-        return result
-
-    def get_best_cell_with_pheromone(self, target_ph, positions, neighborhood):
-        max_ph = 0
-        result = None
-        result_list = []
-        pos_list = list(range(8))
-        # Only look through the positions that are not in front of us.
-        if positions:
-            for p in positions:
-                pos_list.remove(p)
-        for p in pos_list:
-            x = int(self.x / self.size) + self.directions[p][0]
-            y = int(self.y / self.size) + self.directions[p][1]
-            cell = neighborhood[x, y]
-            if cell[0].pheromones[target_ph] > max_ph and len(cell[1]) < 10:
-                result_list = [cell]
-                max_ph = cell[0].pheromones[target_ph]
-            elif cell[0].pheromones[target_ph] == max_ph and len(cell[1]) < 10:
-                result_list.append((cell, p))
-        if result_list:
-            best = random.choice(result_list)
-            # In case we got a result, change our current direction.
-            self.current_dir = best[1]
-            result = best[0]
-        return result
-
-    def get_best_cell_in_direction(self, positions, neighborhood):
-        result = None
-        result_list = []
-        for p in positions:
-            x = int(self.x / self.size) + self.directions[p][0]
-            y = int(self.y / self.size) + self.directions[p][1]
-            cell = neighborhood[x, y]
-            if len(cell[1]) < 10:
-                result_list.append(cell)
-        if result_list:
-            result = random.choice(result_list)
-        return result
-
-    def get_best_cell(self, positions, neighborhood):
-        result = None
-        result_list = []
-        pos_list = list(range(8))
-        # Only look through the positions that are not in front of us.
-        if positions:
-            for p in positions:
-                pos_list.remove(p)
-        for p in pos_list:
-            x = int(self.x / self.size) + self.directions[p][0]
-            y = int(self.y / self.size) + self.directions[p][1]
-            cell = neighborhood[x, y]
-            if len(cell[1]) < 10:
-                result_list.append((cell, p))
-        if result_list:
-            best = random.choice(result_list)
-            # In case we got a result, change our current direction.
-            self.current_dir = best[1]
-            result = best[0]
+            if random.random() < 0.1:
+                result = weighted_choice(result_list)
+            else:
+                result = best_cell
+        elif backup_list:
+            result = random.choice(backup_list)
         return result
 
     def drop_pheromones(self, target_ph, cell):
@@ -189,12 +134,14 @@ class Ant(Agent):
             for agent in cell[1]:
                 if agent.id == target_ph:
                     cell[0].pheromones[target_ph] = self.max_ph
-                else:
-                    max_ph = cell[0].neighbor_max_pheromones[target_ph]
-                    des = max_ph - 2
-                    d = des - cell[0].pheromones[target_ph]
-                    if d > 0:
-                        cell[0].pheromones[target_ph] = d
+                    return
+
+        max_ph = cell[0].last_neighbor_max_pheromone[target_ph]
+        des = max_ph - 2
+        d = des - cell[0].pheromones[target_ph]
+        if d > 0:
+            cell[0].pheromones[target_ph] += d
+        return
 
     def move_to(self, target_c):
         # Save my current position...
@@ -217,3 +164,14 @@ class Ant(Agent):
                 if agent.id == "food":
                     agent.food -= self.food
                     self.has_food = True
+
+
+def weighted_choice(choices):
+    total = sum(w for c, w in choices)
+    r = random.uniform(0, total)
+    up_to = 0
+    for c, w in choices:
+        if up_to + w > r:
+            return c
+        up_to += w
+    assert False, "Shouldn't get here"

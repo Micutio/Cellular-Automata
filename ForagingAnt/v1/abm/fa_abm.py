@@ -64,20 +64,10 @@ class ABM:
         if v.dead:
             # Remove dead agent from agent list on position p
             #self.agent_dict[v.prev_x, v.prev_y].remove(v)
-            a_index = None
-            for a in self.agent_dict[x, y]:
-                if a.a_id == v.a_id:
-                    a_index = self.agent_dict[x, y].index(a)
-            if a_index:
-                self.agent_dict[x, y].pop(a_index)
+            self.remove_agent(v)
         else:
             # Also remove agent from former position
-            a_index = None
-            for a in self.agent_dict[x, y]:
-                if a.a_id == v.a_id:
-                    a_index = self.agent_dict[x, y].index(a)
-            if a_index:
-                self.agent_dict[x, y].pop(a_index)
+            self.remove_agent(v)
             #self.agent_dict[v.prev_x, v.prev_y].remove(v)
             # ... and insert into new one
             self.add_agent(v)
@@ -85,3 +75,14 @@ class ABM:
         # If there is no one else at the old position left, delete it from the dict
         if not self.agent_dict[x, y]:
             self.agent_dict.pop((x, y))
+
+    def remove_agent(self, agent):
+        x = int(agent.prev_x / self.gc.CELL_SIZE)
+        y = int(agent.prev_y / self.gc.CELL_SIZE)
+        a_index = -1
+        for a in self.agent_dict[x, y]:
+            delete = a.a_id == agent.a_id
+            if delete:
+                a_index = self.agent_dict[x, y].index(a)
+        if a_index > -1:
+            self.agent_dict[x, y].pop(a_index)
