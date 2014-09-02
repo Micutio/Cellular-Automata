@@ -39,8 +39,8 @@ class ClassCell:
         for ph in ["hive", "food"]:
             avg = self.neighbor_pheromones[ph] / self.num_neighbors
             self.pheromones[ph] = (1.0 - self.evaporation) * (self.pheromones[ph] + self.diffusion * (avg - self.pheromones[ph]))
-            if self.pheromones[ph] < 0.2:
-                self.pheromones[ph] = 0
+            #if self.pheromones[ph] < 0.2:
+            #    self.pheromones[ph] = 0
 
         self.num_neighbors = 0
         self.neighbor_pheromones = {"hive": 0, "food": 0}

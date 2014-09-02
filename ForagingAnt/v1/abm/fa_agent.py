@@ -121,7 +121,7 @@ class Ant(Agent):
                 elif not cell[1] or len(cell[1]) < 10:
                     backup_list.append(cell)
         if result_list:
-            if random.random() < 0.1:
+            if random.random() < 0.01:
                 result = weighted_choice(result_list)
             else:
                 result = best_cell

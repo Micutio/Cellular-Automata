@@ -26,8 +26,8 @@ class GlobalConstants:
         ################################
         #         CA CONSTANTS         #
         ################################
-        self.DIFFUSION = 0.01
-        self.EVAPORATION = 0.01
+        self.DIFFUSION = 0.001
+        self.EVAPORATION = 0.001
         ################################
         #      UTILITY CONSTANTS       #
         ################################
