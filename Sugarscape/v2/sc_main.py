@@ -19,6 +19,8 @@ from sc_global_constants import GlobalConstants
 from util.sc_visualization import Visualization
 from util.sc_io_handling import EventHandler, Terminal
 
+# TODO: Add loaning and inheritable colors to the agents.
+
 
 class Sugarscape:
     """
