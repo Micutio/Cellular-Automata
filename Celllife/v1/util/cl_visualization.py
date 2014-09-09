@@ -30,7 +30,7 @@ class Visualization:
             if agent.type == "chloroplast":
                 color1 = (0, 255, 0)
             else:
-                color1 = (1, 1, 1)
+                color1 = (0, 0, 0)
             pygame.draw.circle(self.surface, color1, [agent.x, agent.y], radius, 0)
         return
 
@@ -43,13 +43,13 @@ class Visualization:
         :param cell:
         :return:
         """
-        cell_total = cell.h2o + cell.o2 + cell.glucose
+        cell_total = cell.co2 + cell.o2 + cell.glucose
         if cell_total == 0:
             red = green = blue = 0
         else:
             red = 255 * (max(cell.glucose, cell.o2) / cell_total)
-            green = 255 * (cell.o2 / cell_total)
-            blue = 255 * (cell.h2o / cell_total)
+            green = 255 * (cell.glucose / cell_total)
+            blue = 255 * (cell.co2 / cell_total)
 
         color1 = (red, green, blue)
         pygame.draw.rect(self.surface, color1, (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
@@ -62,7 +62,7 @@ class Visualization:
         if red > blue and red > green:
             pygame.draw.line(self.surface, color2, [lx + 1, ly + w1], [lx + h1, ly + w1], int(cell.w * 0.2))
             pygame.draw.line(self.surface, color2, [lx + h1, ly + 1], [lx + h1, ly + w1], int(cell.w * 0.2))
-        elif blue > red and blue > green:
-            pygame.draw.line(self.surface, color2, [lx + 1, ly + 1], [lx + 1, ly + w1], int(cell.w * 0.2))
-            pygame.draw.line(self.surface, color2, [lx + 1, ly + 1], [lx + h1, ly + 1], int(cell.w * 0.2))
+        #elif blue > red and blue > green:
+        #    pygame.draw.line(self.surface, color2, [lx + 1, ly + 1], [lx + 1, ly + w1], int(cell.w * 0.2))
+        #    pygame.draw.line(self.surface, color2, [lx + 1, ly + 1], [lx + h1, ly + 1], int(cell.w * 0.2))
         return

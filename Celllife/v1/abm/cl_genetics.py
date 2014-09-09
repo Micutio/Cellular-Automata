@@ -74,17 +74,17 @@ class Chloroplast:
         self.eff_light = e2
         self.eff_o2 = e3
         self.eff_h2o_in = e4
-        self.eff_ho2_out = e5
+        self.eff_h2o_out = e5
         self.eff_glucose = e6
         return
 
     def process(self, ca_cell):
         output = (self.eff_co2 * ca_cell.co2) + (self.eff_light * ca_cell.light) + (self.eff_h2o_in * ca_cell.h2o)
-        total_out = (self.eff_ho2_out * 100) + (self.eff_o2 * 100)
-        ratio_h2o = (self.eff_ho2_out * 100) / total_out
+        total_out = (self.eff_h2o_out * 100) + (self.eff_o2 * 100) + (self.eff_glucose * 100)
+        ratio_h2o = (self.eff_h2o_out * 100) / total_out
         ratio_o2 = (self.eff_o2 * 100) / total_out
-        glucose_out = output * self.eff_glucose
-        output -= glucose_out
+        ratio_glucose = (self.eff_glucose / total_out)
+        glucose_out = output * ratio_glucose
         h2o_out = output * ratio_h2o
         o2_out = output * ratio_o2
 
@@ -106,4 +106,17 @@ class Mitochondrion:
         return
 
     def process(self, ca_cell):
-        return ca_cell
+        output = (self.eff_o2 * ca_cell.o2) + (self.eff_h2o_in * ca_cell.h2o)
+        total_out = (self.eff_h2o_out * 100) + (self.eff_co2 * 100) + (self.eff_glucose * 100)
+        ratio_h2o = (self.eff_h2o_out * 100) / total_out
+        ratio_co2 = (self.eff_co2 * 100) / total_out
+        ratio_atp = (self.eff_atp / total_out)
+        atp_out = output * ratio_atp
+        h2o_out = output * ratio_h2o
+        co2_out = output * ratio_co2
+
+        ca_cell.co2 -= (self.eff_co2 * ca_cell.co2)
+        ca_cell.h2o -= (self.eff_h2o_in * ca_cell.h2o)
+        ca_cell.h2o += h2o_out
+        ca_cell.co2 += co2_out
+        return atp_out

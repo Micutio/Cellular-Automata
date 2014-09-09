@@ -60,7 +60,7 @@ class BioCell(Agent):
     def procreate(self, neighborhood, abm):
         if self.energy > self.chromosome.mitosis_limit:
             free_cells = []
-            for (_, _), cell in neighborhood.items():
+            for cell in neighborhood.values():
                 if not cell[1]:
                     free_cells.append(cell[0])
 

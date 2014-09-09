@@ -15,9 +15,9 @@ class ClassCell:
         self.diffusion = diffusion
         self.evaporation = evaporation
         self.num_neighbors = 0
-        self.co2 = 1
-        self.light = 1
-        self.h2o = 1
+        self.co2 = 5
+        self.light = 20
+        self.h2o = 20
         self.o2 = 0
         self.glucose = 0
         self.neighbors_o2 = 0
@@ -43,9 +43,9 @@ class ClassCell:
             avg_o2 = self.neighbors_o2 / self.num_neighbors
             self.o2 = (1.0 - (self.evaporation * 10)) * (self.o2 + (self.diffusion * 10) * (avg_o2 - self.o2))
             avg_co2 = self.neighbors_co2 / self.num_neighbors
-            self.co2 = (1.0 - self.evaporation) * (self.co2 + self.diffusion * (avg_co2 - self.co2))
-            avg_h2o = self.neighbors_h2o / self.num_neighbors
-            self.h2o = (1.0 - (self.evaporation * 5)) * (self.h2o + (self.diffusion * 5) * (avg_h2o - self.h2o))
+            self.co2 = (1.0 - self.evaporation * 10) * (self.co2 + (self.diffusion * 10) * (avg_co2 - self.co2))
+            #avg_h2o = self.neighbors_h2o / self.num_neighbors
+            #self.h2o = (1.0 - (self.evaporation * 5)) * (self.h2o + (self.diffusion * 5) * (avg_h2o - self.h2o))
             avg_glucose = self.neighbors_glucose / self.num_neighbors
             self.glucose = (1.0 - self.evaporation) * (self.glucose + self.diffusion * (avg_glucose - self.glucose))
 
@@ -54,6 +54,5 @@ class ClassCell:
             self.neighbors_co2 = 0
             self.neighbors_h2o = 0
             self.neighbors_glucose = 0
-
-        self.co2 = 1
-        self.h2o = 1
+        if self.co2 + 0.01 < 5:
+            self.co2 += 0.01

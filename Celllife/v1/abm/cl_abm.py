@@ -19,6 +19,8 @@ class ABM:
         :return: An initialized ABM.
         """
         self.agent_dict = {}
+        self.agent_list = []
+        self.new_agents = []
         self.visualizer = visualizer
         self.gc = gc
 
@@ -29,13 +31,14 @@ class ABM:
         # Have all agents perceive and act in a random order
         # While we're at it, look for dead agents to remove
         self.spawn_agent()
-        temp_dict = copy.deepcopy(self.agent_dict)
-        for (_, _), v in temp_dict.items():
-            if v:
-                for agent in v:
-                    agent.perceive_and_act(ca, self, self.agent_dict)
-                    # In case the agent has updated it's position we change the position list accordingly.
-                    self.update_position(agent)
+        for agent in self.agent_list:
+            agent.perceive_and_act(ca, self, self.agent_dict)
+            # In case the agent has updated it's position we change the position list accordingly.
+            self.update_position(agent)
+        self.agent_list = [agent for agent in self.agent_list if not agent.dead]
+        if self.new_agents:
+            self.agent_list.extend(self.new_agents)
+            self.new_agents = []
 
     def spawn_agent(self):
         if not self.agent_dict:
@@ -45,7 +48,9 @@ class ABM:
             y = (math.floor(y) * self.gc.CELL_SIZE) + int(self.gc.CELL_SIZE / 2)
             dna = [random.randint(0, 1) for _ in range(64)]
             dna[0] = 0
-            self.add_agent(BioCell(x, y, self.gc.CELL_SIZE, dna))
+            agent = BioCell(x, y, self.gc.CELL_SIZE, dna)
+            self.add_agent(agent)
+            #print("Cell created! %s" % agent.a_id)
 
     def add_agent(self, agent):
         """
@@ -56,13 +61,14 @@ class ABM:
             self.agent_dict[pos].append(agent)
         else:
             self.agent_dict[pos] = [agent]
+        self.new_agents.append(agent)
 
     def draw_agents(self):
         """
         Iterates over all agents and draws them on the grid
         """
-        for (_, _), v in self.agent_dict.items():
-            for agent in v:
+        for a_list in self.agent_dict.values():
+            for agent in a_list:
                 self.visualizer.draw_agent(agent)
 
     def get_agent_at_position(self, x, y):
@@ -71,27 +77,26 @@ class ABM:
                 if agent.x == x and agent.y == y:
                     return agent
 
-    def update_position(self, v):
-        x = int(v.prev_x / self.gc.CELL_SIZE)
-        y = int(v.prev_y / self.gc.CELL_SIZE)
-        if v.dead:
+    def update_position(self, agent):
+        x = int(agent.prev_x / self.gc.CELL_SIZE)
+        y = int(agent.prev_y / self.gc.CELL_SIZE)
+        if agent.dead:
             # Remove dead agent from agent list on position p
             #self.agent_dict[v.prev_x, v.prev_y].remove(v)
-            self.remove_agent(v)
-        else:
+            self.remove_agent(agent, x, y)
+            #print("Cell died! %s" % agent.a_id)
+        elif agent.x != agent.prev_x or agent.y != agent.prev_y:
             # Also remove agent from former position
-            self.remove_agent(v)
+            self.remove_agent(agent)
             #self.agent_dict[v.prev_x, v.prev_y].remove(v)
             # ... and insert into new one
-            self.add_agent(v)
+            self.add_agent(agent)
 
         # If there is no one else at the old position left, delete it from the dict
         if not self.agent_dict[x, y]:
             self.agent_dict.pop((x, y))
 
-    def remove_agent(self, agent):
-        x = int(agent.prev_x / self.gc.CELL_SIZE)
-        y = int(agent.prev_y / self.gc.CELL_SIZE)
+    def remove_agent(self, agent, x, y):
         a_index = -1
         for a in self.agent_dict[x, y]:
             delete = a.a_id == agent.a_id
