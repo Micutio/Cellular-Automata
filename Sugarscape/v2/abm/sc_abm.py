@@ -4,7 +4,7 @@ __version__ = '2.0'
 # This is an ABM for a python implementation of Sugarscape.
 
 import random
-import copy
+
 from abm.sc_agent import Agent
 from abm.sc_tribes import Tribes
 from abm.sc_diseases import Bacteria, Virus
@@ -17,6 +17,7 @@ class ABM:
         :return: An initialized ABM.
         """
         self.agent_dict = {}
+        self.agent_list = []
         self.tribes = Tribes(gc.NUM_TRIBES)
         self.visualizer = visualizer
         self.gc = gc
@@ -55,8 +56,12 @@ class ABM:
 
             # Retrieve a spawn position from the position list belonging to its tribe.
             tribe_id = max(set(c), key=c.count)
-            p = random.choice(position_list[tribe_id])
-            self.agent_dict[p[0], p[1]] = Agent(p[0], p[1], gc.CELL_SIZE, su, sp, genome, a, self.tribes)
+            random.shuffle(position_list[tribe_id])
+            p = position_list[tribe_id].pop()
+            # Create the new agent and add to both, dictionary and list.
+            new_agent = Agent(p[0], p[1], gc.CELL_SIZE, su, sp, genome, a, self.tribes)
+            self.agent_dict[p[0], p[1]] = new_agent
+            self.agent_list.append(new_agent)
 
             # Update the tribal information
             tribal_id = max(set(c), key=c.count)
@@ -71,32 +76,19 @@ class ABM:
         """
         # Have all agents perceive and act in a random order
         # While we're at it, look for dead agents to remove
-        temp_dict = copy.deepcopy(self.agent_dict)
-        for (_, _), v in temp_dict.items():
-            v.perceive_and_act(ca, self.agent_dict)
-            # In case the agent has updated it's position we change the position list accordingly.
-            self.update_position(v)
+        new_agents = []
+        for a in self.agent_list:
+            a.perceive_and_act(ca, self.agent_dict, new_agents)
             self.spawn_disease()
+        self.agent_list.extend(new_agents)
 
     def draw_agents(self):
         """
         Iterates over all agents and draws them on the grid
         """
-        for (_, _), v in self.agent_dict.items():
-            self.visualizer.draw_agent(v)
-
-    def get_agent_at_position(self, x, y):
-        for (_, _), v in self.agent_dict.items():
-            if v.x == x and v.y == y:
-                return v
-
-    def update_position(self, v):
-        if v.dead:
-            v.on_death()
-            self.agent_dict.pop((v.prev_x, v.prev_y))
-        else:
-            self.agent_dict.pop((v.prev_x, v.prev_y))
-            self.agent_dict[v.x, v.y] = v
+        draw = self.visualizer.draw_agent
+        for v in self.agent_dict.values():
+            draw(v)
 
     def spawn_disease(self):
         """

@@ -47,17 +47,14 @@ class Agent:
     def is_fertile(self):
         return self.fertility[0] <= self.age <= self.fertility[1]
 
-    def check_status(self):
+    def check_status(self, agent_positions):
         """
         Check whether I'm still healthy and stuff
         """
-        # Check my resources.
-        if self.sugar <= 0 or self.spice <= 0:
-            self.dead = True
-        # Grow older
+        # Check my resources and age.
+        if not self.dead and (self.sugar <= 0 or self.spice <= 0 or self.age == self.dying_age):
+            self.die(agent_positions)
         self.age += 1
-        if self.age >= self.dying_age:
-            self.dead = True
 
     def welfare(self, su, sp):
         """
@@ -86,7 +83,7 @@ class Agent:
         rate_spice = (self.spice + sp) / self.meta_spice
         return rate_spice / rate_sugar
 
-    def r1_select_best_cell(self, cells):
+    def r1_select_best_cell(self, cells, agent_positions):
         """
         Agent selects the best cell to move to, according to: its resources, occupier and tribal alignment.
         :param cells: A list of all cells+occupiers in my range of sight.
@@ -123,6 +120,7 @@ class Agent:
 
         # Secondly, find the field with highest reward. That basically means: maximize the welfare function!
         best_cells = []
+        max_dist = 0
         while len(available_cells) > 0:
             c = available_cells.pop()
             # Retrieve resources of possible neighbors occupying those cells.
@@ -159,113 +157,25 @@ class Agent:
             self.tribe.tribal_area[c[0].tribe_id] -= 1
             c[0].tribe_id = self.tribe_id
 
-        # Save my current position...
-        self.prev_x = self.x
-        self.prev_y = self.y
-        # ... and move to the new one.
-        self.x = (c[0].x * self.size) + int(self.size / 2)
-        self.y = (c[0].y * self.size) + int(self.size / 2)
+        # Additionally, try to eat from it and kill possible occupants.
+        self.eat_from_cell(c, agent_positions)
+
+        # In case I don't stay on my cell: move
+        if (c[0].x != self.x or c[0].y != self.y) and not self.dead:
+            # Save my current position...
+            self.prev_x = self.x
+            self.prev_y = self.y
+            # ... and move to the new one.
+            self.x = (c[0].x * self.size) + int(self.size / 2)
+            self.y = (c[0].y * self.size) + int(self.size / 2)
+            # Also do not forget to update the agent position dictionary
+            del(agent_positions[self.prev_x, self.prev_y])
+            agent_positions[self.x, self.y] = self
         # Increase the cell's visit counter. This is only important for
         # the heat map visualization option.
         c[0].visits += 1
-        # Additionally, try to eat from it and kill possible occupants.
-        self.eat_from_cell(c)
 
-    def r1_select_best_cell_w_pollution(self, cells):
-        """
-        Agent selects the best cell to move to, according to: its resources, occupier and tribal alignment.
-        :param cells: A list of all cells+occupiers in my range of sight.
-        """
-        grid_x = int(self.x / self.size)
-        grid_y = int(self.y / self.size)
-        available_cells = []
-        # At first filter out all cells we can possibly move to.
-        while len(cells) > 0:
-            c = cells.pop()
-            # Case 1: Cell is occupied.
-            if c[1]:
-                # Case 1a: Cell is my own.
-                if c[1].x == self.x and c[1].y == self.y:
-                    # Remove me from the (cell, agent) tuple. I don't want to kill myself.
-                    available_cells.append((c[0], False))
-                # Case 1b: Cell has an opponent who is poorer than me and the same gender and we're both adults
-                # Then I am allowed to kill the agent and take its cell
-                elif (c[1].tribe_id != self.tribe_id) and (c[1].sugar + c[1].spice) < (self.sugar + self.spice)\
-                        and c[1].gender == self.gender and c[1].fertility[0] < c[1].age < c[1].fertility[1]\
-                        and self.fertility[0] < self.age < self.fertility[1]:
-                    available_cells.append(c)
-            # Case 2: Cell is not occupied
-            else:
-                # Case 2a: Cell belongs to no one.
-                if c[0].tribe_id == -1:
-                    available_cells.append(c)
-                # Case 2b: Cell belongs to my tribe.
-                elif c[0].tribe_id == self.tribe_id:
-                    available_cells.append(c)
-                # Case 2c: Cell belongs to opposing tribe.
-                elif self.tribe.can_conquer(c[0].tribe_id):
-                    available_cells.append(c)
-
-        # Secondly, find the field with highest reward. That basically means: maximize the welfare function!
-        best_cells = []
-        while len(available_cells) > 0:
-            c = available_cells.pop()
-            # Retrieve resources of possible neighbors occupying those cells.
-            occupant_sugar = 0
-            occupant_spice = 0
-            if c[1]:
-                occupant_sugar = c[1].sugar
-                occupant_spice = c[1].spice
-
-            # Case: Haven't found any cell so far.
-            if not best_cells:
-                best_cells = [c]
-                if c[0]. pollution > 0:
-                    max_w = self.welfare(c[0].sugar + occupant_sugar, c[0].spice + occupant_spice) * 10 / c[0].pollution
-                else:
-                    max_w = self.welfare(c[0].sugar + occupant_sugar, c[0].spice + occupant_spice)
-                max_dist = (abs(c[0].x - grid_x) + abs(c[0].y - grid_y))
-            # Case: Already found cells to compare this one to.
-            else:
-                dist = (abs(c[0].x - grid_x) + abs(c[0].y - grid_y))
-                if c[0].pollution > 0:
-                    welfare = self.welfare(c[0].sugar + occupant_sugar, c[0].spice + occupant_spice) * 10 / c[0].pollution
-                else:
-                    welfare = self.welfare(c[0].sugar + occupant_sugar, c[0].spice + occupant_spice)
-                if welfare > max_w:
-                    best_cells = [c]
-                    max_w = welfare
-                    max_dist = dist
-                elif welfare == max_w and dist < max_dist:
-                    best_cells = [c]
-                    max_dist = dist
-                elif welfare == max_w and dist == max_dist:
-                    best_cells.append(c)
-
-        # Finally, pick one of the best cells (if there are multiple)
-        # and set it as new position for this agent
-        c = random.choice(best_cells)
-        # Claim cell for our tribe, if we can afford it.
-        if c[0].tribe_id != self.tribe_id and self.tribe.can_defend(self.tribe_id):
-            self.tribe.tribal_area[self.tribe_id] += 1
-            self.tribe.tribal_area[c[0].tribe_id] -= 1
-            c[0].tribe_id = self.tribe_id
-
-        # Save my current position...
-        self.prev_x = self.x
-        self.prev_y = self.y
-        # ... and move to the new one.
-        self.x = (c[0].x * self.size) + int(self.size / 2)
-        self.y = (c[0].y * self.size) + int(self.size / 2)
-        # Increase the cell's visit counter. This is only important for
-        # the heat map visualization option.
-        c[0].visits += 1
-        # Calculate pollution
-        c[0].pollute(c[0].sugar + c[0].spice, self.meta_sugar + self.meta_spice)
-        # Additionally, try to eat from it and kill possible occupants.
-        self.eat_from_cell(c)
-
-    def eat_from_cell(self, cell):
+    def eat_from_cell(self, cell, agent_positions):
         """
         Take all resources from cell, then claim it, if possible.
         Furthermore metabolise and update tribal statistics.
@@ -275,12 +185,12 @@ class Agent:
         occupant_sugar = 0
         occupant_spice = 0
         # If there happens to be an occupant, kill him/her.
-        if cell[1]:
+        if cell[1] and (cell[1].x != self.x or cell[1].y != self.y):
             occupant_sugar = cell[1].sugar
             occupant_spice = cell[1].spice
             cell[1].sugar = 0
             cell[1].spice = 0
-            cell[1].dead = True
+            cell[1].die(agent_positions)
         # Grab all the resources from the cell.
         self.sugar += cell[0].sugar + occupant_sugar
         self.spice += cell[0].spice + occupant_spice
@@ -295,9 +205,9 @@ class Agent:
         # Update wealth count of my tribe.
         self.tribe.tribal_wealth[self.tribe_id] += (old_wealth - new_wealth)
         if self.sugar <= 0 or self.spice <= 0:
-            self.dead = True
+            self.die(agent_positions)
 
-    def r2_reproduce(self, neighbors, agent_positions):
+    def r2_reproduce(self, neighbors, agent_positions, new_agents):
         """
         Look out for possible mates and procreate!
         :param neighbors: All neighbors around the agents' cell and their occupants.
@@ -339,6 +249,7 @@ class Agent:
                     m.children.append(child)
                     # Update the abm that it has to schedule a new agent.
                     agent_positions[n_x, n_y] = child
+                    new_agents.append(child)
 
     def r3_culture(self, neighbors):
         """
@@ -483,10 +394,13 @@ class Agent:
         for d in eliminated:
             del(self.diseases[d])
 
-    def on_death(self):
+    def die(self, agent_positions):
         """
         As the name suggests, this method is to be executed upon the agent's death.
         """
+        # Remove myself from the world
+        del(agent_positions[self.x, self.y])
+        self.dead = True
         # Inherit my wealth to all my kids
         if self.children:
             num_kids = len(self.children)
@@ -499,25 +413,26 @@ class Agent:
         self.sugar = 0
         self.spice = 0
 
-    def perceive_and_act(self, ca, agent_positions):
+    def perceive_and_act(self, ca, agent_positions, new_agents):
         """
         Perceiving the environment and act according to the rules
         """
-        self.check_status()
-        self.prev_x = self.x
-        self.prev_y = self.y
-        self.sugar_gathered = 0
-        self.spice_gathered = 0
-        self.sugar_traded = 0
-        self.spice_traded = 0
+        self.check_status(agent_positions)
         if not self.dead:
+            self.prev_x = self.x
+            self.prev_y = self.y
+            self.sugar_gathered = 0
+            self.spice_gathered = 0
+            self.sugar_traded = 0
+            self.spice_traded = 0
             vc = ca.get_visible_cells(agent_positions, self.x, self.y, self.vision)
-            self.r1_select_best_cell(vc)
+            self.r1_select_best_cell(vc, agent_positions)
             #self.r1_select_best_cell_w_pollution(vc)
-            nb = ca.get_neighborhood(agent_positions, self.x, self.y)
-            #vc = ca.get_visible_cells(agent_positions, self.x, self.y, self.vision)
-            self.r2_reproduce(nb, agent_positions)
-            self.r3_culture(nb)  # vc
-            self.r4_trading(nb)  # vc
-            self.r5_diseases(nb)
-            self.chromosome.mutate()
+            if not self.dead:
+                nb = ca.get_neighborhood(agent_positions, self.x, self.y)
+                #vc = ca.get_visible_cells(agent_positions, self.x, self.y, self.vision)
+                self.r2_reproduce(nb, agent_positions, new_agents)
+                self.r3_culture(nb)  # vc
+                self.r4_trading(nb)  # vc
+                self.r5_diseases(nb)
+                self.chromosome.mutate()

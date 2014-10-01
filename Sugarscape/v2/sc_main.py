@@ -11,6 +11,7 @@ __version__ = '1.0'
 
 import pygame
 import random
+import time
 
 from abm.sc_abm import ABM
 from ca.sc_ca import CA
@@ -137,6 +138,7 @@ class Sugarscape:
               "                                                                               ")
 
         while 1:
+            #t1 = time.time()
             # This block performs a simulation step.
             if GC.RUN_SIMULATION:
                 self.step_simulation()
@@ -147,6 +149,8 @@ class Sugarscape:
 
             if len(self.abm.agent_dict) == 0:
                 self.reset_simulation()
+            #t2 = time.time()
+            #print("> time per cycle: {0:.5}".format(t2 - t1))
 
 
 if __name__ == '__main__':

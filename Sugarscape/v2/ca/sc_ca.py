@@ -58,9 +58,9 @@ class CA:
         """
         Simply iterating over all cells and calling their draw() method.
         """
-        for y in range(0, self.height):
-            for x in range(0, self.width):
-                self.visualizer.draw_cell(self.ca_grid[x, y])
+        draw = self.visualizer.draw_cell
+        for v in self.ca_grid.values():
+            draw(v)
 
     def cycle_automaton(self):
         """

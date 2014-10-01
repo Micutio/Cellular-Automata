@@ -10,7 +10,7 @@ class GlobalConstants:
         self.RUN_SIMULATION = False
         self.NUM_AGENTS = 200
         self.NUM_TRIBES = 2
-        self.CELL_SIZE = 12
+        self.CELL_SIZE = 15
         self.DIM_X = 50  # How many cells is the ca wide?
         self.DIM_Y = 50  # How many cells is the ca high?
         self.GRID_WIDTH = self.DIM_X * self.CELL_SIZE
