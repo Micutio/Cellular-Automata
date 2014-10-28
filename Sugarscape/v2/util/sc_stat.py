@@ -2,6 +2,7 @@ __author__ = 'Michael Wagner'
 __version__ = '1.0'
 
 import matplotlib.pyplot as plt
+plt.xkcd()
 
 
 class Statistics:
