@@ -7,15 +7,19 @@ __author__ = 'Michael Wagner'
 
 
 class ABM:
-    def __init__(self, visualizer, gc):
+    def __init__(self, gc, visualizer, proto_agent=None):
         """
         Initializes an abm with the given number of agents and returns it.
         :param visualizer: Necessary for graphical output of the agents.
         :param gc: Global Constants, Parameters for the ABM.
         :return: An initialized ABM.
         """
-        self.agent_locations = {}
-        self.agent_list = []
+        if proto_agent is None:
+            self.agent_list = []
+            self.agent_locations = {}
+        else:
+            self.agent_list = [proto_agent]
+
         self.visualizer = visualizer
         self.gc = gc
 
@@ -48,6 +52,9 @@ class ABM:
             draw(a)
 
     def remove_agent(self, agent):
+        """
+        Removes an agent from the system.
+        """
         x = int(agent.prev_x / self.gc.CELL_SIZE)
         y = int(agent.prev_y / self.gc.CELL_SIZE)
         a_index = -1

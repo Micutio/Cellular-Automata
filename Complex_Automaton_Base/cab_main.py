@@ -9,5 +9,9 @@ __author__ = 'Michael Wagner'
 
 if __name__ == '__main__':
     GC = GlobalConstants()
-    simulation = ComplexAutomaton(GC)
+    simulation = ComplexAutomaton(GC,
+                                  proto_cell=None,
+                                  proto_agent=None,
+                                  proto_handler=None,
+                                  proto_visualizer=None)
     simulation.run_main_loop()

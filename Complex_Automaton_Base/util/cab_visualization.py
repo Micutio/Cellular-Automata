@@ -1,5 +1,8 @@
+"""
+This module contains a simple visualization class, which the actual simulation visualizer should inherit from.
+"""
+
 __author__ = 'Michael Wagner'
-__version__ = '1.0'
 
 import pygame
 
@@ -14,42 +17,27 @@ class Visualization:
         Initializes the visualization and passes the surface on which to draw.
         :param surface: Pygame surface object.
         """
-        # TODO: Comment what the modes do, for better overview.
         self.surface = surface
-        self.draw_agent_mode = 1
-        self.draw_cell_mode = 1
         self.gc = gc
+
+    def clone(self, surface):
+        return Visualization(surface, self.gc)
 
     def draw_agent(self, agent):
         """
-        Draw agent as a simple red circle
-        :param agent:
+        Simple exemplary visualization. Draw agent as a black circle
         """
-        radius = int(agent.size / 2)
         if not agent.dead:
-            if agent.id == "hive":
-                color1 = (0, 0, 200)
-            elif agent.id == "food" and agent.food > 0:
-                food_ratio = agent.food / self.gc.MAX_FOOD
-                red = green = int(255 * food_ratio)
-                color1 = (red, green, 0)
-            else:
-                color1 = (255, 0, 0)
-            pygame.draw.circle(self.surface, color1, [agent.x, agent.y], radius, 0)
+            radius = int(agent.size / 2)
+            pygame.draw.circle(self.surface, (0, 0, 0), [agent.x, agent.y], radius, 0)
         return
 
     def draw_cell(self, cell):
         """
-        Draw cell in following colors:
-        a) Dark green if it is a hive.
-        b) Yellow if it is food.
-        c) According to pheromones there, if it is none of the above.
-        :param cell:
-        :return:
+        Simple exemplary visualization. Draw cell in white.
         """
-        green = int(255 * (cell.pheromones["hive"] / self.gc.MAX_PHEROMONE))
-        blue = int(255 * (cell.pheromones["food"] / self.gc.MAX_PHEROMONE))
-        red = int((green + blue) / 2)
-        color1 = (red, green, blue)
-        pygame.draw.rect(self.surface, color1, (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
+        if cell is None:
+            pass
+        else:
+            pygame.draw.rect(self.surface, (255, 255, 255), (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
         return

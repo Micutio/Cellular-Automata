@@ -8,7 +8,7 @@ from ca.cab_cell import CACell
 
 
 class CA:
-    def __init__(self, visualizer, gc):
+    def __init__(self, gc, visualizer, proto_cell=None):
         """
         Initializes and returns the cellular automaton.
         The CA is a dictionary and not a list of lists
@@ -23,16 +23,22 @@ class CA:
         self.visualizer = visualizer
         self.use_moore_neighborhood = gc.USE_MOORE_NEIGHBORHOOD
 
-        for j in range(0, self.height):
-            for i in range(0, self.width):
-                self.ca_grid[i, j] = CACell(i, j, gc.CELL_SIZE)
+        if proto_cell is None:
+            for j in range(0, self.height):
+                for i in range(0, self.width):
+                    self.ca_grid[i, j] = CACell(i, j, gc.CELL_SIZE, gc)
+        else:
+            for j in range(0, self.height):
+                for i in range(0, self.width):
+
+                    self.ca_grid[i, j] = proto_cell.clone(i, j, gc.CELL_SIZE)
 
     def draw_cells(self):
         """
         Simply iterating over all cells and calling their draw() method.
         """
         draw = self.visualizer.draw_cell
-        for cell in self.ca_grid:
+        for cell in self.ca_grid.values():
             draw(cell)
 
     def cycle_automaton(self):
