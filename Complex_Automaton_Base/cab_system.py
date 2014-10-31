@@ -7,6 +7,7 @@ __author__ = 'Michael Wagner'
 
 
 import pygame
+import time
 
 from ca.cab_ca import CA
 from abm.cab_abm import ABM
@@ -30,22 +31,26 @@ class ComplexAutomaton:
         pygame.display.set_caption('Complex Automaton Base')
 
         if proto_visualizer is None:
-            self.visualizer = Visualization(self.screen, self.gc)
+            self.visualizer = Visualization(self.gc, self.screen)
         else:
-            self.visualizer = proto_visualizer.clone(self.screen, self.gc)
+            self.visualizer = proto_visualizer.clone(self.screen)
 
         if proto_cell is None:
             self.ca = CA(self.gc, self.visualizer)
+            self.proto_cell = None
         else:
             self.ca = CA(self.gc, self.visualizer, proto_cell=proto_cell)
+            self.proto_cell = proto_cell
 
         if proto_agent is None:
             self.abm = ABM(self.gc, self.visualizer)
+            self.proto_agent = None
         else:
             self.abm = ABM(self.gc, self.visualizer, proto_agent=proto_agent)
+            self.proto_agent = proto_agent
 
         if proto_handler is None:
-            self.handler = InputHandler(self)
+            self.handler = InputHandler(cab_system=self)
         else:
             self.handler = proto_handler.clone(self)
 
@@ -63,12 +68,14 @@ class ComplexAutomaton:
               "\n" % self.gc.VERSION)
 
     def reset_simulation(self):
-        self.ca.__init__(self.gc, self.visualizer)
-        self.abm.__init__(self.gc, self.visualizer)
+        self.ca.__init__(self.gc, self.visualizer, self.proto_cell)
+        self.abm.__init__(self.gc, self.visualizer, self.proto_agent)
+        self.gc.TIME_STEP = 0
 
     def step_simulation(self):
         self.abm.cycle_system(self.ca)
         self.ca.cycle_automaton()
+        self.gc.TIME_STEP += 1
 
     def render_simulation(self):
         self.ca.draw_cells()

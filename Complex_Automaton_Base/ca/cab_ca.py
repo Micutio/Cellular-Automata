@@ -22,6 +22,7 @@ class CA:
         self.cell_size = gc.CELL_SIZE
         self.visualizer = visualizer
         self.use_moore_neighborhood = gc.USE_MOORE_NEIGHBORHOOD
+        self.use_borders = gc.USE_CA_BORDERS
 
         if proto_cell is None:
             for j in range(0, self.height):
@@ -77,20 +78,22 @@ class CA:
         return neighborhood
 
     def update_cells_from_neighborhood(self):
-        if self.use_moore_neighborhood:
+        if not self.use_moore_neighborhood:
             self.von_neumann()
-            self.borders_von_neumann()
+            if self.use_borders:
+                self.borders_von_neumann()
         else:
             self.moore()
-            self.borders_moore()
+            if self.use_borders:
+                self.borders_moore()
 
     def von_neumann(self):
         """
         Looping over all cells to gather the neighbor information they need to update.
         This method uses Von-Neumann-Neighborhood
         """
-        for y in range(1, self.grid_height - 1):
-            for x in range(1, self.grid_width - 1):
+        for y in range(1, self.height - 1):
+            for x in range(1, self.width - 1):
                 neighbors = [self.ca_grid[x, (y - 1)],
                              self.ca_grid[x, (y + 1)],
                              self.ca_grid[(x - 1), y],
@@ -101,16 +104,16 @@ class CA:
         """
         Going through all border-regions of the automaton to update them.
         """
-        w = self.grid_width
-        h = self.grid_height
-        for y in range(1, self.grid_height - 1):
+        w = self.width
+        h = self.height
+        for y in range(1, self.height - 1):
             neighbors_vn = [self.ca_grid[0, (y - 1)], self.ca_grid[0, (y + 1)], self.ca_grid[1, y]]
             self.ca_grid[0, y].sense_neighborhood(neighbors_vn)
 
             neighbors_vn = [self.ca_grid[(w - 1), (y - 1)], self.ca_grid[(w - 1), (y + 1)], self.ca_grid[(w - 2), y]]
             self.ca_grid[(w - 1), y].sense_neighborhood(neighbors_vn)
 
-        for x in range(1, self.grid_width - 1):
+        for x in range(1, self.width - 1):
             neighbors_vn = [self.ca_grid[x, 1], self.ca_grid[(x - 1), 0], self.ca_grid[(x + 1), 0]]
             self.ca_grid[x, 0].sense_neighborhood(neighbors_vn)
 
@@ -138,8 +141,8 @@ class CA:
         Looping over all cells to gather the neighbor information they need to update.
         This method uses Moore_neighborhood.
         """
-        for y in range(1, self.grid_height - 1):
-            for x in range(1, self.grid_width - 1):
+        for y in range(1, self.height - 1):
+            for x in range(1, self.width - 1):
                 neighbors = [self.ca_grid[x, (y - 1)],
                              self.ca_grid[x, (y + 1)],
                              self.ca_grid[(x - 1), y],
@@ -154,9 +157,9 @@ class CA:
         """
         Going through all border-regions of the automaton to update them.
         """
-        w = self.grid_width
-        h = self.grid_height
-        for y in range(1, self.grid_height - 1):
+        w = self.width
+        h = self.height
+        for y in range(1, self.height - 1):
             neighbors_mo = [self.ca_grid[0, (y - 1)], self.ca_grid[0, (y + 1)], self.ca_grid[1, y],
                             self.ca_grid[1, (y - 1)], self.ca_grid[1, (y + 1)]]
             self.ca_grid[0, y].sense_neighborhood(neighbors_mo)
@@ -165,7 +168,7 @@ class CA:
                             self.ca_grid[(w - 2), (y - 1)], self.ca_grid[(w - 2), (y + 1)]]
             self.ca_grid[(w - 1), y].sense_neighborhood(neighbors_mo)
 
-        for x in range(1, self.grid_width - 1):
+        for x in range(1, self.width - 1):
             neighbors_mo = [self.ca_grid[x, 1], self.ca_grid[(x - 1), 0], self.ca_grid[(x + 1), 0],
                             self.ca_grid[(x - 1), 1], self.ca_grid[(x + 1), 1]]
             self.ca_grid[x, 0].sense_neighborhood(neighbors_mo)

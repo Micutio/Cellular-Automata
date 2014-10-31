@@ -12,9 +12,13 @@ class InputHandler:
     def __init__(self, cab_system):
         self.mx = 0
         self.my = 0
-        self.sys = cab_system
-        self.disease = "b"
-        self.old_hive_pos = None
+        if cab_system is None:
+            self.sys = None
+        else:
+            self.sys = cab_system
+
+    def clone(self, cab_sys):
+        return InputHandler(cab_sys)
 
     def process_input(self):
         """
@@ -29,11 +33,12 @@ class InputHandler:
                 self.mouse_motion()
             # Mouse action
             elif event.type == pygame.MOUSEBUTTONUP:
-                self.mouse_action(event.button)
+                self.custom_mouse_action(event.button)
             # Keyboard key is pressed
             elif event.type == pygame.KEYUP:
                 # space bar is pressed
-                self.keyboard_action(event.key)
+                self.def_keyboard_action(event.key)
+                self.custom_keyboard_action(event.key)
 
     def mouse_motion(self):
         """
@@ -43,9 +48,9 @@ class InputHandler:
         self.mx = (self.mx / self.sys.gc.CELL_SIZE)
         self.my = (self.my / self.sys.gc.CELL_SIZE)
 
-    def mouse_action(self, button):
+    def custom_mouse_action(self, button):
         """
-        Processing Mouse action. Extend module here!
+        Processing Mouse action. Overwrite to extend!
         """
         # Click on left mouse button.
         if button == 1:
@@ -55,10 +60,9 @@ class InputHandler:
         elif button == 3:
             raise NotImplementedError
 
-    def keyboard_action(self, active_key):
+    def def_keyboard_action(self, active_key):
         """
         Method to process all the keyboard inputs.
-        Define additional keys here!
         """
         if active_key == pygame.K_SPACE:
             self.sys.gc.RUN_SIMULATION = not self.sys.gc.RUN_SIMULATION
@@ -70,8 +74,16 @@ class InputHandler:
         # Simulation Standard: 'r' resets the simulation
         if active_key == pygame.K_r:
             self.sys.reset_simulation()
+            print(" > simulation reset")
 
         # Simulation Standard: 's' advances the simulation by one step
         if active_key == pygame.K_s:
             self.sys.step_simulation()
             self.sys.render_simulation()
+
+    def custom_keyboard_action(self, active_key):
+        """
+        Customizable Method to process keyboard inputs.
+        Overwrite this method to add more inputs.
+        """
+        pass

@@ -12,10 +12,12 @@ class GlobalConstants:
         #     SIMULATION CONSTANTS     #
         ################################
         self.RUN_SIMULATION = False
+        self.TIME_STEP = 0
         ################################
         #         CA CONSTANTS         #
         ################################
         self.USE_MOORE_NEIGHBORHOOD = True
+        self.USE_CA_BORDERS = True
         self.DIM_X = 50  # How many cells is the ca wide?
         self.DIM_Y = 50  # How many cells is the ca high?
         self.CELL_SIZE = 15  # How long/wide is one cell?
