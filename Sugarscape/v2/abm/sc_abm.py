@@ -78,9 +78,12 @@ class ABM:
         # While we're at it, look for dead agents to remove
         new_agents = []
         for a in self.agent_list:
-            a.perceive_and_act(ca, self.agent_dict, new_agents)
+            offspring = a.perceive_and_act(ca, self.agent_dict)
+            if not offspring is None:
+                new_agents.append(offspring)
             self.spawn_disease()
         self.agent_list.extend(new_agents)
+        self.agent_list = [a for a in self.agent_list if not a.dead]
 
     def draw_agents(self):
         """

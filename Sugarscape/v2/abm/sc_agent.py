@@ -207,7 +207,7 @@ class Agent:
         if self.sugar <= 0 or self.spice <= 0:
             self.die(agent_positions)
 
-    def r2_reproduce(self, neighbors, agent_positions, new_agents):
+    def r2_reproduce(self, neighbors, agent_positions):
         """
         Look out for possible mates and procreate!
         :param neighbors: All neighbors around the agents' cell and their occupants.
@@ -249,7 +249,7 @@ class Agent:
                     m.children.append(child)
                     # Update the abm that it has to schedule a new agent.
                     agent_positions[n_x, n_y] = child
-                    new_agents.append(child)
+                    return child
 
     def r3_culture(self, neighbors):
         """
@@ -413,7 +413,7 @@ class Agent:
         self.sugar = 0
         self.spice = 0
 
-    def perceive_and_act(self, ca, agent_positions, new_agents):
+    def perceive_and_act(self, ca, agent_positions):
         """
         Perceiving the environment and act according to the rules
         """
@@ -431,8 +431,9 @@ class Agent:
             if not self.dead:
                 nb = ca.get_neighborhood(agent_positions, self.x, self.y)
                 #vc = ca.get_visible_cells(agent_positions, self.x, self.y, self.vision)
-                self.r2_reproduce(nb, agent_positions, new_agents)
+                offspring = self.r2_reproduce(nb, agent_positions)
                 self.r3_culture(nb)  # vc
                 self.r4_trading(nb)  # vc
                 self.r5_diseases(nb)
                 self.chromosome.mutate()
+                return offspring
