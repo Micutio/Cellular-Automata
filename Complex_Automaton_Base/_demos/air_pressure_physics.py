@@ -23,6 +23,7 @@ class GC(GlobalConstants):
         #     SIMULATION CONSTANTS     #
         ################################
         self.RUN_SIMULATION = False
+        self.ONE_AGENT_PER_CELL = False
         ################################
         #         CA CONSTANTS         #
         ################################

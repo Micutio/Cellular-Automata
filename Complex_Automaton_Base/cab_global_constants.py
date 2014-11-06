@@ -13,6 +13,7 @@ class GlobalConstants:
         ################################
         self.RUN_SIMULATION = False
         self.TIME_STEP = 0
+        self.ONE_AGENT_PER_CELL = False
         ################################
         #         CA CONSTANTS         #
         ################################

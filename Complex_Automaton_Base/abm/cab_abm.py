@@ -6,6 +6,7 @@ except for the agent classes themselves.
 __author__ = 'Michael Wagner'
 
 
+# TODO: include choice between cells inhabitable by only one or multiple agents at once.
 class ABM:
     def __init__(self, gc, visualizer, proto_agent=None):
         """
@@ -38,10 +39,15 @@ class ABM:
         Adds an agent to be scheduled by the abm.
         """
         pos = (int(agent.x / self.gc.CELL_SIZE), int(agent.y / self.gc.CELL_SIZE))
-        if pos in self.agent_locations:
-            self.agent_locations[pos].append(agent)
+        if self.gc.ONE_AGENT_PER_CELL:
+            if not pos in self.agent_locations:
+                self.agent_locations[pos] = agent
+            # Can't insert agent if cell is already occupied.
         else:
-            self.agent_locations[pos] = [agent]
+            if pos in self.agent_locations:
+                self.agent_locations[pos].append(agent)
+            else:
+                self.agent_locations[pos] = [agent]
 
     def draw_agents(self):
         """
@@ -58,9 +64,13 @@ class ABM:
         x = int(agent.prev_x / self.gc.CELL_SIZE)
         y = int(agent.prev_y / self.gc.CELL_SIZE)
         a_index = -1
-        for a in self.agent_locations[x, y]:
-            if a.a_id == agent.a_id:
-                a_index = self.agent_locations[x, y].index(a)
-                break
+        if self.gc.ONE_AGENT_PER_CELL:
+            if self.agent_locations[x, y].a_id == agent.a_id:
+                del(self.agent_locations[x, y])
+        else:
+            for a in self.agent_locations[x, y]:
+                if a.a_id == agent.a_id:
+                    a_index = self.agent_locations[x, y].index(a)
+                    break
         if a_index != -1:
             self.agent_locations[x, y].pop(a_index)

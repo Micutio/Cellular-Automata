@@ -7,12 +7,11 @@ __author__ = 'Michael Wagner'
 
 
 import pygame
-import time
 
-from ca.cab_ca import CA
-from abm.cab_abm import ABM
-from util.cab_input_handling import InputHandler
-from util.cab_visualization import Visualization
+from cab_ca import CA
+from cab_abm import ABM
+from cab_input_handling import InputHandler
+from cab_visualization import Visualization
 
 
 class ComplexAutomaton:

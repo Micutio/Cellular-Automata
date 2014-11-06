@@ -4,7 +4,7 @@ This module contains all classes needed for simulating the cellular automaton.
 
 __author__ = 'Michael Wagner'
 
-from ca.cab_cell import CACell
+from cab_cell import CACell
 
 
 class CA:
