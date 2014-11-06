@@ -20,9 +20,10 @@ class Agent:
         self.prev_y = y
         self.size = gc.CELL_SIZE
         self.gc = gc
+        self.dead = False
 
     def clone(self, x, y):
         return Agent(x, y, self.gc)
 
-    def perceive_and_act(self, ca, agent_list, agent_locations):
+    def perceive_and_act(self, ca, abm):
         raise NotImplementedError("Method needs to be implemented")

@@ -15,14 +15,14 @@ class ABM:
         :param gc: Global Constants, Parameters for the ABM.
         :return: An initialized ABM.
         """
-        if proto_agent is None:
-            self.agent_list = []
-            self.agent_locations = {}
-        else:
-            self.agent_list = [proto_agent]
-
+        self.agent_list = []
+        self.agent_locations = {}
         self.visualizer = visualizer
         self.gc = gc
+
+        if not proto_agent is None:
+            self.add_agent(proto_agent)
+            self.agent_list = [proto_agent]
 
     def cycle_system(self, ca):
         """
@@ -31,7 +31,7 @@ class ABM:
         # Have all agents perceive and act in a random order
         # While we're at it, look for dead agents to remove
         for a in self.agent_list:
-            a.perceive_and_act(ca, self.agent_locations, self.agent_list)
+            a.perceive_and_act(ca, self)
         self.agent_list = [agent for agent in self.agent_list if not agent.dead]
 
     def add_agent(self, agent):

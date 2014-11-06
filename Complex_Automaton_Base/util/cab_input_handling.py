@@ -80,6 +80,7 @@ class InputHandler:
         if active_key == pygame.K_s:
             self.sys.step_simulation()
             self.sys.render_simulation()
+            print(" < stepping simulation")
 
     def custom_keyboard_action(self, active_key):
         """

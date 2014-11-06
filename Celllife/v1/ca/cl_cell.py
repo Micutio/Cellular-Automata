@@ -20,12 +20,15 @@ class CellLifeCell(CACell):
         self.is_persistent = False
         #self.neighbor_values = {"o2": 0, "co2": 0, "h2o": 0, "glucose": 0}
 
-    def sense_neighborhood(self, neighbors):
+    def clone(self, x, y, c_size):
+        return CellLifeCell(x, y, c_size, self.gc)
+
+    def sense_neighborhood(self, neighborhood):
         neigh_o2 = 0.0
         neigh_co2 = 0.0
         num_neighbors = 0
         if not self.is_persistent:
-            for n in neighbors:
+            for n in neighborhood:
                 if not n.is_persistent:
                     num_neighbors += 1
                     neigh_o2 += n.o2
