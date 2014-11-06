@@ -1,58 +1,45 @@
 __author__ = 'Michael Wagner'
-__version__ = '2.0'
 
 
-class ClassCell:
+from cab_cell import CACell
+
+
+class CellLifeCell(CACell):
     """
     This class models one cell of the CA, while the grid itself will be a dictionary of ClassCell instances.
     """
 
-    def __init__(self, x, y, c_size, diffusion, evaporation):
-        self.x = x
-        self.y = y
-        self.w = c_size
-        self.h = c_size
-        self.diffusion = diffusion
-        self.evaporation = evaporation
-        self.num_neighbors = 0
-        self.co2 = 5
-        self.light = 20
-        self.h2o = 20
-        self.o2 = 0
-        self.glucose = 0
-        self.neighbors_o2 = 0
-        self.neighbors_co2 = 0
-        self.neighbors_h2o = 0
-        self.neighbors_glucose = 0
+    def __init__(self, x, y, c_size, gc):
+        super().__init__(x, y, c_size, gc)
+        self.diffusion = gc.DIFFUSION
+        self.evaporation = gc.EVAPORATION
+        self.o2 = 0.0
+        self.co2 = 0.0
+        self.new_o2 = 0
+        self.new_co2 = 0
         self.is_persistent = False
         #self.neighbor_values = {"o2": 0, "co2": 0, "h2o": 0, "glucose": 0}
 
-    def sense_neighbor(self, neigh):
+    def sense_neighborhood(self, neighbors):
+        neigh_o2 = 0.0
+        neigh_co2 = 0.0
+        num_neighbors = 0
         if not self.is_persistent:
-            self.num_neighbors += 1
-            self.neighbors_o2 += neigh.o2
-            self.neighbors_co2 += neigh.o2
-            self.neighbors_h2o += neigh.h2o
-            self.neighbors_glucose += neigh.glucose
+            for n in neighbors:
+                if not n.is_persistent:
+                    num_neighbors += 1
+                    neigh_o2 += n.o2
+                    neigh_co2 += n.co2
+
+            if num_neighbors > 0:
+                avg_o2 = neigh_o2 / num_neighbors
+                avg_co2 = neigh_co2 / num_neighbors
+                self.new_o2 = (1.0 - (self.evaporation * 10)) * (self.o2 + (self.diffusion * 10) * (avg_o2 - self.o2))
+                self.new_co2 = (1.0 - self.evaporation * 10) * (self.co2 + (self.diffusion * 10) * (avg_co2 - self.co2))
 
     def update(self):
         """
         This method regulates the cell's temperature according to the temperature of its neighbors.
         """
-        if not self.is_persistent:
-            avg_o2 = self.neighbors_o2 / self.num_neighbors
-            self.o2 = (1.0 - (self.evaporation * 10)) * (self.o2 + (self.diffusion * 10) * (avg_o2 - self.o2))
-            avg_co2 = self.neighbors_co2 / self.num_neighbors
-            self.co2 = (1.0 - self.evaporation * 10) * (self.co2 + (self.diffusion * 10) * (avg_co2 - self.co2))
-            #avg_h2o = self.neighbors_h2o / self.num_neighbors
-            #self.h2o = (1.0 - (self.evaporation * 5)) * (self.h2o + (self.diffusion * 5) * (avg_h2o - self.h2o))
-            avg_glucose = self.neighbors_glucose / self.num_neighbors
-            self.glucose = (1.0 - self.evaporation) * (self.glucose + self.diffusion * (avg_glucose - self.glucose))
-
-            self.num_neighbors = 0
-            self.neighbors_o2 = 0
-            self.neighbors_co2 = 0
-            self.neighbors_h2o = 0
-            self.neighbors_glucose = 0
-        if self.co2 + 0.01 < 5:
-            self.co2 += 0.01
+        self.o2 = self.new_o2
+        self.co2 = self.new_co2

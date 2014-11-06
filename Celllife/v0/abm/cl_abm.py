@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from v1.abm.cl_agent import BioCell
+from v0.abm.cl_agent import BioCell
 
 __author__ = 'Michael Wagner'
 __version__ = '1.0'

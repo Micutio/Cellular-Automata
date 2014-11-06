@@ -1,8 +1,8 @@
-from v1.abm.cl_abm import ABM
-from v1.ca.cl_ca import CA
-from v1.cl_global_constants import GlobalConstants
-from v1.util.cl_io_handling import EventHandler
-from v1.util.cl_visualization import Visualization
+from v0.abm.cl_abm import ABM
+from v0.ca.cl_ca import CA
+from v0.cl_global_constants import GlobalConstants
+from v0.util.cl_io_handling import EventHandler
+from v0.util.cl_visualization import Visualization
 
 __author__ = 'Michael Wagner'
 __version__ = '1.0'
