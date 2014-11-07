@@ -75,6 +75,7 @@ class ABM:
         # Have all agents perceive and act in a random order
         # While we're at it, look for dead agents to remove
         new_agents = []
+        
         for a in self.agent_list:
             offspring = a.perceive_and_act(ca, self.agent_dict)
             if not offspring is None:

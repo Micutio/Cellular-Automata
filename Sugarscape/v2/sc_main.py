@@ -36,7 +36,7 @@ class Sugarscape:
         self.gc = global_constants
 
         # Init random seed
-        random.seed(a="SUGARSCAPE", version=2)
+        random.seed(a="Sugarscape", version=2)
         # Save random state at the beginning of the run in case
         # we want to save and load the exact same sim instance later.
         self.random_state = random.getstate()

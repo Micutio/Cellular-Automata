@@ -106,14 +106,14 @@ class Statistics:
             color = '#%02x%02x%02x' % (rgb[0], rgb[1], rgb[2])
             pop_graph.plot(gen_line, self.tribes[i], "-", color=color, linewidth=1)
         plt.ylabel("population and tribes")
-        pop_graph.grid()
+        #pop_graph.grid()  # deactivate if using xkcd()
         #pop_graph.legend(("total pop", "male pop", "female pop", "tribes"), loc=7)
 
         resource_graph = plt.subplot(2, 2, 2)
         resource_graph.plot(gen_line, self.total_sugar, color="#90FF90", linewidth=1)
         resource_graph.plot(gen_line, self.total_spice, color="#FF9090", linewidth=1)
         plt.ylabel("resources")
-        resource_graph.grid()
+        #resource_graph.grid()  # deactivate if using xkcd()
         #resource_graph.legend(("total sugar", "total spice"), loc=7)
 
         production_graph = plt.subplot(2, 2, 3)
@@ -122,13 +122,13 @@ class Statistics:
         production_graph.plot(gen_line, self.production_spice, ":", color="#AA0000", linewidth=1)
         production_graph.plot(gen_line, self.trade_spice, "--", color="#AA0000", linewidth=1)
         plt.ylabel("production (dotted) and trade (dashed)")
-        production_graph.grid()
+        #production_graph.grid()  # deactivate if using xkcd()
 
         market_graph = plt.subplot(2, 2, 4)
         market_graph.plot(gen_line, self.sugar_price, color="#00FF00", linewidth=1)
         market_graph.plot(gen_line, self.spice_price, color="#FF0000", linewidth=1)
         plt.ylabel("market prices")
-        market_graph.grid()
+        #market_graph.grid()  # deactivate if using xkcd()
 
         plt.title("Sugarscape Information")
         plt.show()

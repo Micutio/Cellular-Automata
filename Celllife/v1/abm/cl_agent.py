@@ -13,7 +13,9 @@ class CellLifeAgent(Agent):
         return CellLifeAgent(x, y, self.gc)
 
     def perceive_and_act(self, ca, abm):
-        possible_cells = [cell for cell in ca.ca_grid.values() if not (cell.x, cell.y) in abm.agent_locations]
+        possible_cells = [cell for cell in ca.ca_grid.values() if
+                          not (cell.x, cell.y) in abm.agent_locations
+                          and abs(cell.x - self.x) < 2 and abs(cell.y - self.y) < 2]
         if possible_cells:
             new_cell = random.choice(possible_cells)
             abm.remove_agent(self)
