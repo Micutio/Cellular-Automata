@@ -13,14 +13,12 @@ class GlobalConstants:
         self.CELL_SIZE = 15
         self.DIM_X = 50  # How many cells is the ca wide?
         self.DIM_Y = 50  # How many cells is the ca high?
-        self.GRID_WIDTH = self.DIM_X * self.CELL_SIZE
-        self.GRID_HEIGHT = self.DIM_Y * self.CELL_SIZE
         # ABM_BOUNDS (x1, x2, y1, y2) describe a rectangle spanning
         # between the two points (x1, y1) and (x2, y2)
         # We use two rectangles to mark the areas the agents are spawning in.
         half_x = int(self.DIM_X / 2)
         half_y = int(self.DIM_Y / 2)
-        self.ABM_BOUNDS = [(half_x, 50, 0, half_y), (0, half_x, half_y, 50)]
+        self.ABM_BOUNDS = [(half_x, self.DIM_X, 0, half_y), (0, half_x, half_y, self.DIM_Y)]
         self.TICKS = 1
         self.EXPERIMENT_RUN = 1
         self.MAX_MEASURED_TICKS = 0

@@ -22,12 +22,10 @@ class ABM:
         self.visualizer = visualizer
         self.gc = gc
         total_wealth = 0
-        c = gc.CELL_SIZE
-        r = int(gc.CELL_SIZE / 2)
         # Create a list with possible spawn positions for every tribe, then pack them all into a list.
         position_list = []
         for b in gc.ABM_BOUNDS:
-            positions = [((x * c) + r, (y * c) + r) for x in range(b[0], b[1]) for y in range(b[2], b[3])]
+            positions = [(x, y) for x in range(b[0], b[1]) for y in range(b[2], b[3])]
             random.shuffle(positions)
             position_list.append(positions)
 
@@ -111,3 +109,18 @@ class ABM:
                     disease = Virus(dis_genome)
                     print(" > viral infection spawned: %s" % disease.genome_string)
                 victim.diseases[disease.genome_string] = disease
+
+    def add_agent(self, agent):
+        """
+        Adds an agent to be scheduled by the abm.
+        """
+        pos = (agent.x, agent.y)
+        if not pos in self.agent_dict:
+            self.agent_dict[pos] = agent
+
+    def remove_agent(self, agent):
+        """
+        Removes an agent from the system.
+        """
+        if self.agent_dict[agent.x, agent.y].a_id == agent.a_id:
+            del(self.agent_dict[agent.x, agent.y])

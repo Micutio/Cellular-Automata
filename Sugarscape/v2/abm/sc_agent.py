@@ -88,8 +88,6 @@ class Agent:
         Agent selects the best cell to move to, according to: its resources, occupier and tribal alignment.
         :param cells: A list of all cells+occupiers in my range of sight.
         """
-        grid_x = int(self.x / self.size)
-        grid_y = int(self.y / self.size)
         available_cells = []
         # At first filter out all cells we can possibly move to.
         while len(cells) > 0:
@@ -134,9 +132,9 @@ class Agent:
             if not best_cells:
                 best_cells = [c]
                 max_w = self.welfare(c[0].sugar + occupant_sugar, c[0].spice + occupant_spice)
-                max_dist = (abs(c[0].x - grid_x) + abs(c[0].y - grid_y))
+                max_dist = (abs(c[0].x - self.x) + abs(c[0].y - self.y))
             else:
-                dist = (abs(c[0].x - grid_x) + abs(c[0].y - grid_y))
+                dist = (abs(c[0].x - self.x) + abs(c[0].y - self.y))
                 welfare = self.welfare(c[0].sugar + occupant_sugar, c[0].spice + occupant_spice)
                 if welfare > max_w:
                     best_cells = [c]
@@ -166,8 +164,8 @@ class Agent:
             self.prev_x = self.x
             self.prev_y = self.y
             # ... and move to the new one.
-            self.x = (c[0].x * self.size) + int(self.size / 2)
-            self.y = (c[0].y * self.size) + int(self.size / 2)
+            self.x = c[0].x
+            self.y = c[0].y
             # Also do not forget to update the agent position dictionary
             del(agent_positions[self.prev_x, self.prev_y])
             agent_positions[self.x, self.y] = self
@@ -229,8 +227,8 @@ class Agent:
                 if free_cells and m.is_fertile() and m.gender != self.gender and both_wealthy1 and both_wealthy2:
                     # Take one free cell to place Junior there.
                     c = random.choice(free_cells)
-                    n_x = (c.x * self.size) + int(self.size / 2)
-                    n_y = (c.y * self.size) + int(self.size / 2)
+                    n_x = c.x
+                    n_y = c.y
                     n_s = self.size
                     # Give him / her initial resources
                     n_su = int(self.init_sugar / 2) + int(m.init_sugar / 2)

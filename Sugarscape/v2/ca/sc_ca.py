@@ -20,10 +20,8 @@ class CA:
         :return: The initialized CA.
         """
         self.ca_grid = {}
-        self.grid_height = gc.GRID_HEIGHT
-        self.grid_width = gc.GRID_WIDTH
-        self.height = int(self.grid_height / gc.CELL_SIZE)
-        self.width = int(self.grid_width / gc.CELL_SIZE)
+        self.height = int(gc.DIM_Y)
+        self.width = int(gc.DIM_X)
         self.cell_size = gc.CELL_SIZE
         self.season_count = 0
         self.season = 1
@@ -111,49 +109,41 @@ class CA:
         Delivers all cells that are in sight of cell(x,y) with sight range of v.
         Here we use the von-Neumann neighborhood
         """
-        x = int(agent_x / self.cell_size)
-        y = int(agent_y / self.cell_size)
         visible_cells = []
         for i in range(-v, v + 1):
             # 1. go through horizontal line of sight
-            grid_x = x + i
-            if (grid_x, y) in self.ca_grid:
-                new_cell = self.ca_grid[grid_x, y]
-                agnt_x = ((grid_x * self.cell_size) + int(self.cell_size / 2))
-                if (agnt_x, agent_y) not in a_pos:
+            grid_x = agent_x + i
+            if (grid_x, agent_y) in self.ca_grid:
+                new_cell = self.ca_grid[grid_x, agent_y]
+                if (grid_x, agent_y) not in a_pos:
                     new_agent = False
                 else:
-                    new_agent = a_pos[agnt_x, agent_y]
+                    new_agent = a_pos[grid_x, agent_y]
                 visible_cells.append((new_cell, new_agent))
             # 2. go through vertical line of sight. And this time skip your own cell,
             # because we already checked it in the horizontal line of sight
-            grid_y = y + i
-            if (x, grid_y) in self.ca_grid and i != 0:
-                new_cell = self.ca_grid[x, grid_y]
-                agnt_y = ((grid_y * self.cell_size) + int(self.cell_size / 2))
-                if (agent_x, agnt_y) not in a_pos:
+            grid_y = agent_y + i
+            if (agent_x, grid_y) in self.ca_grid and i != 0:
+                new_cell = self.ca_grid[agent_x, grid_y]
+                if (agent_x, grid_y) not in a_pos:
                     new_agent = False
                 else:
-                    new_agent = a_pos[agent_x, agnt_y]
+                    new_agent = a_pos[agent_x, grid_y]
                 visible_cells.append((new_cell, new_agent))
         return visible_cells
 
     def get_neighborhood(self, a_pos, agent_x, agent_y):
-        x = int(agent_x / self.cell_size)
-        y = int(agent_y / self.cell_size)
         neighborhood = []
         for i in range(-1, 2):
             for j in range(-1, 2):
-                grid_x = x + i
-                agnt_x = ((grid_x * self.cell_size) + int(self.cell_size / 2))
-                grid_y = y + j
-                agnt_y = ((grid_y * self.cell_size) + int(self.cell_size / 2))
+                grid_x = agent_x + i
+                grid_y = agent_y + j
                 if (grid_x, grid_y) in self.ca_grid and not (grid_x == 0 and grid_y == 0):
                     a = self.ca_grid[grid_x, grid_y]
-                    if (agnt_x, agnt_y) not in a_pos:
+                    if (grid_x, grid_y) not in a_pos:
                         b = False
                     else:
-                        b = a_pos[agnt_x, agnt_y]
+                        b = a_pos[grid_x, grid_y]
                     neighborhood.append((a, b))
         return neighborhood
 

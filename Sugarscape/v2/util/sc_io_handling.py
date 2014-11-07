@@ -36,8 +36,8 @@ class EventHandler:
 
     def mouse_motion(self):
         self.mx, self.my = pygame.mouse.get_pos()
-        self.mx = (self.mx / self.main.gc.CELL_SIZE)
-        self.my = (self.my / self.main.gc.CELL_SIZE)
+        self.mx = int(self.mx / self.main.gc.CELL_SIZE)
+        self.my = int(self.my / self.main.gc.CELL_SIZE)
 
     def mouse_action(self, button):
         # Click on left mouse button
@@ -46,13 +46,11 @@ class EventHandler:
             print("[SIMULATION][MODEL][CELL INFO]-------------------------------------------------")
             print(" > cell(%i, %i): sugar = %i, spice = %i" %
                   (self.mx, self.my,
-                   self.main.ca.ca_grid[int(self.mx), int(self.my)].sugar,
-                   self.main.ca.ca_grid[int(self.mx), int(self.my)].spice))
+                   self.main.ca.ca_grid[self.mx, self.my].sugar,
+                   self.main.ca.ca_grid[self.mx, self.my].spice))
             print("-------------------------------------------------------------------------------")
-            agent_x = (math.floor(self.mx) * self.main.gc.CELL_SIZE) + int(self.main.gc.CELL_SIZE / 2)
-            agent_y = (math.floor(self.my) * self.main.gc.CELL_SIZE) + int(self.main.gc.CELL_SIZE / 2)
-            if (agent_x, agent_y) in self.main.abm.agent_dict:
-                agent_attributes = vars(self.main.abm.agent_dict[agent_x, agent_y].chromosome)
+            if (self.mx, self.my) in self.main.abm.agent_dict:
+                agent_attributes = vars(self.main.abm.agent_dict[self.mx, self.my].chromosome)
                 print("[SIMULATION][MODEL][AGENT INFO]------------------------------------------------")
                 for key in sorted(agent_attributes):
                     if not ("att_map" in key or "immune_system" in key or "genomes" in key):
@@ -61,18 +59,16 @@ class EventHandler:
         # Click on right mouse button
         # -> display cell information
         elif button == 3:
-            agent_x = (math.floor(self.mx) * self.main.gc.CELL_SIZE) + int(self.main.gc.CELL_SIZE / 2)
-            agent_y = (math.floor(self.my) * self.main.gc.CELL_SIZE) + int(self.main.gc.CELL_SIZE / 2)
             # Create disease and infect selected agent.
-            if (agent_x, agent_y) in self.main.abm.agent_dict:
+            if (self.mx, self.my) in self.main.abm.agent_dict:
                 dis_genome = [random.getrandbits(1) for _ in range(self.main.gc.DISEASE_GENOME_LENGTH)]
                 if self.disease == "b":
                     bacteria = Bacteria(dis_genome)
-                    self.main.abm.agent_dict[agent_x, agent_y].diseases[bacteria.genome_string] = bacteria
+                    self.main.abm.agent_dict[self.mx, self.my].diseases[bacteria.genome_string] = bacteria
                     print(" < bacterial infection spawned: %s" % bacteria.genome_string)
                 if self.disease == "v":
                     virus = Virus(dis_genome)
-                    self.main.abm.agent_dict[agent_x, agent_y].diseases[virus.genome_string] = virus
+                    self.main.abm.agent_dict[self.mx, self.my].diseases[virus.genome_string] = virus
                     print(" < viral infection spawned: %s" % virus.genome_string)
 
     def keyboard_action(self, active_key):

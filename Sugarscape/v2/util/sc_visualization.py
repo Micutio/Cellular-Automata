@@ -25,8 +25,10 @@ class Visualization:
         Draw agent with 1) age, 2) gender, 3) tribe or something else.
         :param agent:
         """
-        radius = int(agent.size / 2)
         if not agent.dead:
+            radius = int(agent.size / 2)
+            x = int((agent.x * self.gc.CELL_SIZE) + (self.gc.CELL_SIZE / 2))
+            y = int((agent.y * self.gc.CELL_SIZE) + (self.gc.CELL_SIZE / 2))
             if self.draw_agent_mode == 0:
                 return
             elif self.draw_agent_mode == 1:
@@ -50,8 +52,8 @@ class Visualization:
                     blue = 90
                 color1 = (red, green, blue)
                 color2 = self.gc.TRIBE_COLORS[agent.tribe_id]
-                pygame.draw.circle(self.surface, color1, [agent.x, agent.y], radius, 0)
-                pygame.draw.circle(self.surface, color2, [agent.x, agent.y], radius - 2, 0)
+                pygame.draw.circle(self.surface, color1, [x, y], radius, 0)
+                pygame.draw.circle(self.surface, color2, [x, y], radius - 2, 0)
             elif self.draw_agent_mode == 2:
             # Show gender and age of the agents.
                 # Case 1: agent is a child.
@@ -75,11 +77,11 @@ class Visualization:
                     green = 160
                     blue = 160
                 color = (red, green, blue)
-                pygame.draw.circle(self.surface, color, [agent.x, agent.y], radius, 0)
+                pygame.draw.circle(self.surface, color, [x, y], radius, 0)
             elif self.draw_agent_mode == 3:
                 # Show only tribe of the agents.
                 color = self.gc.TRIBE_COLORS[agent.tribe_id]
-                pygame.draw.circle(self.surface, color, [agent.x, agent.y], radius, 0)
+                pygame.draw.circle(self.surface, color, [x, y], radius, 0)
             elif self.draw_agent_mode == 4:
                 # Show diseases.
                 has_virus = False
@@ -90,13 +92,13 @@ class Visualization:
                     else:
                         has_virus = True
                 if has_bacteria:
-                    pygame.draw.circle(self.surface, (0, 0, 255), [agent.x, agent.y], radius, 0)
+                    pygame.draw.circle(self.surface, (0, 0, 255), [x, y], radius, 0)
                 else:
-                    pygame.draw.circle(self.surface, (255, 255, 255), [agent.x, agent.y], radius, 0)
+                    pygame.draw.circle(self.surface, (255, 255, 255), [x, y], radius, 0)
                 if has_virus:
-                    pygame.draw.circle(self.surface, (170, 170, 0), [agent.x, agent.y], radius - 2, 0)
+                    pygame.draw.circle(self.surface, (170, 170, 0), [x, y], radius - 2, 0)
                 else:
-                    pygame.draw.circle(self.surface, (255, 255, 255), [agent.x, agent.y], radius - 2, 0)
+                    pygame.draw.circle(self.surface, (255, 255, 255), [x, y], radius - 2, 0)
         return
 
     def draw_cell(self, cell):

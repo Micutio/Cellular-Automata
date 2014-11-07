@@ -43,7 +43,9 @@ class Sugarscape:
         self.terminal = Terminal()
 
         pygame.init()
-        self.screen = pygame.display.set_mode((self.gc.GRID_WIDTH, self.gc.GRID_HEIGHT), pygame.RESIZABLE, 32)
+        width = self.gc.DIM_X * self.gc.CELL_SIZE
+        height = self.gc.DIM_Y * self.gc.CELL_SIZE
+        self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE, 32)
         pygame.display.set_caption('Sugarscape Simulation')
 
         self.visualizer = Visualization(self.screen, self.gc)
