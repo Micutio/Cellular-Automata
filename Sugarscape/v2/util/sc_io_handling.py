@@ -203,6 +203,9 @@ class EventHandler:
         if active_key == pygame.K_6:
             self.main.visualizer.draw_cell_mode = 6
             print(" < set draw cell mode to 5 (variable cell size)")
+        if active_key == pygame.K_7:
+            self.main.visualizer.draw_cell_mode = 7
+            print(" < set draw cell mode to 6 (round cells)")
 
     def save_sim_status_to_file(self):
         filename = self.main.gc.FILE_PATH + "sgrscp_" + str(self.main.gc.TICKS) + ".sav"
