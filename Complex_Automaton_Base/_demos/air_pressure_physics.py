@@ -3,7 +3,6 @@ Main module of the Flow and Pressure Demo.
 Uses the Complex Automaton Base.
 """
 from ca.cab_cell import CACell
-
 from cab_global_constants import GlobalConstants
 from cab_system import ComplexAutomaton
 from util.cab_input_handling import InputHandler

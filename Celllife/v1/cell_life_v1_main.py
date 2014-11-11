@@ -3,6 +3,9 @@ Main module of the Flow and Pressure Demo.
 Uses the Complex Automaton Base.
 """
 
+import sys
+cab_path = "C:/Users/michael.wagner/Documents/GitHub/Cellular-Automata/Complex_Automaton_Base"
+sys.path.append(cab_path)
 from cab_system import ComplexAutomaton
 
 from v1.global_constants import CellLifeGC
