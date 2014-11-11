@@ -1,7 +1,7 @@
 __author__ = 'Michael Wagner'
 __version__ = '1.0'
 
-
+import os
 class GlobalConstants:
     def __init__(self):
         ################################

@@ -163,6 +163,13 @@ class Visualization:
             new_h = int(cell.h * size)
             pygame.draw.rect(self.surface, (0, 0, 0), (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
             pygame.draw.rect(self.surface, col, (x, y, new_w, new_h), 0)
+        elif self.draw_cell_mode == 7:
+            col = self.calculate_cell_color(cell)
+            x = int((cell.x * self.gc.CELL_SIZE) + (self.gc.CELL_SIZE / 2))
+            y = int((cell.y * self.gc.CELL_SIZE) + (self.gc.CELL_SIZE / 2))
+            radius = int(cell.w / 2)
+            pygame.draw.rect(self.surface, (0, 0, 0), (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
+            pygame.draw.circle(self.surface, col, [x, y], radius, 0)
         return
 
     def calculate_cell_color(self, cell):

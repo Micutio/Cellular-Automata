@@ -203,22 +203,26 @@ class EventHandler:
         if active_key == pygame.K_6:
             self.main.visualizer.draw_cell_mode = 6
             print(" < set draw cell mode to 5 (variable cell size)")
+        if active_key == pygame.K_7:
+            self.main.visualizer.draw_cell_mode = 7
+            print(" < set draw cell mode to 6 (round cells)")
 
     def save_sim_status_to_file(self):
         filename = self.main.gc.FILE_PATH + "sgrscp_" + str(self.main.gc.TICKS) + ".sav"
         sim_state = {"ca_sugar": self.main.ca.landscape_sugar,
                      "ca_spice": self.main.ca.landscape_spice,
-                     "random_state": self.main.random_state}
+                     "random_state": self.main.random_state,
+                     "random_seed": self.main.seed}
         with open(filename, "wb") as handle:
             pickle.dump(sim_state, handle)
-        print(" > saved landscape to file")
+        print(" > saved landscape to file %s" % filename)
 
     def load_sim_status_from_file(self):
         found_files = [name for name in os.listdir(self.main.gc.FILE_PATH)
                        if os.path.isfile(name) and "sgrscp_" in name]
         l = len(found_files)
         if l == 0:
-            print(" < ERROR: no file found")
+            print(" < ERROR: no file found in %s" % self.main.gc.FILE_PATH)
             return
         elif l == 1:
             file = found_files[0]

@@ -11,6 +11,7 @@ __version__ = '1.0'
 
 import pygame
 import random
+import sys
 import time
 
 from abm.sc_abm import ABM
@@ -34,9 +35,14 @@ class Sugarscape:
         :param global_constants: All constants or important variables that control the simulation.
         """
         self.gc = global_constants
-
+        self.seed = None
         # Init random seed
-        random.seed(a="Sugarscape", version=2)
+        # TODO: Proper argument parsing a la "sc_main.py -seed <seed>"
+        if len(sys.argv) > 1:
+            self.seed = sys.argv[1]
+        else:
+            self.seed = "Sugarscape"
+        random.seed(a=self.seed, version=2)
         # Save random state at the beginning of the run in case
         # we want to save and load the exact same sim instance later.
         self.random_state = random.getstate()
@@ -99,7 +105,7 @@ class Sugarscape:
         self.abm.draw_agents()
         pygame.display.flip()
 
-    def reset_simulation(self, loaded=False):
+    def reset_simulation(self, loaded=None):
         # Finalize current simulation run.
         self.gc.EXPERIMENT_RUN += 1
         # Important for experiments: in case we found a configuration tha ran longer than all before, save it!
@@ -119,7 +125,8 @@ class Sugarscape:
         # we want to save and load the exact same sim instance later.
         self.random_state = random.getstate()
         # In case the simulation is reset to load previously saved one, the loaded values are applied.
-        if loaded:
+        if not loaded is None:
+            random.seed(a=loaded["random_seed"], version=2)
             random.setstate(loaded["random_state"])
             self.ca.__init__(self.visualizer, self.gc, ls_sugar=loaded["ca_sugar"], ls_spice=loaded["ca_spice"])
         # In case we have landscape mode 4, use the same configuration as last time.

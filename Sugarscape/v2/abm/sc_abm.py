@@ -101,15 +101,18 @@ class ABM:
             dis_genome = [random.getrandbits(1) for _ in range(self.gc.DISEASE_GENOME_LENGTH)]
 
             # Choose a random agent as victim
-            victim = random.choice(list(self.agent_dict.values()))
-            if len(victim.diseases) == 0:
-                if random.choice([0, 1]) == 0:
-                    disease = Bacteria(dis_genome)
-                    print(" > bacterial infection spawned: %s" % disease.genome_string)
-                else:
-                    disease = Virus(dis_genome)
-                    print(" > viral infection spawned: %s" % disease.genome_string)
-                victim.diseases[disease.genome_string] = disease
+            try:
+                victim = random.choice(list(self.agent_dict.values()))
+                if len(victim.diseases) == 0:
+                    if random.choice([0, 1]) == 0:
+                        disease = Bacteria(dis_genome)
+                        print(" > bacterial infection spawned: %s" % disease.genome_string)
+                    else:
+                        disease = Virus(dis_genome)
+                        print(" > viral infection spawned: %s" % disease.genome_string)
+                    victim.diseases[disease.genome_string] = disease
+            except IndexError:
+                " < [ABM.spawn_disease()] Error: tried to spawn a disease when no agent was left."
 
     def add_agent(self, agent):
         """
