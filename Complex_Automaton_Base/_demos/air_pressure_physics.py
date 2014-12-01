@@ -10,6 +10,7 @@ from util.cab_visualization import Visualization
 
 import pygame
 import numpy
+import cProfile
 
 __author__ = 'Michael Wagner'
 
@@ -51,10 +52,10 @@ class FlowCell(CACell):
         self.next_color = False
         self.is_solid = False
 
-    def sense_neighborhood(self, neighborhood):
+    def sense_neighborhood(self):
         _pressure = 0
         _neighs = 0
-        for cell in neighborhood:
+        for cell in self.neighbors:
             if not cell.is_solid:
                 _pressure += cell.pressure
                 _neighs += 1
@@ -137,4 +138,5 @@ if __name__ == '__main__':
                                   proto_agent=None,
                                   proto_handler=ph,
                                   proto_visualizer=pv)
-    simulation.run_main_loop()
+    #simulation.run_main_loop()
+    cProfile.run("simulation.run_main_loop()")

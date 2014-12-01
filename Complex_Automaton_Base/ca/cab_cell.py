@@ -15,8 +15,12 @@ class CACell:
         self.w = c_size
         self.h = c_size
         self.gc = gc
+        self.neighbors = None
 
-    def sense_neighborhood(self, neighborhood):
+    def set_neighbors(self, neighbors):
+        self.neighbors = neighbors
+
+    def sense_neighborhood(self):
         raise NotImplementedError("Method needs to be implemented")
 
     def update(self):
