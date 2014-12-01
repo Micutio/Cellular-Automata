@@ -5,12 +5,23 @@ import random
 from cab_agent import Agent
 
 
-class CellLifeAgent(Agent):
+class ChloroplastAgent(Agent):
     def __init__(self, x, y, gc):
         super().__init__(x, y, gc)
 
     def clone(self, x, y):
-        return CellLifeAgent(x, y, self.gc)
+        return ChloroplastAgent(x, y, self.gc)
+
+    def perceive_and_act(self, ca, abm):
+        pass
+
+
+class MitochondrionAgent(Agent):
+    def __init__(self, x, y, gc):
+        super().__init__(x, y, gc)
+
+    def clone(self, x, y):
+        return MitochondrionAgent(x, y, self.gc)
 
     def perceive_and_act(self, ca, abm):
         possible_cells = [cell for cell in ca.ca_grid.values() if
@@ -36,7 +47,7 @@ class CellLifeSpawner(Agent):
         if len(abm.agent_locations) == 1:
             new_x = random.randint(0, self.gc.DIM_X)
             new_y = random.randint(0, self.gc.DIM_Y)
-            _agent = CellLifeAgent(new_x, new_y, self.gc)
+            _agent = ChloroplastAgent(new_x, new_y, self.gc)
             abm.add_agent(_agent)
             abm.agent_list.append(_agent)
             print("added agent")
