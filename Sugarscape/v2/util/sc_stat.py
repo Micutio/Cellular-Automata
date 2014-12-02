@@ -122,10 +122,22 @@ class Statistics:
         #resource_graph.legend(("total sugar", "total spice"), loc=7)
 
         production_graph = plt.subplot(2, 2, 3)
-        production_graph.plot(gen_line, self.produced_sugar, ":", color="#00AA00", linewidth=1, label="sugar harvested")
-        production_graph.plot(gen_line, self.traded_sugar, "--", color="#00AA00", linewidth=1, label="sugar traded")
-        production_graph.plot(gen_line, self.produced_spice, ":", color="#AA0000", linewidth=1, label="spice harvested")
-        production_graph.plot(gen_line, self.traded_spice, "--", color="#AA0000", linewidth=1, label="spice traded")
+        if generations > 200:
+            n = int(generations / 100)
+            time_line = gen_line[0::n]
+            prod_sugar_line = self.produced_sugar[0::n]
+            trade_sugar_line = self.traded_sugar[0::n]
+            prod_spice_line = self.produced_spice[0::n]
+            trade_spice_line = self.traded_spice[0::n]
+            production_graph.plot(time_line, prod_sugar_line, "-", color="#00FF00", linewidth=1, label="sugar harvested")
+            production_graph.plot(time_line, trade_sugar_line, "--", color="#00FF00", linewidth=1, label="sugar traded")
+            production_graph.plot(time_line, prod_spice_line, "-", color="#FF0000", linewidth=1, label="spice harvested")
+            production_graph.plot(time_line, trade_spice_line, "--", color="#FF0000", linewidth=1, label="spice traded")
+        else:
+            production_graph.plot(gen_line, self.produced_sugar, "-", color="#00FF00", linewidth=1, label="sugar harvested")
+            production_graph.plot(gen_line, self.traded_sugar, "--", color="#00FF00", linewidth=1, label="sugar traded")
+            production_graph.plot(gen_line, self.produced_spice, "-", color="#FF0000", linewidth=1, label="spice harvested")
+            production_graph.plot(gen_line, self.traded_spice, "--", color="#FF0000", linewidth=1, label="spice traded")
         production_graph.legend(loc="upper right", fontsize=9)
         plt.ylabel("foraging (dotted) and trade (dashed)")
         #production_graph.grid()  # deactivate if using xkcd()

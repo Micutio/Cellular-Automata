@@ -149,7 +149,7 @@ class EventHandler:
             elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
                 # shift + 1: change landscape mode
                 self.main.gc.LANDSCAPE_MODE = 1
-                print(" < set landscape mode to 1 (plain)")
+                print(" < set landscape mode to 0 (plain)")
             else:
                 # only 1: change draw cells mode
                 self.main.visualizer.draw_cell_mode = 1
@@ -165,7 +165,7 @@ class EventHandler:
             elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
                 # shift + 2: change landscape mode
                 self.main.gc.LANDSCAPE_MODE = 2
-                print(" < set landscape mode to 2 (procedurally random)")
+                print(" < set landscape mode to 1 (procedurally random (v1))")
             else:
                 # only 2: change draw cells mode
                 self.main.visualizer.draw_cell_mode = 2
@@ -181,7 +181,7 @@ class EventHandler:
             elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
                 # shift + 3: change landscape mode
                 self.main.gc.LANDSCAPE_MODE = 3
-                print(" < set landscape mode to 3 (two hills)")
+                print(" < set landscape mode to 2 (procedurally random (v2))")
             else:
                 # only 3: change draw cells mode
                 self.main.visualizer.draw_cell_mode = 3
@@ -193,13 +193,23 @@ class EventHandler:
                 # ctrl + 4: change draw agent mode
                 self.main.visualizer.draw_agent_mode = 4
                 print(" < set draw agent mode to 3 (diseases)")
+            elif pygame.key.get_mods() & pygame.KMOD_SHIFT:
+                # shift + 1: change landscape mode
+                self.main.gc.LANDSCAPE_MODE = 4
+                print(" < set landscape mode to 4 (two-hill landscape)")
             else:
                 # only 3: change draw cells mode
                 self.main.visualizer.draw_cell_mode = 4
                 print(" < set draw cell mode to 3 (diseases)")
         if active_key == pygame.K_5:
-            self.main.visualizer.draw_cell_mode = 5
-            print(" < set draw cell mode to 4 (pollution)")
+            if pygame.key.get_mods() & pygame.KMOD_CTRL:
+                # ctrl + 4: change draw agent mode
+                self.main.visualizer.draw_agent_mode = 5
+                print(" < set draw agent mode to 4 (dna color)")
+            else:
+                # only 3: change draw cells mode
+                self.main.visualizer.draw_cell_mode = 5
+                print(" < set draw cell mode to 4 (pollution)")
         if active_key == pygame.K_6:
             self.main.visualizer.draw_cell_mode = 6
             print(" < set draw cell mode to 5 (variable cell size)")

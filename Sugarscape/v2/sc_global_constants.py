@@ -46,7 +46,7 @@ class GlobalConstants:
         ################################
         #         CA CONSTANTS         #
         ################################
-        self.LANDSCAPE_MODE = 2  # 1 = randomized, 2 = procedural, 3 = two hills, 4 = use same as last time
+        self.LANDSCAPE_MODE = 3  # 1 = randomized, 2 = procedural, 3 = procedural, 4 = two hills
         self.MAX_SUGAR = 4
         self.GROWTH_PER_TICK = 1
         self.GROWTH_PERIOD = 1

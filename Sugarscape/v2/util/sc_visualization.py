@@ -99,6 +99,10 @@ class Visualization:
                     pygame.draw.circle(self.surface, (170, 170, 0), [x, y], radius - 2, 0)
                 else:
                     pygame.draw.circle(self.surface, (255, 255, 255), [x, y], radius - 2, 0)
+            elif self.draw_agent_mode == 5:
+                # Show only tribe of the agents.
+                color = agent.chromosome.dna_color
+                pygame.draw.circle(self.surface, color, [x, y], radius, 0)
         return
 
     def draw_cell(self, cell):

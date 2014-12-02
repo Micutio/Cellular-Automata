@@ -40,9 +40,12 @@ class CA:
                 self.landscape_sugar = self.get_plain_landscape()
                 self.landscape_spice = self.get_plain_landscape()
             elif gc.LANDSCAPE_MODE == 2:
-                self.landscape_sugar = self.get_procedural_landscape()
-                self.landscape_spice = self.get_procedural_landscape()
+                self.landscape_sugar = self.get_procedural_landscape_v1()
+                self.landscape_spice = self.get_procedural_landscape_v1()
             elif gc.LANDSCAPE_MODE == 3:
+                self.landscape_sugar = self.get_procedural_landscape_v2()
+                self.landscape_spice = self.get_procedural_landscape_v2()
+            elif gc.LANDSCAPE_MODE == 4:
                 self.landscape_sugar = self.get_two_hill_landscape()
                 self.landscape_spice = self.get_inverted_two_hill_landscape()
 
@@ -116,7 +119,7 @@ class CA:
             if (grid_x, agent_y) in self.ca_grid:
                 new_cell = self.ca_grid[grid_x, agent_y]
                 if (grid_x, agent_y) not in a_pos:
-                    new_agent = False
+                    new_agent = None
                 else:
                     new_agent = a_pos[grid_x, agent_y]
                 visible_cells.append((new_cell, new_agent))
@@ -126,7 +129,7 @@ class CA:
             if (agent_x, grid_y) in self.ca_grid and i != 0:
                 new_cell = self.ca_grid[agent_x, grid_y]
                 if (agent_x, grid_y) not in a_pos:
-                    new_agent = False
+                    new_agent = None
                 else:
                     new_agent = a_pos[agent_x, grid_y]
                 visible_cells.append((new_cell, new_agent))
@@ -141,7 +144,7 @@ class CA:
                 if (grid_x, grid_y) in self.ca_grid and not (grid_x == 0 and grid_y == 0):
                     a = self.ca_grid[grid_x, grid_y]
                     if (grid_x, grid_y) not in a_pos:
-                        b = False
+                        b = None
                     else:
                         b = a_pos[grid_x, grid_y]
                     neighborhood.append((a, b))
@@ -167,7 +170,33 @@ class CA:
         landscape = [[2 for _ in range(self.gc.DIM_Y)] for _ in range(self.gc.DIM_X)]
         return landscape
 
-    def get_procedural_landscape(self):
+    def get_procedural_landscape_v1(self):
+        l1 = [[0 for _ in range(self.gc.DIM_Y)] for _ in range(self.gc.DIM_X)]
+        l2 = [[0 for _ in range(self.gc.DIM_Y)] for _ in range(self.gc.DIM_X)]
+        for j in range(self.gc.DIM_Y):
+            for i in range(self.gc.DIM_X):
+                l1[i][j] = random.randint(0, 4)
+
+        for _ in range(8):
+            for j in range(self.gc.DIM_Y):
+                for i in range(self.gc.DIM_X):
+                    n = 0
+                    f = 0
+                    for cy in range(-1, 2):
+                        for cx in range(-1, 2):
+                            if not (cy == 0 and cx == 0):
+                                try:
+                                    n += 1
+                                    f += l1[i + cx][j + cy]
+                                except IndexError:
+                                    pass
+                    avg = f / n
+                    if abs(avg - l1[i][j]) > 0.3:
+                        l2[i][j] = int(avg)
+            l1, l2 = l2, l1
+        return l1
+
+    def get_procedural_landscape_v2(self):
         landscape = [[0 for _ in range(self.gc.DIM_Y)] for _ in range(self.gc.DIM_X)]
         # First step: plant some 'seeds' for hills
         num_hills = random.randint(5, 15)
@@ -176,15 +205,18 @@ class CA:
             rand_y = random.randint(0, self.gc.DIM_Y - 1)
             landscape[rand_x][rand_y] = self.gc.MAX_SUGAR
         for _ in range(50):
-            for j in range(1, self.gc.DIM_Y - 1):
-                for i in range(1, self.gc.DIM_X - 1):
-                    c1 = landscape[i - 1][j]
-                    c2 = landscape[i + 1][j]
-                    c3 = landscape[i][j - 1]
-                    c4 = landscape[i][j + 1]
-                    choice = random.choice([c1, c2, c3, c4])
-                    if 0 < choice and landscape[i][j] < self.gc.MAX_SUGAR:
-                        landscape[i][j] = random.choice(range(1, choice + 1))
+            for j in range(self.gc.DIM_Y):
+                for i in range(self.gc.DIM_X):
+                    try:
+                        c1 = landscape[i - 1][j]
+                        c2 = landscape[i + 1][j]
+                        c3 = landscape[i][j - 1]
+                        c4 = landscape[i][j + 1]
+                        choice = random.choice([c1, c2, c3, c4])
+                        if 0 < choice and landscape[i][j] < self.gc.MAX_SUGAR:
+                            landscape[i][j] = random.choice(range(1, choice + 1))
+                    except IndexError:
+                        pass
         return landscape
 
     def get_two_hill_landscape(self):

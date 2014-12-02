@@ -9,7 +9,6 @@ class Chromosome:
     """
     This class handles all biological aspects of an agent.
     """
-
     def __init__(self, dna):
         """
         Standard initializer.
@@ -18,8 +17,8 @@ class Chromosome:
         self.genomes = dna[0:2]
         self.culture = dna[2]
         self.immune_system = dna[3]
-        my_gen = max(dna[4][0], dna[4][1]) + 1
-        self.generation = (dna[4][0], dna[4][1], my_gen)
+        my_generation = max(dna[4][0], dna[4][1]) + 1
+        self.generation = (dna[4][0], dna[4][1], my_generation)
         self.meta_sugar = None
         self.meta_spice = None
         self.init_sugar = None
@@ -28,6 +27,7 @@ class Chromosome:
         self.gender = None
         self.fertility = None
         self.dying_age = None
+        self.dna_color = None
         # Read dictionary entries as:
         # ----> {attribute: (start index, end index)}
         # TODO: Shift this map into GlobalConstants and automatically generate genome lengths from the given constants.
@@ -49,16 +49,27 @@ class Chromosome:
         """
         # The meta and init attributes cannot become smaller than 1,
         # even though that is possible by the encoding. We have to avoid that.
-        self.meta_sugar = max(int(self.choose_dominant_gene(self.get_genome_substring('meta_sugar')), 2), 1)
-        self.meta_spice = max(int(self.choose_dominant_gene(self.get_genome_substring('meta_spice')), 2), 1)
-        self.init_sugar = max(int(self.choose_dominant_gene(self.get_genome_substring('init_sugar')), 2), 1)
-        self.init_spice = max(int(self.choose_dominant_gene(self.get_genome_substring('init_spice')), 2), 1)
-        self.vision = int(self.choose_dominant_gene(self.get_genome_substring('vision')), 2)
-        self.gender = int(random.choice(self.get_genome_substring('gender')), 2)
-        self.dying_age = int(self.choose_dominant_gene(self.get_genome_substring('dying_age')), 2)
-        f1 = int(self.choose_dominant_gene(self.get_genome_substring('fertility_1')), 2)
-        f2 = int(self.choose_dominant_gene(self.get_genome_substring('fertility_2')), 2)
-        self.fertility = (f1, f2)
+        meta_sugar = self.choose_dominant_gene(self.get_genome_substring('meta_sugar'))
+        meta_spice = self.choose_dominant_gene(self.get_genome_substring('meta_spice'))
+        init_sugar = self.choose_dominant_gene(self.get_genome_substring('init_sugar'))
+        init_spice = self.choose_dominant_gene(self.get_genome_substring('init_spice'))
+        vision = self.choose_dominant_gene(self.get_genome_substring('vision'))
+        gender = random.choice(self.get_genome_substring('gender'))
+        f1 = self.choose_dominant_gene(self.get_genome_substring('fertility_1'))
+        f2 = self.choose_dominant_gene(self.get_genome_substring('fertility_2'))
+        dying_age = self.choose_dominant_gene(self.get_genome_substring('dying_age'))
+
+        self.meta_sugar = max(int(meta_sugar, 2), 1)
+        self.meta_spice = max(int(meta_spice, 2), 1)
+        self.init_sugar = max(int(init_sugar, 2), 1)
+        self.init_spice = max(int(init_spice, 2), 1)
+        self.vision = int(vision, 2)
+        self.gender = int(gender, 2)
+        self.dying_age = int(dying_age, 2)
+        self.fertility = (int(f1, 2), int(f2, 2))
+
+        dna = "".join((meta_sugar, meta_spice, init_sugar, init_spice, vision, gender, f1, f2, dying_age))
+        self.dna_color = convert_to_color(dna)
 
     def get_genome_substring(self, key):
         """
@@ -96,7 +107,7 @@ class Chromosome:
         :param mate_chromosome:
         :return: The child's chromosome.
         """
-        # Concept: divide genome in partions of varying length.
+        # Concept: divide genome in partitions of varying length.
         # Exchange those parts between mother and father gametes?
         genome1 = self.create_gamete(self.genomes)
         genome2 = self.create_gamete(mate_chromosome.genomes)
@@ -176,3 +187,19 @@ class Chromosome:
     # This method makes sense only for Lamarckian Evolution!
     #def map_attributes_to_genome(self, attributes):
     #    return
+
+
+def convert_to_color(dna):
+    #l = len(dna)
+    #l1 = int(l / 3)
+    #l2 = 2 * l1
+    r_string = dna[0::3]  #dna[0:l1]
+    g_string = dna[1::3]  #dna[l1:l2]
+    b_string = dna[2::3]  #dna[l2:]
+    r_num = int(r_string, 2)
+    g_num = int(g_string, 2)
+    b_num = int(b_string, 2)
+    r = int((r_num / (2 ** len(r_string))) * 25) * 10
+    g = int((g_num / (2 ** len(g_string))) * 25) * 10
+    b = int((b_num / (2 ** len(b_string))) * 25) * 10
+    return r, g, b

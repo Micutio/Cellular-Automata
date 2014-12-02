@@ -93,11 +93,11 @@ class Agent:
         while len(cells) > 0:
             c = cells.pop()
             # Case 1: Cell is occupied.
-            if c[1]:
+            if not c[1] is None:
                 # Case 1a: Cell is my own.
                 if c[1].x == self.x and c[1].y == self.y:
                     # Remove me from the (cell, agent) tuple. I don't want to kill myself.
-                    available_cells.append((c[0], False))
+                    available_cells.append((c[0], None))
                 # Case 1b: Cell has an opponent who is poorer than me and the same gender and we're both adults
                 # Then I am allowed to kill the agent and take its cell
                 elif (c[1].tribe_id != self.tribe_id) and (c[1].sugar + c[1].spice) < (self.sugar + self.spice)\
@@ -124,7 +124,7 @@ class Agent:
             # Retrieve resources of possible neighbors occupying those cells.
             occupant_sugar = 0
             occupant_spice = 0
-            if c[1]:
+            if not c[1] is None:
                 occupant_sugar = c[1].sugar
                 occupant_spice = c[1].spice
 
@@ -183,7 +183,7 @@ class Agent:
         occupant_sugar = 0
         occupant_spice = 0
         # If there happens to be an occupant, kill him/her.
-        if cell[1] and (cell[1].x != self.x or cell[1].y != self.y):
+        if not cell[1] is None and (cell[1].x != self.x or cell[1].y != self.y):
             occupant_sugar = cell[1].sugar
             occupant_spice = cell[1].spice
             cell[1].sugar = 0
@@ -215,7 +215,7 @@ class Agent:
             free_cells = []
             mates = []
             for nb in neighbors:
-                if nb[1]:
+                if not nb[1] is None:
                     mates.append(nb[1])
                 else:
                     free_cells.append(nb[0])
@@ -254,7 +254,7 @@ class Agent:
         Attempt to convert neighboring agents towards my culture.
         """
         for n in neighbors:
-            if n[1] and n[1].tribe_id != self.tribe_id:
+            if not n[1]is None and n[1].tribe_id != self.tribe_id:
                 old_id = n[1].tribe_id
                 genes_to_flip = [n[1].culture.index(g) for g in n[1].culture if g != self.tribe_id]
                 if genes_to_flip:
@@ -279,7 +279,7 @@ class Agent:
         self.sugar_price = 0
         self.spice_price = 0
         for n in neighbors:
-            if n[1] and not n[1].dead and not self.dead and n[1].sugar > 0 and n[1].spice > 0:
+            if not n[1]is None and not n[1].dead and not self.dead and n[1].sugar > 0 and n[1].spice > 0:
                 m1_now = self.mrs(0, 0)
                 m2_now = n[1].mrs(0, 0)
                 mrs_diff = m1_now - m2_now
@@ -354,10 +354,16 @@ class Agent:
         """
         All diseases, the agent is currently infected with, are trying to spread to its neighbors.
         """
-        for n in neighbors:
-            if n[1] and not n[1].dead and not self.dead:
-                for _, d in self.diseases.items():
-                    d.spread(n[1])
+        #for n in neighbors:
+        #    if n[1] and not n[1].dead and not self.dead:
+        #        for _, d in self.diseases.items():
+        #            d.spread(n[1])
+        for _, d in self.diseases.items():
+            targets = [agent for (cell, agent) in neighbors if not agent is None and not agent.dead and not self.dead]
+            if targets:
+                victim = random.choice(targets)
+                d.spread(victim)
+
         # Let the immune system build another instance
         # and then attempt to fight the diseases.
         self.im_create_antibodies()
