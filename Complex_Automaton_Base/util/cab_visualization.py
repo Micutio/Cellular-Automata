@@ -1,7 +1,6 @@
 """
 This module contains a simple visualization class, which the actual simulation visualizer should inherit from.
 """
-
 __author__ = 'Michael Wagner'
 
 import pygame
@@ -33,7 +32,6 @@ class Visualization:
         if not agent.dead:
             radius = int(agent.size / 2)
             pygame.draw.circle(self.surface, (0, 0, 0), [agent.x, agent.y], radius, 0)
-        return
 
     def draw_cell(self, cell):
         """
@@ -43,4 +41,3 @@ class Visualization:
             pass
         else:
             pygame.draw.rect(self.surface, (255, 255, 255), (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
-        return

@@ -23,12 +23,14 @@ class CA:
         self.visualizer = visualizer
         self.use_moore_neighborhood = gc.USE_MOORE_NEIGHBORHOOD
         self.use_borders = gc.USE_CA_BORDERS
+        self.proto_cell = None
 
         if proto_cell is None:
             for j in range(0, self.height):
                 for i in range(0, self.width):
                     self.ca_grid[i, j] = CACell(i, j, gc.CELL_SIZE, gc)
         else:
+            self.proto_cell = proto_cell
             for j in range(0, self.height):
                 for i in range(0, self.width):
                     self.ca_grid[i, j] = proto_cell.clone(i, j, gc.CELL_SIZE)

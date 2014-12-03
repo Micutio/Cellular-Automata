@@ -18,7 +18,7 @@ __author__ = 'Michael Wagner'
 class GC(GlobalConstants):
     def __init__(self):
         super().__init__()
-        self.VERSION = "version: 09-2014"
+        self.VERSION = 'version: 09-2014'
         ################################
         #     SIMULATION CONSTANTS     #
         ################################
@@ -133,10 +133,6 @@ if __name__ == '__main__':
     pc = FlowCell(0, 0, 0, gc)
     ph = FlowIO(None)
     pv = FlowVis(gc, None)
-    simulation = ComplexAutomaton(gc,
-                                  proto_cell=pc,
-                                  proto_agent=None,
-                                  proto_handler=ph,
-                                  proto_visualizer=pv)
+    simulation = ComplexAutomaton(gc, proto_cell=pc, proto_handler=ph, proto_visualizer=pv)
     #simulation.run_main_loop()
     cProfile.run("simulation.run_main_loop()")

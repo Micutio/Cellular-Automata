@@ -18,7 +18,7 @@ class ComplexAutomaton:
     """
     The main class of Sugarscape. This controls everything.
     """
-    def __init__(self, global_constants, proto_cell=None, proto_agent=None, proto_visualizer=None, proto_handler=None):
+    def __init__(self, global_constants, **kwargs):  #proto_cell=None, proto_agent=None, proto_visualizer=None, proto_handler=None):
         """
         Standard initializer.
         :param global_constants: All constants or important variables that control the simulation.
@@ -29,29 +29,29 @@ class ComplexAutomaton:
         self.screen = pygame.display.set_mode((self.gc.GRID_WIDTH, self.gc.GRID_HEIGHT), pygame.RESIZABLE, 32)
         pygame.display.set_caption('Complex Automaton Base')
 
-        if proto_visualizer is None:
-            self.visualizer = Visualization(self.gc, self.screen)
+        if 'proto_visualizer' in kwargs:
+            self.visualizer = kwargs['proto_visualizer'].clone(self.screen)
         else:
-            self.visualizer = proto_visualizer.clone(self.screen)
+            self.visualizer = Visualization(self.gc, self.screen)
 
-        if proto_cell is None:
+        if 'proto_cell' in kwargs:
+            self.ca = CA(self.gc, self.visualizer, proto_cell=kwargs['proto_cell'])
+            self.proto_cell = kwargs['proto_cell']
+        else:
             self.ca = CA(self.gc, self.visualizer)
             self.proto_cell = None
-        else:
-            self.ca = CA(self.gc, self.visualizer, proto_cell=proto_cell)
-            self.proto_cell = proto_cell
 
-        if proto_agent is None:
+        if 'proto_agent' in kwargs:
+            self.abm = ABM(self.gc, self.visualizer, proto_agent=kwargs['proto_agent'])
+            self.proto_agent = kwargs['proto_agent']
+        else:
             self.abm = ABM(self.gc, self.visualizer)
             self.proto_agent = None
-        else:
-            self.abm = ABM(self.gc, self.visualizer, proto_agent=proto_agent)
-            self.proto_agent = proto_agent
 
-        if proto_handler is None:
-            self.handler = InputHandler(cab_system=self)
+        if 'proto_handler' in kwargs:
+            self.handler = kwargs['proto_handler'].clone(self)
         else:
-            self.handler = proto_handler.clone(self)
+            self.handler = InputHandler(cab_system=self)
 
         self.display_info()
         return
@@ -87,8 +87,9 @@ class ComplexAutomaton:
         """
         print("------------------------------[SIMULATION LOG]---------------------------------\n"
               "                                                                               ")
-        while 1:
+        while True:
             if self.gc.RUN_SIMULATION:
                 self.step_simulation()
+                self.gc.TIME_STEP += 1
             self.render_simulation()
             self.handler.process_input()
