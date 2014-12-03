@@ -20,6 +20,9 @@ class Chloroplast(Chromosome):
     """
     def __init__(self, dna):
         super().__init__(dna)
+        self.h2o = 0  # Resource needed for production.
+        self.co2 = 0  # Catalyst needed for production.
+        self.energy = 0  # Output of production will be glucose.
 
 
 class Mitochondrion(Chromosome):
@@ -28,6 +31,9 @@ class Mitochondrion(Chromosome):
     """
     def __init__(self, dna):
         super().__init__(dna)
+        self.h2o = 0  # Resource needed for production.
+        self.glucose = 0  # Catalyst needed for production.
+        self.energy = 0  # Output of production of production will be ATP.
 
 
 def get_genome_substring(self, key):
