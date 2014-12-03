@@ -5,37 +5,6 @@ import random
 from cab_agent import Agent
 
 
-class ChloroplastAgent(Agent):
-    def __init__(self, x, y, gc):
-        super().__init__(x, y, gc)
-
-    def clone(self, x, y):
-        return ChloroplastAgent(x, y, self.gc)
-
-    def perceive_and_act(self, ca, abm):
-        pass
-
-
-class MitochondrionAgent(Agent):
-    def __init__(self, x, y, gc):
-        super().__init__(x, y, gc)
-
-    def clone(self, x, y):
-        return MitochondrionAgent(x, y, self.gc)
-
-    def perceive_and_act(self, ca, abm):
-        possible_cells = [cell for cell in ca.ca_grid.values() if
-                          not (cell.x, cell.y) in abm.agent_locations
-                          and abs(cell.x - self.x) < 2 and abs(cell.y - self.y) < 2]
-        if possible_cells:
-            new_cell = random.choice(possible_cells)
-            abm.remove_agent(self)
-            self.x = new_cell.x
-            self.y = new_cell.y
-            abm.add_agent(self)
-        pass
-
-
 class CellLifeSpawner(Agent):
     def __init__(self, x, y, gc):
         super().__init__(x, y, gc)
@@ -47,8 +16,52 @@ class CellLifeSpawner(Agent):
         if len(abm.agent_locations) == 1:
             new_x = random.randint(0, self.gc.DIM_X)
             new_y = random.randint(0, self.gc.DIM_Y)
-            _agent = ChloroplastAgent(new_x, new_y, self.gc)
+            _agent = CellAgent(new_x, new_y, self.gc)
             abm.add_agent(_agent)
             abm.agent_list.append(_agent)
             print("added agent")
         pass
+
+
+class AbstractChromosome:
+    def __init__(self, dna):
+        self.dna = dna
+        self.core = None  # Will be either a chloroplast (plant) or a mitochondrion (animal).
+
+    def get_genome_substring(self, key):
+        raise NotImplementedError("Should have implemented this")
+
+
+class MitosisChromosome(AbstractChromosome):
+    def __init__(self, dna):
+        super().__init__(dna)
+        self.att_map = {"type": (0, 1),  # Decides whether the core is gonna be a chloroplast or mitochondrion.
+                        "efficiency": (1, 8),
+                        "mitosis_limit": (8, 15),  # How much is needed to procreate.
+                        "dying_age": (15, 22),
+                        "metabolism": (22, 28)}  # How much is needed every tick to stay alive.
+
+        self.eff = min(int(self.get_genome_substring("efficiency"), 2) / 100, 1)
+        c_type = int(self.get_genome_substring("type"), 2)
+        self.metabolism = int(self.get_genome_substring("metabolism"), 2)
+        if c_type == 0:
+            #self.core = Chloroplast(eff, metabolism)
+            self.type = "chloroplast"
+        else:
+            #self.core = Mitochondrion(eff, metabolism)
+            self.type = "mitochondrion"
+
+        self.mitosis_limit = max(int(self.get_genome_substring("mitosis_limit"), 2), 1)
+        self.dying_age = int(self.get_genome_substring("dying_age"), 2)
+
+
+class CellAgent(Agent):
+    def __init__(self, x, y, gc, chromosome):
+        super().__init__(x, y, gc)
+        self.chromosome = chromosome
+
+    def clone(self, x, y):
+        return CellAgent(x, y, self.gc, self.chromosome)
+
+    def perceive_and_act(self, ca, abm):
+        self.chromosome.act(self, ca, abm)

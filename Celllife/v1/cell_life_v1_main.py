@@ -21,9 +21,5 @@ if __name__ == '__main__':
     pa = CellLifeSpawner(-1, -1, gc)
     ph = CellLifeInputHandler(None)
     pv = CellLifeVisualizer(gc, None)
-    simulation = ComplexAutomaton(gc,
-                                  proto_cell=pc,
-                                  proto_agent=pa,
-                                  proto_handler=ph,
-                                  proto_visualizer=pv)
+    simulation = ComplexAutomaton(gc, proto_cell=pc, proto_agent=pa, proto_handler=ph, proto_visualizer=pv)
     simulation.run_main_loop()
