@@ -39,6 +39,7 @@ class ABM:
         Adds an agent to be scheduled by the abm.
         """
         pos = (agent.x, agent.y)
+        self.agent_list.append(agent)
         if self.gc.ONE_AGENT_PER_CELL:
             if not pos in self.agent_locations:
                 self.agent_locations[pos] = agent

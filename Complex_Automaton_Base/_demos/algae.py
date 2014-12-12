@@ -9,7 +9,6 @@ from util.cab_input_handling import InputHandler
 from util.cab_visualization import Visualization
 
 import pygame
-import numpy
 import cProfile
 
 __author__ = 'Michael Wagner'
@@ -29,9 +28,9 @@ class GC(GlobalConstants):
         ################################
         self.USE_MOORE_NEIGHBORHOOD = True
         self.USE_CA_BORDERS = False
-        self.DIM_X = 50  # How many cells is the ca wide?
-        self.DIM_Y = 50  # How many cells is the ca high?
-        self.CELL_SIZE = 15  # How long/wide is one cell?
+        self.DIM_X = 5  # How many cells is the ca wide?
+        self.DIM_Y = 10  # How many cells is the ca high?
+        self.CELL_SIZE = 50  # How long/wide is one cell?
         self.GRID_WIDTH = self.DIM_X * self.CELL_SIZE
         self.GRID_HEIGHT = self.DIM_Y * self.CELL_SIZE
         ################################
@@ -45,34 +44,26 @@ class GC(GlobalConstants):
 class FlowCell(CACell):
     def __init__(self, x, y, c_size, c):
         super().__init__(x, y, c_size, c)
-        self.pressure = 10
-        self.new_pressure = 10
-        self.flow = 1
-        self.has_color = False
-        self.next_color = False
+        self.light = 0
+        self.new_light = 0
+        self.nutrition = 0
+        self.new_nutrition = 0
         self.is_solid = False
 
     def sense_neighborhood(self):
-        _pressure = 0
-        _neighs = 0
-        for cell in self.neighbors:
-            if not cell.is_solid:
-                _pressure += cell.pressure
-                _neighs += 1
-        _pressure /= _neighs
-        d_pressure = self.pressure - _pressure
-        flow = self.flow * d_pressure
-        a = self.pressure / 10.0
-        b = -_pressure / 10.0
-        if a < b:
-            flow = float(numpy.clip(flow, a, b))
-        else:
-            flow = float(numpy.clip(flow, b, a))
-        self.new_pressure -= flow
+        if not self.is_solid:
+            for cell in self.neighbors:
+                if cell.x == self.x:
+                    if cell.y < self.y:
+                        self.new_light = cell.light * 0.8
+                    elif cell.y > self.y:
+                        self.new_nutrition = cell.nutrition * 0.8
         #self.flow += flow
 
     def update(self):
-        self.pressure = self.new_pressure
+        if not self.is_solid:
+            self.light = self.new_light
+            self.nutrition = self.new_nutrition
 
     def clone(self, x, y, c_size):
         return FlowCell(x, y, c_size, self.gc)
@@ -90,7 +81,13 @@ class FlowIO(InputHandler):
         if button == 1:
             cell_x = int(self.mx)
             cell_y = int(self.my)
-            self.sys.ca.ca_grid[cell_x, cell_y].pressure = 500000
+            if self.sys.ca.ca_grid[cell_x, cell_y].is_solid:
+                self.sys.ca.ca_grid[cell_x, cell_y].light = 0.0
+                self.sys.ca.ca_grid[cell_x, cell_y].is_solid = False
+            else:
+                self.sys.ca.ca_grid[cell_x, cell_y].light = 1.0
+                self.sys.ca.ca_grid[cell_x, cell_y].is_solid = True
+
             #self.sys.ca.ca_grid[cell_x, cell_y].new_pressure = 10000
 
         elif button == 2:
@@ -103,9 +100,12 @@ class FlowIO(InputHandler):
         elif button == 3:
             cell_x = int(self.mx)
             cell_y = int(self.my)
-            self.sys.ca.ca_grid[cell_x, cell_y].is_solid = not self.sys.ca.ca_grid[cell_x, cell_y].is_solid
-            #self.sys.ca.ca_grid[cell_x, cell_y].pressure = -100
-            #print(self.sys.ca.ca_grid[cell_x, cell_y].pressure)
+            if self.sys.ca.ca_grid[cell_x, cell_y].is_solid:
+                self.sys.ca.ca_grid[cell_x, cell_y].nutrition = 0.0
+                self.sys.ca.ca_grid[cell_x, cell_y].is_solid = False
+            else:
+                self.sys.ca.ca_grid[cell_x, cell_y].nutrition = 1.0
+                self.sys.ca.ca_grid[cell_x, cell_y].is_solid = True
 
 
 class FlowVis(Visualization):
@@ -116,23 +116,9 @@ class FlowVis(Visualization):
         return FlowVis(self.gc, cab_sys)
 
     def draw_cell(self, cell):
-        if cell.is_solid:
-            pygame.draw.rect(self.surface, (255, 0, 0), (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
-        else:
-            if cell.pressure > 100:
-                red = 255
-                green = 255
-                blue = 255
-            elif cell.pressure < 0:
-                red = 0
-                green = 0
-                blue = 0
-            else:
-                red = int((cell.pressure / 100) * 150)
-                green = int((cell.pressure / 100) * 150)
-                blue = int((cell.pressure / 100) * 255)
-            pygame.draw.rect(self.surface, (red, green, blue), (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
-        return
+        red = green = int(cell.light * 255)
+        blue = int(cell.nutrition * 255)
+        pygame.draw.rect(self.surface, (red, green, blue), (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
 
 if __name__ == '__main__':
     gc = GC()
