@@ -25,6 +25,11 @@ class GlobalConstants:
         self.GRID_WIDTH = self.DIM_X * self.CELL_SIZE
         self.GRID_HEIGHT = self.DIM_Y * self.CELL_SIZE
         ################################
+        # Specifically for HEX CAs     #
+        ################################
+        self.hex_directions = [(+1, -1, 0), (+1, 0, -1), (0, +1, -1),
+                               (-1, +1, 0), (-1, 0, +1), (0, -1, +1)]
+        ################################
         #        ABM CONSTANTS         #
         ################################
         ################################

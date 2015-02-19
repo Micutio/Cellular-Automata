@@ -4,6 +4,7 @@ This module contains a simple visualization class, which the actual simulation v
 __author__ = 'Michael Wagner'
 
 import pygame
+import pygame.gfxdraw
 
 
 class Visualization:
@@ -39,5 +40,15 @@ class Visualization:
         """
         if cell is None:
             pass
-        else:
+        elif cell.rectangular:
             pygame.draw.rect(self.surface, (255, 255, 255), (cell.x * cell.w, cell.y * cell.h, cell.w, cell.h), 0)
+        else:
+            crnrs = cell.get_corners()
+            pygame.draw.polygon(self.surface, (255, 255, 255), crnrs, 1)
+            pygame.gfxdraw.aacircle(self.surface, 50, 50, 10 + 10, (0,255,0))
+            pygame.gfxdraw.filled_circle(self.surface, 50, 50, 10, (0,255,0))
+            pygame.gfxdraw.aacircle(self.surface, 50, 50, 10 - 2, (0,0,0))
+            pygame.gfxdraw.filled_circle(self.surface, 50, 50, 10 - 2, (0,0,0))
+            # print(crnrs)
+            # pygame.draw.aalines(self.surface, (255, 255, 255), True, crnrs, 0)
+            # pygame.gfxdraw.aapolygon(self.surface, crnrs, (255, 255, 255))

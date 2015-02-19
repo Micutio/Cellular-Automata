@@ -7,11 +7,14 @@ __author__ = 'Michael Wagner'
 
 
 import pygame
+import math
 
-from cab_ca import CA
-from cab_abm import ABM
-from cab_input_handling import InputHandler
-from cab_visualization import Visualization
+from ca.cab_ca_hex import CAHex
+from abm.cab_abm import ABM
+from util.cab_input_handling import InputHandler
+from util.cab_visualization import Visualization
+
+from pygame.locals import *
 
 
 class ComplexAutomaton:
@@ -26,7 +29,11 @@ class ComplexAutomaton:
         self.gc = global_constants
 
         pygame.init()
-        self.screen = pygame.display.set_mode((self.gc.GRID_WIDTH, self.gc.GRID_HEIGHT), pygame.RESIZABLE, 32)
+        # pygame.display.init()
+        offset = int((math.sqrt(3) / 2) * (self.gc.CELL_SIZE * 2) * self.gc.DIM_X)
+        # print(offset)
+        # self.screen = pygame.display.set_mode((self.gc.GRID_WIDTH * offset, self.gc.GRID_HEIGHT), pygame.RESIZABLE, 32)
+        self.screen = pygame.display.set_mode((offset, self.gc.GRID_HEIGHT), HWSURFACE|DOUBLEBUF, 32)
         pygame.display.set_caption('Complex Automaton Base')
 
         if 'proto_visualizer' in kwargs:
@@ -35,10 +42,10 @@ class ComplexAutomaton:
             self.visualizer = Visualization(self.gc, self.screen)
 
         if 'proto_cell' in kwargs:
-            self.ca = CA(self.gc, self.visualizer, proto_cell=kwargs['proto_cell'])
+            self.ca = CAHex(self.gc, self.visualizer, proto_cell=kwargs['proto_cell'])
             self.proto_cell = kwargs['proto_cell']
         else:
-            self.ca = CA(self.gc, self.visualizer)
+            self.ca = CAHex(self.gc, self.visualizer)
             self.proto_cell = None
 
         if 'proto_agent' in kwargs:

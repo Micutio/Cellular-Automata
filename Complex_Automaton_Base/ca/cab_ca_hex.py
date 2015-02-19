@@ -1,14 +1,22 @@
 """
-This module contains the class for a CA with rectangular cells.
-Moore and von-Neumann neighborhoods are available.
+This module contains the class for a CA with hexagonal cells in pointy top layout.
 """
 
 __author__ = 'Michael Wagner'
 
-from cab_cell import CellRect
+from ca.cab_cell import CellHex
+
+import math
 
 
-class CA:
+class CAHex:
+    '''
+    For reference go to "http://www.redblobgames.com/grids/hexagons/"
+    Hex CA parameters:
+    - even-r horizontal layout
+    - cube coordinates for algorithms
+    - axial coordinates for storage
+    '''
     def __init__(self, gc, visualizer, proto_cell=None):
         """
         Initializes and returns the cellular automaton.
@@ -22,26 +30,22 @@ class CA:
         self.width = int(self.grid_width / gc.CELL_SIZE)
         self.cell_size = gc.CELL_SIZE
         self.visualizer = visualizer
-        self.use_moore_neighborhood = gc.USE_MOORE_NEIGHBORHOOD
         self.use_borders = gc.USE_CA_BORDERS
         self.proto_cell = None
 
         if proto_cell is None:
             for j in range(0, self.height):
                 for i in range(0, self.width):
-                    self.ca_grid[i, j] = CellRect(i, j, gc.CELL_SIZE, gc)
+                    # self.ca_grid[i, j] = CellHex(i, j, gc.CELL_SIZE, gc)
+                    self.ca_grid[i-math.floor(j/2), j] = CellHex(i-math.floor(j/2), j, gc.CELL_SIZE, gc)
+                    # print('x={0}, y={1}'.format(i-math.floor(j/2), j))
         else:
             self.proto_cell = proto_cell
             for j in range(0, self.height):
                 for i in range(0, self.width):
-                    self.ca_grid[i, j] = proto_cell.clone(i, j, gc.CELL_SIZE)
-
-        if self.use_moore_neighborhood:
-            self.init_moore()
-            self.init_moore_borders()
-        else:
-            self.init_von_neumann()
-            self.init_von_neumann_borders()
+                    # self.ca_grid[i, j] = proto_cell.clone(i, j, gc.CELL_SIZE)
+                    self.ca_grid[i-math.floor(j/2), j] = proto_cell.clone(i-math.floor(j/2), j, gc.CELL_SIZE)
+                    # print('x={0}, y={1}'.format(i-math.floor(j/2), j))
 
     def draw_cells(self):
         """
