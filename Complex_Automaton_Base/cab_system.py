@@ -30,11 +30,17 @@ class ComplexAutomaton:
 
         pygame.init()
         # pygame.display.init()
-        offset = int((math.sqrt(3) / 2) * (self.gc.CELL_SIZE * 2) * self.gc.DIM_X)
+        offset_x = int((math.sqrt(3) / 2) * (self.gc.CELL_SIZE * 2) * (self.gc.DIM_X - 1))
+        offset_y = int((3 / 4) * (self.gc.CELL_SIZE * 2) * (self.gc.DIM_Y - 1))
         # print(offset)
-        # self.screen = pygame.display.set_mode((self.gc.GRID_WIDTH * offset, self.gc.GRID_HEIGHT), pygame.RESIZABLE, 32)
-        self.screen = pygame.display.set_mode((offset, self.gc.GRID_HEIGHT), HWSURFACE|DOUBLEBUF, 32)
+        # self.screen = pygame.display.set_mode((self.gc.GRID_WIDTH, self.gc.GRID_HEIGHT), pygame.RESIZABLE, 32)
+        self.screen = pygame.display.set_mode((offset_x, offset_y), HWSURFACE|DOUBLEBUF, 32)
         pygame.display.set_caption('Complex Automaton Base')
+
+        # pygame.gfxdraw.aacircle(self.screen, 50, 50, 10 + 10, (0,255,0))
+        # pygame.gfxdraw.filled_circle(self.screen, 50, 50, 10, (0,255,0))
+        # pygame.gfxdraw.aacircle(self.screen, 50, 50, 10 - 2, (0,0,0))
+        # pygame.gfxdraw.filled_circle(self.screen, 50, 50, 10 - 2, (0,0,0))
 
         if 'proto_visualizer' in kwargs:
             self.visualizer = kwargs['proto_visualizer'].clone(self.screen)

@@ -15,8 +15,9 @@ class CACell:
         self.x = x
         self.y = y
         self.gc = gc
-        self.neighbors = None
+        self.neighbors = []
         self.rectangular = True
+        self.is_border = False
 
     def set_neighbors(self, neighbors):
         self.neighbors = neighbors

@@ -42,11 +42,19 @@ class InputHandler:
 
     def mouse_motion(self):
         """
-        Method to track mouse motion. Do not overwrite!
+        Method to track mouse motion.
+        Overwrite custom_mouse_motion to add functionality here.
         """
         self.mx, self.my = pygame.mouse.get_pos()
         self.mx = (self.mx / self.sys.gc.CELL_SIZE)
         self.my = (self.my / self.sys.gc.CELL_SIZE)
+        self.custom_mouse_motion()
+
+    def custom_mouse_motion(self):
+        """
+        Overwrite to define additional actions on mouse movement.
+        """
+        pass
 
     def custom_mouse_action(self, button):
         """
