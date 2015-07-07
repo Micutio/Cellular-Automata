@@ -20,6 +20,8 @@ from util.sc_stat import Statistics
 from sc_global_constants import GlobalConstants
 from util.sc_visualization import Visualization
 from util.sc_io_handling import EventHandler, Terminal
+from pygame.locals import *
+from pygame.time import Clock
 
 # TODO: Add loaning and inheritable colors to the agents.
 
@@ -51,7 +53,7 @@ class Sugarscape:
         pygame.init()
         width = self.gc.DIM_X * self.gc.CELL_SIZE
         height = self.gc.DIM_Y * self.gc.CELL_SIZE
-        self.screen = pygame.display.set_mode((width, height), pygame.RESIZABLE, 32)
+        self.screen = pygame.display.set_mode((width, height), HWSURFACE|DOUBLEBUF, 32)
         pygame.display.set_caption('Sugarscape Simulation')
 
         self.visualizer = Visualization(self.screen, self.gc)
@@ -145,7 +147,7 @@ class Sugarscape:
 
         print("------------------------------[SIMULATION LOG]---------------------------------\n"
               "                                                                               ")
-
+        clock = Clock()
         while 1:
             #t1 = time.time()
             # This block performs a simulation step.
@@ -158,6 +160,7 @@ class Sugarscape:
 
             if len(self.abm.agent_dict) == 0:
                 self.reset_simulation()
+            clock.tick(25)
             #t2 = time.time()
             #print("> time per cycle: {0:.5}".format(t2 - t1))
 

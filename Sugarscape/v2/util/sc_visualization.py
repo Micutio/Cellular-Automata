@@ -2,6 +2,7 @@ __author__ = 'Michael Wagner'
 __version__ = '1.0'
 
 import pygame
+import pygame.gfxdraw
 
 
 class Visualization:
@@ -52,8 +53,12 @@ class Visualization:
                     blue = 90
                 color1 = (red, green, blue)
                 color2 = self.gc.TRIBE_COLORS[agent.tribe_id]
-                pygame.draw.circle(self.surface, color1, [x, y], radius, 0)
-                pygame.draw.circle(self.surface, color2, [x, y], radius - 2, 0)
+                pygame.gfxdraw.aacircle(self.surface, x, y, radius+10, color1)
+                pygame.gfxdraw.filled_circle(self.surface, x, y, radius, color1)
+                pygame.gfxdraw.aacircle(self.surface, x, y, radius - 2, color2)
+                pygame.gfxdraw.filled_circle(self.surface, x, y, radius - 2, color2)
+                
+                
             elif self.draw_agent_mode == 2:
             # Show gender and age of the agents.
                 # Case 1: agent is a child.
