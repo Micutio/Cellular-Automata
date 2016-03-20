@@ -8,8 +8,8 @@ class GlobalConstants:
         #     SIMULATION CONSTANTS     #
         ################################
         self.RUN_SIMULATION = False
-        self.MAX_ANTS = 30
-        self.CELL_SIZE = 15
+        self.MAX_ANTS = 50
+        self.CELL_SIZE = 20
         self.DIM_X = 50  # How many cells is the ca wide?
         self.DIM_Y = 50  # How many cells is the ca high?
         self.GRID_WIDTH = self.DIM_X * self.CELL_SIZE
@@ -22,7 +22,7 @@ class GlobalConstants:
         ################################
         self.VISION = 1
         self.MAX_PHEROMONE = 100
-        self.MAX_FOOD = 10
+        self.MAX_FOOD = 10000
         ################################
         #         CA CONSTANTS         #
         ################################

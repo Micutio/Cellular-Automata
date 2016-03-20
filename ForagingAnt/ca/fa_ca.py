@@ -1,4 +1,4 @@
-from v1.ca.fa_cell import ClassCell
+from ca.fa_cell import ClassCell
 
 __author__ = 'Michael Wagner'
 __version__ = '2.0'

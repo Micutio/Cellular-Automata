@@ -90,6 +90,8 @@ class Ant(Agent):
             self.drop_pheromones("food", this_cell)
             self.move_to(cell[0])
             self.check_if_at_hive(cell[1])
+        else:
+            print('Ant Error: no valid hive bound cell found!')
 
     def find_food_source(self, neighborhood):
         cell = self.get_cell_with_pheromone("food", neighborhood)
@@ -100,6 +102,8 @@ class Ant(Agent):
             self.drop_pheromones("hive", this_cell)
             self.move_to(cell[0])
             self.check_if_at_food(cell[1])
+        else:
+            print('Ant Error: no valid hive bound cell found!')
 
     def get_cell_with_pheromone(self, target_ph, neighborhood):
         result = None
@@ -107,7 +111,17 @@ class Ant(Agent):
         backup_list = []
         best_cell = None
         max_ph = 0
-        for d in self.directions:
+
+        # Choose the possible directions the ants can currently look at.
+        if self.current_dir == 7:
+            possible_dirs = [6, 7, 0]
+        elif self.current_dir == 0:
+            possible_dirs = [7, 0, 1]
+        else:
+            possible_dirs = [self.current_dir -1, self.current_dir, self.current_dir + 1]
+
+        for i in possible_dirs:
+            d = self.directions[i]
             x = int(self.x / self.size) + d[0]
             y = int(self.y / self.size) + d[1]
             if (x, y) in neighborhood:
@@ -117,21 +131,31 @@ class Ant(Agent):
                     if ph > max_ph:
                         best_cell = cell
                         max_ph = ph
-                    result_list.append((cell, ph))
+                        self.current_dir = i
+                    result_list.append((cell, ph, i))
                 elif not cell[1] or len(cell[1]) < 10:
-                    backup_list.append(cell)
+                    backup_list.append((cell, i))
         if result_list:
             if random.random() < 0.01:
-                result = weighted_choice(result_list)
+                choice = weighted_choice(result_list)
+                result = choice[0]
+                self.current_dir = choice[1]
             else:
                 result = best_cell
         elif backup_list:
-            result = random.choice(backup_list)
+            choice = random.choice(backup_list)
+            result = choice[0]
+            self.current_dir = choice[1]
+        else:
+            # print('Ant Error: no cells found to move to!')
+            self.current_dir = get_opposite_direction(self.current_dir)
+            return self.get_cell_with_pheromone(target_ph, neighborhood)
         return result
 
     def drop_pheromones(self, target_ph, cell):
         if cell[1]:
             for agent in cell[1]:
+                # Check if one of the agents present on this cell is hive or food.
                 if agent.id == target_ph:
                     cell[0].pheromones[target_ph] = self.max_ph
                     return
@@ -167,11 +191,17 @@ class Ant(Agent):
 
 
 def weighted_choice(choices):
-    total = sum(w for c, w in choices)
+    total = sum(w for c, w, i in choices)
     r = random.uniform(0, total)
     up_to = 0
-    for c, w in choices:
+    for c, w, i in choices:
         if up_to + w > r:
-            return c
+            return c, i
         up_to += w
     assert False, "Shouldn't get here"
+
+def get_opposite_direction(number):
+    if number < 4:
+        return number + 4
+    else:
+        return number - 1

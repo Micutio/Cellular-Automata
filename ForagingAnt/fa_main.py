@@ -1,8 +1,8 @@
-from v1.abm.fa_abm import ABM
-from v1.ca.fa_ca import CA
-from v1.fa_global_constants import GlobalConstants
-from v1.util.fa_io_handling import EventHandler
-from v1.util.fa_visualization import Visualization
+from abm.fa_abm import ABM
+from ca.fa_ca import CA
+from fa_global_constants import GlobalConstants
+from util.fa_io_handling import EventHandler
+from util.fa_visualization import Visualization
 
 __author__ = 'Michael Wagner'
 __version__ = '1.0'

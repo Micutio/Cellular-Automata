@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from v1.abm.fa_agent import Ant
+from abm.fa_agent import Ant
 
 __author__ = 'Michael Wagner'
 __version__ = '1.0'

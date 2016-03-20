@@ -1,4 +1,4 @@
-from v1.abm.fa_agent import Food, Hive
+from abm.fa_agent import Food, Hive
 
 __author__ = 'Michael Wagner'
 __version__ = '1.0'
